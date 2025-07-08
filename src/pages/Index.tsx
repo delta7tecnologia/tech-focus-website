@@ -10,7 +10,12 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="text-center mb-20">
-          <h1 className="text-6xl lg:text-7xl font-bold mb-6">
+          <h1 className="text-6xl lg:text-7xl font-bold mb-6 flex flex-col items-center space-y-4">
+            <img 
+              src="https://delta7tecnologia.com.br/delta7/wp-content/uploads/2023/03/delta-e-dell-branco.png" 
+              alt="Delta7 Tecnologia" 
+              className="h-20 lg:h-24 object-contain"
+            />
             <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Delta7 Tecnologia
             </span>
