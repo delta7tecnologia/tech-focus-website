@@ -12,12 +12,12 @@ const Index = () => {
         <div className="text-center mb-20">
           <h1 className="text-6xl lg:text-7xl font-bold mb-6 flex flex-col items-center space-y-4">
             <img 
-              src="https://delta7tecnologia.com.br/delta7/wp-content/uploads/2023/03/delta-e-dell-branco.png" 
+              src="public\logo.png" 
               alt="Delta7 Tecnologia" 
               className="h-20 lg:h-24 object-contain"
             />
             <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Delta7 Tecnologia
+              
             </span>
           </h1>
           <p className="text-2xl text-gray-600 mb-4 font-medium">
@@ -38,10 +38,10 @@ const Index = () => {
                 </div>
               </div>
               <CardTitle className="text-2xl text-gray-900 mb-4">
-                Assistência Técnica Jurídica
+                Suporte de TI para empresas
               </CardTitle>
               <CardDescription className="text-gray-600 text-lg px-4">
-                Suporte especializado para escritórios de advocacia e profissionais do direito
+                Suporte especializado para pequenas e grandes empresas
               </CardDescription>
             </CardHeader>
             <CardContent className="px-8 pb-8">
@@ -52,7 +52,7 @@ const Index = () => {
                 </div>
                 <div className="flex items-center space-x-3 text-gray-700">
                   <Monitor className="h-5 w-5 text-blue-600 flex-shrink-0" />
-                  <span>Suporte para softwares jurídicos</span>
+                  <span>Suporte para softwares Empresariais</span>
                 </div>
                 <div className="flex items-center space-x-3 text-gray-700">
                   <Users className="h-5 w-5 text-blue-600 flex-shrink-0" />
@@ -61,7 +61,7 @@ const Index = () => {
               </div>
               <Link to="/juridico">
                 <Button className="w-full bg-blue-600 hover:bg-blue-700 text-lg py-6 group">
-                  Acessar Suporte Jurídico
+                  Acessar Suporte Empresarial
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>

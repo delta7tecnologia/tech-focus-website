@@ -88,7 +88,7 @@ const Juridico = () => {
               </Link>
               <div className="h-6 w-px bg-gray-300"></div>
               <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Delta7 Tecnologia - Suporte Jurídico
+                Delta7 Tecnologia - Suporte corporativo
               </h2>
             </div>
             <div className="hidden md:flex space-x-6">
@@ -104,7 +104,7 @@ const Juridico = () => {
       <section className="pt-20 pb-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
           <div className="mb-8">
-            <Badge className="bg-blue-100 text-blue-800 mb-4">Especialização Jurídica</Badge>
+            <Badge className="bg-blue-100 text-blue-800 mb-4">Criada para empresas</Badge>
             <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6">
               Tecnologia com
               <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -112,8 +112,7 @@ const Juridico = () => {
               </span>
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Suporte técnico especializado da Delta7 para escritórios de advocacia, departamentos jurídicos 
-              e profissionais liberais que precisam de tecnologia confiável e segura.
+              Na Delta7, oferecemos suporte técnico confiável, seguro e sob medida para manter sua operação funcionando sem interrupções.
             </p>
           </div>
 
@@ -122,6 +121,7 @@ const Juridico = () => {
               <MessageSquare className="mr-2 h-5 w-5" />
               Agendar Atendimento
             </Button>
+            
             <Button size="lg" variant="outline">
               <Phone className="mr-2 h-5 w-5" />
               Contato Imediato
