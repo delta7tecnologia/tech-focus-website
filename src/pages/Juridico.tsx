@@ -88,7 +88,7 @@ const Juridico = () => {
               </Link>
               <div className="h-6 w-px bg-gray-300"></div>
               <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                TechSolutions Jurídico
+                Delta7 Tecnologia - Suporte Jurídico
               </h2>
             </div>
             <div className="hidden md:flex space-x-6">
@@ -112,7 +112,7 @@ const Juridico = () => {
               </span>
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Suporte técnico especializado para escritórios de advocacia, departamentos jurídicos 
+              Suporte técnico especializado da Delta7 para escritórios de advocacia, departamentos jurídicos 
               e profissionais liberais que precisam de tecnologia confiável e segura.
             </p>
           </div>
@@ -241,7 +241,7 @@ const Juridico = () => {
                 <h3 className="font-semibold text-gray-900 mb-2">E-mail</h3>
                 <p className="text-gray-600 mb-4">Contato profissional</p>
                 <Button variant="outline">
-                  juridico@techsolutions.com
+                  contato@delta7tecnologia.com.br
                 </Button>
               </CardContent>
             </Card>

@@ -25,7 +25,7 @@ const Solucoes = () => {
               </Link>
               <div className="h-6 w-px bg-gray-300"></div>
               <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                TechSolutions Empresarial
+                Delta7 Tecnologia - Soluções Empresariais
               </h2>
             </div>
             

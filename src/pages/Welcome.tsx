@@ -12,14 +12,14 @@ const Welcome = () => {
         <div className="text-center mb-16">
           <h1 className="text-5xl lg:text-7xl font-bold text-gray-900 mb-6">
             <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              TechSolutions
+              Delta7 Tecnologia
             </span>
           </h1>
           <p className="text-2xl text-gray-600 mb-4">
-            Bem-vindo à nossa plataforma de soluções tecnológicas
+            Soluções completas em tecnologia da informação
           </p>
           <p className="text-lg text-gray-500 max-w-3xl mx-auto">
-            Escolha a área que melhor atende às suas necessidades empresariais
+            Especialistas em infraestrutura de TI, desenvolvimento de software e consultoria tecnológica
           </p>
         </div>
 

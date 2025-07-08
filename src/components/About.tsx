@@ -35,14 +35,14 @@ const About = () => {
           <div className="space-y-8">
             <div>
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-6">
-                Quem Somos
+                Sobre a Delta7 Tecnologia
               </h2>
               <div className="space-y-4 text-gray-600 leading-relaxed">
                 <p>
-                  Somos uma empresa especializada em infraestrutura de TI, com foco em 
-                  soluções open-source e tecnologias enterprise. Nossa equipe possui 
-                  anos de experiência em implementação e suporte de ferramentas como 
-                  GLPI, Zabbix, Proxmox, PfSense e Wazuh.
+                  A Delta7 Tecnologia é uma empresa especializada em soluções completas de TI, 
+                  com foco em infraestrutura, desenvolvimento de software e consultoria tecnológica. 
+                  Nossa equipe possui anos de experiência em implementação e suporte de ferramentas 
+                  como GLPI, Zabbix, Proxmox, PfSense e Wazuh.
                 </p>
                 <p>
                   Nossa missão é fornecer soluções de TI robustas, seguras e eficientes, 
@@ -59,11 +59,11 @@ const About = () => {
 
             <div className="grid grid-cols-2 gap-6">
               <div className="text-center p-4 bg-white rounded-lg shadow-sm">
-                <div className="text-3xl font-bold text-blue-600 mb-2">5+</div>
+                <div className="text-3xl font-bold text-blue-600 mb-2">10+</div>
                 <div className="text-sm text-gray-600">Anos no Mercado</div>
               </div>
               <div className="text-center p-4 bg-white rounded-lg shadow-sm">
-                <div className="text-3xl font-bold text-green-600 mb-2">100+</div>
+                <div className="text-3xl font-bold text-green-600 mb-2">200+</div>
                 <div className="text-sm text-gray-600">Projetos Entregues</div>
               </div>
             </div>
