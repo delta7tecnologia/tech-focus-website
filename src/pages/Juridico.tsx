@@ -120,14 +120,14 @@ const Juridico = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="bg-blue-600 hover:bg-blue-700" asChild>
-              <a href="https://wa.me/5599999999999?text=Olá! Gostaria de agendar um atendimento técnico" target="_blank" rel="noopener noreferrer">
+              <a href="https://wa.me/5591982370332?text=Olá! Gostaria de agendar um atendimento técnico" target="_blank" rel="noopener noreferrer">
                 <MessageSquare className="mr-2 h-5 w-5" />
                 Agendar Atendimento
               </a>
             </Button>
             
             <Button size="lg" variant="outline" asChild>
-              <a href="tel:+5599999999999">
+              <a href="tel:+5591982370332">
                 <Phone className="mr-2 h-5 w-5" />
                 Contato Imediato
               </a>
@@ -293,7 +293,7 @@ const Juridico = () => {
                 <h3 className="font-semibold text-gray-900 mb-2">WhatsApp</h3>
                 <p className="text-gray-600 mb-4">Atendimento rápido e direto</p>
                 <Button className="bg-green-600 hover:bg-green-700" asChild>
-                  <a href="https://wa.me/5599999999999?text=Olá! Preciso de suporte técnico" target="_blank" rel="noopener noreferrer">
+                  <a href="https://wa.me/5591982370332?text=Olá! Preciso de suporte técnico" target="_blank" rel="noopener noreferrer">
                     Chamar no WhatsApp
                   </a>
                 </Button>
@@ -308,8 +308,8 @@ const Juridico = () => {
                 <h3 className="font-semibold text-gray-900 mb-2">Telefone</h3>
                 <p className="text-gray-600 mb-4">Atendimento comercial</p>
                 <Button variant="outline" asChild>
-                  <a href="tel:+5599999999999">
-                    (99) 9999-9999
+                  <a href="tel:+5591982370332">
+                    (91) 98237-0332
                   </a>
                 </Button>
               </CardContent>
