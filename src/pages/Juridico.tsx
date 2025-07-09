@@ -30,7 +30,7 @@ const Juridico = () => {
     },
     {
       title: "Backup Seguro",
-      description: "Backup local e em nuvem de documentos jurídicos",
+      description: "Backup local e em nuvem de documentos empresariais",
       icon: <Shield className="h-6 w-6 text-blue-600" />
     },
     {
@@ -87,9 +87,11 @@ const Juridico = () => {
                 </Button>
               </Link>
               <div className="h-6 w-px bg-gray-300"></div>
-              <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Delta7 Tecnologia - Suporte corporativo
-              </h2>
+              <img 
+                src="/lovable-uploads/960d4398-2d86-492b-8415-3fe19e4f9f38.png" 
+                alt="Delta7 Tecnologia"
+                className="h-12 w-auto"
+              />
             </div>
             <div className="hidden md:flex space-x-6">
               <a href="#servicos" className="text-gray-700 hover:text-blue-600 font-medium">Serviços</a>
@@ -138,7 +140,7 @@ const Juridico = () => {
               Serviços Especializados
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Soluções técnicas desenvolvidas especificamente para as necessidades do setor jurídico
+              Soluções técnicas desenvolvidas especificamente para as necessidades de clientes empresariais
             </p>
           </div>
 
@@ -170,7 +172,7 @@ const Juridico = () => {
               Nossos Diferenciais
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              O que nos torna únicos no atendimento ao setor jurídico
+              O que nos torna únicos no atendimento a clientes empresariais
             </p>
           </div>
 
@@ -190,6 +192,77 @@ const Juridico = () => {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Clients Section */}
+      <section className="py-20 bg-blue-900 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <div className="flex items-center justify-center mb-4">
+              <img 
+                src="/lovable-uploads/960d4398-2d86-492b-8415-3fe19e4f9f38.png" 
+                alt="Delta7 Tecnologia"
+                className="h-16 w-auto mb-4"
+              />
+            </div>
+            <div className="inline-flex items-center mb-6">
+              <span className="text-2xl mr-2">🤝</span>
+              <h2 className="text-3xl lg:text-4xl font-bold">Nossos Clientes</h2>
+            </div>
+            
+            <p className="text-xl text-blue-100 max-w-4xl mx-auto leading-relaxed mb-8">
+              A <strong>Delta7 Tecnologia</strong> tem orgulho de atender empresas que são referência em seus segmentos
+            </p>
+            
+            <p className="text-lg text-blue-200 max-w-4xl mx-auto leading-relaxed">
+              Confira alguns dos nossos parceiros que confiam em nossa expertise em <strong>TI</strong> para garantir performance, segurança e inovação:
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 mb-12">
+            {[
+              'Construcred Norte',
+              'Dinâmica',
+              'Agro RC',
+              'Geo Master',
+              'Fundação Amazônia',
+              'Sandro Auto Parts',
+              'Estradão',
+              'Hidráulica Imperatriz',
+              'Igapó',
+              'Adequa BBTS',
+              'Cemestra',
+              'JM Prime',
+              'Nacional',
+              'Agro Gil',
+              'Belagro',
+              'O Boticário',
+              'Plantagro Rural',
+              'Contabilidade',
+              'Vale Verde',
+              'Ferbel',
+              'C740',
+              'Zara Service',
+              'Forte Med'
+            ].map((client, index) => (
+              <div key={index} className="bg-white/10 backdrop-blur-sm rounded-lg p-4 hover:bg-white/20 transition-all duration-300">
+                <div className="h-12 flex items-center justify-center">
+                  <span className="text-sm font-medium text-white/90 text-center">{client}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center">
+            <div className="flex items-center justify-center mb-4">
+              <span className="text-2xl mr-2">🔒</span>
+              <h3 className="text-2xl font-bold">Clientes Diversificados</h3>
+            </div>
+            <p className="text-blue-100 text-lg">
+              São clientes de diferentes áreas que compartilham uma escolha em comum: <strong>soluções tecnológicas com qualidade, suporte especializado e confiança Delta7</strong>.
+            </p>
           </div>
         </div>
       </section>
