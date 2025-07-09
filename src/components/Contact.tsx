@@ -48,8 +48,8 @@ const Contact = () => {
     {
       icon: <Mail className="h-6 w-6 text-purple-600" />,
       title: "E-mail",
-      info: "contato@techsolutions.com.br",
-      link: "mailto:contato@techsolutions.com.br"
+      info: "contato@delta7tecnologia.com.br",
+      link: "mailto:contato@delta7tecnologia.com.br"
     },
     {
       icon: <Clock className="h-6 w-6 text-orange-600" />,
@@ -167,8 +167,10 @@ const Contact = () => {
                 Oferecemos uma análise gratuita da sua infraestrutura atual 
                 e apresentamos propostas personalizadas para otimização.
               </p>
-              <Button variant="secondary" className="bg-white text-blue-600 hover:bg-gray-100">
-                Agendar Consultoria
+              <Button variant="secondary" className="bg-white text-blue-600 hover:bg-gray-100" asChild>
+                <a href="https://wa.me/5511999999999?text=Olá! Gostaria de agendar uma consultoria gratuita.">
+                  Agendar Consultoria
+                </a>
               </Button>
             </div>
 

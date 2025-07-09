@@ -92,12 +92,16 @@ const Solucoes = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 group">
-                  Solicitar Orçamento
-                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 group" asChild>
+                  <a href="https://wa.me/5511999999999?text=Olá! Gostaria de solicitar um orçamento para soluções empresariais.">
+                    Solicitar Orçamento
+                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </a>
                 </Button>
-                <Button size="lg" variant="outline" className="border-gray-300">
-                  Nossos Serviços
+                <Button size="lg" variant="outline" className="border-gray-300" asChild>
+                  <a href="#services">
+                    Nossos Serviços
+                  </a>
                 </Button>
               </div>
 
@@ -188,9 +192,11 @@ const Solucoes = () => {
                       </li>
                     ))}
                   </ul>
-                  <Button variant="outline" className="w-full group">
-                    Saiba Mais
-                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  <Button variant="outline" className="w-full group" asChild>
+                    <a href="#contact">
+                      Saiba Mais
+                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </a>
                   </Button>
                 </CardContent>
               </Card>
