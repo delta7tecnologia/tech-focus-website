@@ -118,13 +118,17 @@ const Juridico = () => {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
-              <MessageSquare className="mr-2 h-5 w-5" />
-              Agendar Atendimento
+            <Button size="lg" className="bg-blue-600 hover:bg-blue-700" asChild>
+              <a href="https://wa.me/5511999999999?text=Olá! Gostaria de agendar um atendimento para suporte jurídico.">
+                <MessageSquare className="mr-2 h-5 w-5" />
+                Agendar Atendimento
+              </a>
             </Button>
-            <Button size="lg" variant="outline">
-              <Phone className="mr-2 h-5 w-5" />
-              Contato Imediato
+            <Button size="lg" variant="outline" asChild>
+              <a href="tel:+5511999999999">
+                <Phone className="mr-2 h-5 w-5" />
+                Contato Imediato
+              </a>
             </Button>
           </div>
         </div>
@@ -214,8 +218,10 @@ const Juridico = () => {
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-2">WhatsApp</h3>
                 <p className="text-gray-600 mb-4">Atendimento rápido e direto</p>
-                <Button className="bg-green-600 hover:bg-green-700">
-                  Chamar no WhatsApp
+                <Button className="bg-green-600 hover:bg-green-700" asChild>
+                  <a href="https://wa.me/5511999999999?text=Olá! Preciso de suporte técnico jurídico.">
+                    Chamar no WhatsApp
+                  </a>
                 </Button>
               </CardContent>
             </Card>
@@ -227,8 +233,10 @@ const Juridico = () => {
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-2">Telefone</h3>
                 <p className="text-gray-600 mb-4">Atendimento comercial</p>
-                <Button variant="outline">
-                  (11) 9999-9999
+                <Button variant="outline" asChild>
+                  <a href="tel:+5511999999999">
+                    (11) 9999-9999
+                  </a>
                 </Button>
               </CardContent>
             </Card>
@@ -240,8 +248,10 @@ const Juridico = () => {
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-2">E-mail</h3>
                 <p className="text-gray-600 mb-4">Contato profissional</p>
-                <Button variant="outline">
-                  contato@delta7tecnologia.com.br
+                <Button variant="outline" asChild>
+                  <a href="mailto:contato@delta7tecnologia.com.br">
+                    contato@delta7tecnologia.com.br
+                  </a>
                 </Button>
               </CardContent>
             </Card>
