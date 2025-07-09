@@ -85,7 +85,7 @@ const Solucoes = () => {
                   </span>
                 </h1>
                 <p className="text-xl text-gray-600 leading-relaxed">
-                  Especialistas em GLPI, Zabbix, Proxmox, PfSense e Wazuh. 
+                  Especialistas em sistemas de monitoramento, servidores virtualizados, firewalls avançados e proteção cibernética.
                   Oferecemos soluções completas de monitoramento, virtualização, 
                   segurança e backup para sua empresa.
                 </p>
@@ -93,7 +93,7 @@ const Solucoes = () => {
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button size="lg" className="bg-blue-600 hover:bg-blue-700 group" asChild>
-                  <a href="https://wa.me/5511999999999?text=Olá! Gostaria de solicitar um orçamento para soluções empresariais.">
+                  <a href="https://wa.me/5591982370332?text=Olá! Gostaria de solicitar um orçamento para soluções empresariais.">
                     Solicitar Orçamento
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </a>
