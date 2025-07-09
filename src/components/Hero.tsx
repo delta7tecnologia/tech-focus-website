@@ -18,7 +18,7 @@ const Hero = () => {
                 </span>
               </h1>
               <p className="text-xl text-gray-600 leading-relaxed">
-                Especialistas em GLPI, Zabbix, Proxmox, PfSense e Wazuh. 
+                Especialistas em sistemas de monitoramento, servidores virtualizados, firewalls avançados e proteção cibernética. 
                 Oferecemos soluções completas de monitoramento, virtualização, 
                 segurança e backup para sua empresa.
               </p>

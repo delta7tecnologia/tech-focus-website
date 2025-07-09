@@ -206,7 +206,7 @@ const Juridico = () => {
           <div className="text-center mb-16">
             <div className="flex items-center justify-center mb-4">
               <img 
-                src="/lovable-uploads/960d4398-2d86-492b-8415-3fe19e4f9f38.png" 
+                src="/logo-branco.png" 
                 alt="Delta7 Tecnologia"
                 className="h-16 w-auto mb-4"
               />
@@ -227,28 +227,29 @@ const Juridico = () => {
 
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 mb-12">
             {[
-              'Construcred Norte',
+              'Construnorte',
               'Dinâmica',
-              'Agro RC',
-              'Geo Master',
-              'Fundação Amazônia',
-              'Sandro Auto Parts',
+              'AgroTec',
+              'GeoMaster',
+              'Evolução contabilidade',
+              'Sandro auto peças',
               'Estradão',
               'Hidráulica Imperatriz',
               'Igapó',
               'Adequa BBTS',
-              'Cemestra',
-              'JM Prime',
+              'Cemetra',
+              'NPrime',
               'Nacional',
-              'Agro Gil',
+              'AgroGil',
               'Belagro',
               'O Boticário',
               'Plantagro Rural',
-              'Contabilidade',
+              'AC Contabilidade',
               'Vale Verde',
               'Ferbel',
-              'C740',
-              'Zara Service',
+              'A4 Vistoria',
+              'Geomap',
+              'Para service',
               'Forte Med'
             ].map((client, index) => (
               <div key={index} className="bg-white/10 backdrop-blur-sm rounded-lg p-4 hover:bg-white/20 transition-all duration-300">

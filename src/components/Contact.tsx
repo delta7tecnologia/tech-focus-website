@@ -36,14 +36,14 @@ const Contact = () => {
     {
       icon: <Phone className="h-6 w-6 text-blue-600" />,
       title: "Telefone",
-      info: "(11) 9999-9999",
-      link: "tel:+5511999999999"
+      info: "(91) 98237-0332",
+      link: "tel:+5591982370332"
     },
     {
       icon: <MessageCircle className="h-6 w-6 text-green-600" />,
       title: "WhatsApp",
-      info: "(11) 9999-9999",
-      link: "https://wa.me/5511999999999"
+      info: "(91) 98237-0332",
+      link: "https://wa.me/5591982370332"
     },
     {
       icon: <Mail className="h-6 w-6 text-purple-600" />,
@@ -168,7 +168,7 @@ const Contact = () => {
                 e apresentamos propostas personalizadas para otimização.
               </p>
               <Button variant="secondary" className="bg-white text-blue-600 hover:bg-gray-100" asChild>
-                <a href="https://wa.me/5511999999999?text=Olá! Gostaria de agendar uma consultoria gratuita.">
+                <a href="https://wa.me/5591982370332?text=Olá! Gostaria de agendar uma consultoria gratuita.">
                   Agendar Consultoria
                 </a>
               </Button>
