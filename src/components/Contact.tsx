@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Phone, Mail, MapPin, Clock, MessageCircle } from 'lucide-react';
+import { Phone, Mail, MapPin, Clock, MessageCircle, Instagram } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 
 const Contact = () => {
@@ -50,6 +49,12 @@ const Contact = () => {
       title: "E-mail",
       info: "contato@delta7tecnologia.com.br",
       link: "mailto:contato@delta7tecnologia.com.br"
+    },
+    {
+      icon: <Instagram className="h-6 w-6 text-pink-600" />,
+      title: "Instagram",
+      info: "@delta7tecnologia",
+      link: "https://www.instagram.com/delta7tecnologia/"
     },
     {
       icon: <Clock className="h-6 w-6 text-orange-600" />,
@@ -147,6 +152,8 @@ const Contact = () => {
                         <a 
                           href={item.link}
                           className="text-blue-600 hover:text-blue-700 transition-colors"
+                          target={item.link.startsWith('http') ? '_blank' : undefined}
+                          rel={item.link.startsWith('http') ? 'noopener noreferrer' : undefined}
                         >
                           {item.info}
                         </a>
@@ -196,6 +203,33 @@ const Contact = () => {
                   <span>Documentação completa</span>
                 </li>
               </ul>
+            </div>
+
+            {/* Map Section */}
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+              <div className="p-6">
+                <h4 className="font-bold text-gray-900 mb-4 text-center">
+                  Nossa Localização
+                </h4>
+              </div>
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.8167!2d-48.4778!3d-1.4558!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMcKwMjcnMjAuOSJTIDQ4wrAyOCczOS44Ilc!5e0!3m2!1spt-BR!2sbr!4v1"
+                width="100%"
+                height="300"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Localização Delta7 Tecnologia"
+              ></iframe>
+              <div className="p-4 text-center">
+                <Button variant="outline" asChild>
+                  <a href="https://maps.app.goo.gl/5RbmwEGGWdrSRcqVA" target="_blank" rel="noopener noreferrer">
+                    <MapPin className="mr-2 h-4 w-4" />
+                    Ver no Google Maps
+                  </a>
+                </Button>
+              </div>
             </div>
           </div>
         </div>

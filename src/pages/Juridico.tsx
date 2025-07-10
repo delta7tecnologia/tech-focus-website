@@ -272,6 +272,132 @@ const Juridico = () => {
         </div>
       </section>
 
+      {/* Portal Section */}
+      <section className="py-20 bg-gradient-to-r from-green-600 to-blue-600">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8">
+            <h2 className="text-3xl font-bold text-white mb-4">
+              Portal de Abertura de Chamados
+            </h2>
+            <p className="text-green-100 text-lg mb-6">
+              Clientes com contrato de suporte podem abrir chamados técnicos através do nosso portal online
+            </p>
+            <Button size="lg" className="bg-white text-green-600 hover:bg-gray-100" asChild>
+              <a href="#" target="_blank" rel="noopener noreferrer">
+                <Monitor className="mr-2 h-5 w-5" />
+                Acessar Portal de Chamados
+              </a>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Tools Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Ferramentas Essenciais
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Principais ferramentas para manter seu computador funcionando de forma saudável e segura
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Card className="hover:shadow-lg transition-shadow border-0 shadow-md">
+              <CardContent className="p-6 text-center">
+                <div className="p-4 bg-blue-100 rounded-full w-fit mx-auto mb-4">
+                  <Shield className="h-8 w-8 text-blue-600" />
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">Windows Defender</h3>
+                <p className="text-gray-600 mb-4">Antivírus nativo do Windows para proteção básica</p>
+                <Button variant="outline" size="sm" asChild>
+                  <a href="https://www.microsoft.com/pt-br/windows/comprehensive-security" target="_blank" rel="noopener noreferrer">
+                    Acessar
+                  </a>
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow border-0 shadow-md">
+              <CardContent className="p-6 text-center">
+                <div className="p-4 bg-green-100 rounded-full w-fit mx-auto mb-4">
+                  <FileText className="h-8 w-8 text-green-600" />
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">CCleaner</h3>
+                <p className="text-gray-600 mb-4">Limpeza e otimização do sistema</p>
+                <Button variant="outline" size="sm" asChild>
+                  <a href="https://www.ccleaner.com/pt-br" target="_blank" rel="noopener noreferrer">
+                    Download
+                  </a>
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow border-0 shadow-md">
+              <CardContent className="p-6 text-center">
+                <div className="p-4 bg-purple-100 rounded-full w-fit mx-auto mb-4">
+                  <Monitor className="h-8 w-8 text-purple-600" />
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">TeamViewer</h3>
+                <p className="text-gray-600 mb-4">Acesso remoto para suporte técnico</p>
+                <Button variant="outline" size="sm" asChild>
+                  <a href="https://www.teamviewer.com/pt-br/" target="_blank" rel="noopener noreferrer">
+                    Download
+                  </a>
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow border-0 shadow-md">
+              <CardContent className="p-6 text-center">
+                <div className="p-4 bg-red-100 rounded-full w-fit mx-auto mb-4">
+                  <Shield className="h-8 w-8 text-red-600" />
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">Malwarebytes</h3>
+                <p className="text-gray-600 mb-4">Proteção avançada contra malware</p>
+                <Button variant="outline" size="sm" asChild>
+                  <a href="https://www.malwarebytes.com/" target="_blank" rel="noopener noreferrer">
+                    Download
+                  </a>
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow border-0 shadow-md">
+              <CardContent className="p-6 text-center">
+                <div className="p-4 bg-yellow-100 rounded-full w-fit mx-auto mb-4">
+                  <CheckCircle className="h-8 w-8 text-yellow-600" />
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">Windows Update</h3>
+                <p className="text-gray-600 mb-4">Atualizações automáticas do sistema</p>
+                <Button variant="outline" size="sm" asChild>
+                  <a href="ms-settings:windowsupdate" target="_blank" rel="noopener noreferrer">
+                    Acessar
+                  </a>
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow border-0 shadow-md">
+              <CardContent className="p-6 text-center">
+                <div className="p-4 bg-indigo-100 rounded-full w-fit mx-auto mb-4">
+                  <Clock className="h-8 w-8 text-indigo-600" />
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">Backup Automático</h3>
+                <p className="text-gray-600 mb-4">Configuração de backup no Windows</p>
+                <Button variant="outline" size="sm" asChild>
+                  <a href="ms-settings:backup" target="_blank" rel="noopener noreferrer">
+                    Configurar
+                  </a>
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
       {/* Contact Section */}
       <section id="contato" className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
