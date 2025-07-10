@@ -54,7 +54,7 @@ const VideoInstitucional = () => {
                   <Play className="h-16 w-16 text-blue-600" />
                 </div>
                 <Button size="lg" className="bg-red-600 hover:bg-red-700" asChild>
-                  <a href="https://youtube.com/@delta7tecnologia" target="_blank" rel="noopener noreferrer">
+                  <a href="https://youtube.com/shorts/t7GlACKyUno?feature=share" target="_blank" rel="noopener noreferrer">
                     <Play className="mr-2 h-6 w-6" />
                     Assistir no YouTube
                   </a>

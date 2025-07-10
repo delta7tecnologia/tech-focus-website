@@ -7,40 +7,40 @@ import { Link } from 'react-router-dom';
 const Depoimentos = () => {
   const testimonials = [
     {
-      name: "João Silva",
-      company: "Construnorte",
+      name: "Liliam Seguins",
+      company: "Cemetra",
       rating: 5,
-      text: "Excelente atendimento! A Delta7 resolveu todos os nossos problemas de TI com muita agilidade e profissionalismo. Recomendo para qualquer empresa que precise de suporte técnico confiável."
+      text: "Super recomendo, o Thiago é comunicativo, explica com excelência o que vai executar, prestativo, pontual, honesto... dentre várias  qualidades que atribuirmos ao seu trabalho, a atenção nos dada para suprir toda a nossa necessidade, nos encantou. Parabéns equipe Delta7."
     },
     {
-      name: "Maria Santos",
-      company: "Dinâmica Contabilidade",
+      name: "Luiz Eduardo Pozzer",
+      company: "Dinâmica Center",
       rating: 5,
-      text: "Suporte técnico excepcional. Sempre prontos para ajudar e com soluções eficientes para nossa empresa. A adequação à LGPD foi feita de forma impecável."
+      text: "Thiago sempre eficiente, tanto em chamados simples e os mais complexos envolvendo minha rede e o meu servidor! És um profissional experiente quando se fala em redes e servidores em geral...."
     },
     {
-      name: "Carlos Oliveira",
-      company: "AgroTec",
+      name: "Vinícius Rodrigues Rios",
+      company: "JMC FERROS",
       rating: 5,
-      text: "Parceria de confiança! A Delta7 cuida de toda nossa infraestrutura de TI com excelência. Nunca mais tivemos problemas desde que contratamos seus serviços."
+      text: "Presta serviço de qualidade, é eficiente no atendimento, não demora pra fazer visitas técnica. Super recomendo!"
     },
     {
-      name: "Ana Costa",
+      name: "DANIELA REIS",
       company: "Evolução Contabilidade",
       rating: 5,
-      text: "Profissionais extremamente capacitados. Implementaram soluções que otimizaram nossos processos e aumentaram nossa produtividade significativamente."
+      text: "Atendimento rápido, eficiente, com segurança. Acima de tudo, muito profissional."
     },
     {
-      name: "Roberto Lima",
-      company: "Sandro Auto Peças",
+      name: "Luiz Claudio",
+      company: "CF Contabilidade",
       rating: 5,
-      text: "Atendimento personalizado e soluções sob medida. A Delta7 entende as necessidades específicas de cada empresa e oferece o melhor suporte."
+      text: "Empresa comprometida em dar a melhor solução ao cliente. Todos os serviços que fizemos com a delta foram resolvidos com 100% de satisfação."
     },
     {
-      name: "Fernanda Reis",
-      company: "Hidráulica Imperatriz",
+      name: "Izaias Rossi",
+      company: "Tamadil Auto Peças e Serviços",
       rating: 5,
-      text: "Suporte técnico rápido e eficiente. Sempre que precisamos, eles estão disponíveis. A tranquilidade de ter um parceiro confiável em TI é inestimável."
+      text: "Bom atendimento, sempre prestativo, bom relacionamento com clientes."
     }
   ];
 

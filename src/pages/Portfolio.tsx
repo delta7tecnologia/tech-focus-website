@@ -55,7 +55,7 @@ const Portfolio = () => {
               Baixe nosso portfólio em PDF e conheça todos os nossos projetos, cases de sucesso e soluções implementadas para empresas de diversos segmentos
             </p>
             <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100" asChild>
-              <a href="/portfolio-delta7.pdf" download>
+              <a href="/catalogo.pdf" download>
                 <Download className="mr-2 h-5 w-5" />
                 Baixar Portfólio PDF
               </a>
@@ -90,7 +90,7 @@ const Portfolio = () => {
               },
               {
                 title: "Adequação LGPD",
-                client: "Dinâmica Contabilidade",
+                client: "Dinâmica Center",
                 description: "Consultoria e implementação de medidas para adequação à LGPD"
               },
               {

@@ -14,15 +14,15 @@ const Solucoes = () => {
     {
       icon: <Monitor className="h-8 w-8 text-blue-600" />,
       title: "Gerenciamento e Suporte de TI",
-      description: "Gestão completa da infraestrutura com GLPI e Proxmox",
-      features: ["GLPI - Controle de chamados e inventário", "Proxmox - Virtualização e alta disponibilidade", "Inventário automatizado de ativos", "Gestão de incidentes e problemas"],
+      description: "Gestão completa da infraestrutura com soluções integradas",
+      features: ["Sistema de chamados e controle de ativos", "Plataforma de virtualização com alta disponibilidade", "Inventário automatizado de equipamentos e sistemas", "Gestão eficiente de incidentes e problemas"],
       badge: "Essencial"
     },
     {
       icon: <BarChart3 className="h-8 w-8 text-purple-600" />,
       title: "Monitoramento e Observabilidade",
-      description: "Supervisão proativa com Zabbix e Grafana",
-      features: ["Zabbix - Monitoramento de servidores e redes", "Grafana - Dashboards e análise visual", "Alertas em tempo real", "Relatórios de performance"],
+      description: "Supervisão proativa com ferramentas de monitoramento e visualização",
+      features: ["Monitoramento contínuo de servidores e redes", "Painéis visuais para análise de dados", "Alertas em tempo real", "Relatórios de desempenho e disponibilidade"],
       badge: "Crítico"
     },
     {
@@ -56,7 +56,11 @@ const Solucoes = () => {
               </Link>
               <div className="h-6 w-px bg-gray-300"></div>
               <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Delta7 Tecnologia - Soluções Empresariais
+               <img 
+                src="/logo.png" 
+                alt="Delta7 Tecnologia"
+                className="h-16 w-auto mb-4"
+              />
               </h2>
             </div>
             

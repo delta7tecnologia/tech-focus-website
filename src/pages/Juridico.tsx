@@ -334,7 +334,7 @@ const Juridico = () => {
               Clientes com contrato de suporte podem abrir chamados técnicos através do nosso portal online
             </p>
             <Button size="lg" className="bg-white text-green-600 hover:bg-gray-100" asChild>
-              <a href="https://portal.delta7tecnologia.com.br" target="_blank" rel="noopener noreferrer">
+              <a href="https://app.delta7tecnologia.com.br" target="_blank" rel="noopener noreferrer">
                 <Monitor className="mr-2 h-5 w-5" />
                 Acessar Portal de Chamados
               </a>
