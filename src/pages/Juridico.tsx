@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -272,62 +271,54 @@ const Juridico = () => {
         </div>
       </section>
 
-      {/* Portfolio Section */}
+      {/* Quick Links Section */}
       <section className="py-20 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="mb-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Nosso Portfólio
+              Explore Nossos Serviços
             </h2>
             <p className="text-xl text-gray-600">
-              Conheça nossos projetos e cases de sucesso
+              Acesse informações detalhadas sobre nossos serviços e recursos
             </p>
           </div>
-          
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white">
-            <div className="p-4 bg-white/10 rounded-full w-fit mx-auto mb-6">
-              <Download className="h-12 w-12 text-white" />
-            </div>
-            <h3 className="text-2xl font-bold mb-4">Portfólio Completo</h3>
-            <p className="text-blue-100 mb-6">
-              Baixe nosso portfólio em PDF e conheça todos os nossos projetos, cases de sucesso e soluções implementadas
-            </p>
-            <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100" asChild>
-              <a href="/portfolio-delta7.pdf" download>
-                <Download className="mr-2 h-5 w-5" />
-                Baixar Portfólio PDF
-              </a>
-            </Button>
-          </div>
-        </div>
-      </section>
 
-      {/* Video Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Conheça a Delta7
-            </h2>
-            <p className="text-xl text-gray-600">
-              Vídeo institucional da nossa empresa
-            </p>
-          </div>
-          
-          <div className="bg-white rounded-2xl p-8 shadow-lg">
-            <div className="aspect-video bg-gray-100 rounded-lg mb-6 flex items-center justify-center relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-lg"></div>
-              <Button size="lg" className="bg-red-600 hover:bg-red-700 relative z-10" asChild>
-                <a href="https://youtube.com/@delta7tecnologia" target="_blank" rel="noopener noreferrer">
-                  <Play className="mr-2 h-6 w-6" />
-                  Assistir no YouTube
-                </a>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl p-6 text-white hover:shadow-lg transition-shadow">
+              <Download className="h-8 w-8 mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Portfólio</h3>
+              <p className="text-blue-100 mb-4 text-sm">Conheça nossos projetos e cases de sucesso</p>
+              <Button size="sm" variant="secondary" asChild>
+                <Link to="/portfolio">Ver Portfólio</Link>
               </Button>
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Delta7 Tecnologia</h3>
-            <p className="text-gray-600">
-              Conheça nossa história, valores e como podemos transformar a tecnologia da sua empresa
-            </p>
+
+            <div className="bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl p-6 text-white hover:shadow-lg transition-shadow">
+              <Play className="h-8 w-8 mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Vídeo Institucional</h3>
+              <p className="text-purple-100 mb-4 text-sm">Conheça nossa história e valores</p>
+              <Button size="sm" variant="secondary" asChild>
+                <Link to="/video-institucional">Assistir</Link>
+              </Button>
+            </div>
+
+            <div className="bg-gradient-to-br from-green-600 to-green-700 rounded-xl p-6 text-white hover:shadow-lg transition-shadow">
+              <Quote className="h-8 w-8 mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Depoimentos</h3>
+              <p className="text-green-100 mb-4 text-sm">Veja o que nossos clientes falam</p>
+              <Button size="sm" variant="secondary" asChild>
+                <Link to="/depoimentos">Ver Depoimentos</Link>
+              </Button>
+            </div>
+
+            <div className="bg-gradient-to-br from-orange-600 to-orange-700 rounded-xl p-6 text-white hover:shadow-lg transition-shadow">
+              <Monitor className="h-8 w-8 mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Ferramentas</h3>
+              <p className="text-orange-100 mb-4 text-sm">Ferramentas essenciais para seu PC</p>
+              <Button size="sm" variant="secondary" asChild>
+                <Link to="/ferramentas">Ver Ferramentas</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>
@@ -348,188 +339,6 @@ const Juridico = () => {
                 Acessar Portal de Chamados
               </a>
             </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Depoimentos dos Clientes
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Veja o que nossos clientes falam sobre nossos serviços
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            {[
-              {
-                name: "João Silva",
-                company: "Construnorte",
-                rating: 5,
-                text: "Excelente atendimento! A Delta7 resolveu todos os nossos problemas de TI com muita agilidade e profissionalismo."
-              },
-              {
-                name: "Maria Santos",
-                company: "Dinâmica Contabilidade",
-                rating: 5,
-                text: "Suporte técnico excepcional. Sempre prontos para ajudar e com soluções eficientes para nossa empresa."
-              },
-              {
-                name: "Carlos Oliveira",
-                company: "AgroTec",
-                rating: 5,
-                text: "Parceria de confiança! A Delta7 cuida de toda nossa infraestrutura de TI com excelência."
-              }
-            ].map((testimonial, index) => (
-              <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-shadow">
-                <CardContent className="p-8">
-                  <div className="flex items-center mb-4">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-                    ))}
-                  </div>
-                  <div className="mb-6">
-                    <Quote className="h-8 w-8 text-blue-600 mb-4" />
-                    <p className="text-gray-600 italic">{testimonial.text}</p>
-                  </div>
-                  <div className="border-t pt-4">
-                    <p className="font-semibold text-gray-900">{testimonial.name}</p>
-                    <p className="text-gray-500 text-sm">{testimonial.company}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white text-center">
-            <h3 className="text-2xl font-bold mb-4">Avaliações Google</h3>
-            <div className="flex items-center justify-center mb-4">
-              <div className="flex mr-4">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="h-6 w-6 text-yellow-400 fill-current" />
-                ))}
-              </div>
-              <span className="text-2xl font-bold">4.9/5</span>
-            </div>
-            <p className="text-blue-100 mb-6">
-              Mais de 50 avaliações positivas no Google
-            </p>
-            <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100" asChild>
-              <a href="https://maps.app.goo.gl/5RbmwEGGWdrSRcqVA" target="_blank" rel="noopener noreferrer">
-                <Star className="mr-2 h-5 w-5" />
-                Ver Todas as Avaliações
-              </a>
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Tools Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Ferramentas Essenciais
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Principais ferramentas para manter seu computador funcionando de forma saudável e segura
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card className="hover:shadow-lg transition-shadow border-0 shadow-md">
-              <CardContent className="p-6 text-center">
-                <div className="p-4 bg-blue-100 rounded-full w-fit mx-auto mb-4">
-                  <Shield className="h-8 w-8 text-blue-600" />
-                </div>
-                <h3 className="font-semibold text-gray-900 mb-2">Windows Defender</h3>
-                <p className="text-gray-600 mb-4">Antivírus nativo do Windows para proteção básica</p>
-                <Button variant="outline" size="sm" asChild>
-                  <a href="https://www.microsoft.com/pt-br/windows/comprehensive-security" target="_blank" rel="noopener noreferrer">
-                    Acessar
-                  </a>
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow border-0 shadow-md">
-              <CardContent className="p-6 text-center">
-                <div className="p-4 bg-green-100 rounded-full w-fit mx-auto mb-4">
-                  <FileText className="h-8 w-8 text-green-600" />
-                </div>
-                <h3 className="font-semibold text-gray-900 mb-2">CCleaner</h3>
-                <p className="text-gray-600 mb-4">Limpeza e otimização do sistema</p>
-                <Button variant="outline" size="sm" asChild>
-                  <a href="https://www.ccleaner.com/pt-br" target="_blank" rel="noopener noreferrer">
-                    Download
-                  </a>
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow border-0 shadow-md">
-              <CardContent className="p-6 text-center">
-                <div className="p-4 bg-purple-100 rounded-full w-fit mx-auto mb-4">
-                  <Monitor className="h-8 w-8 text-purple-600" />
-                </div>
-                <h3 className="font-semibold text-gray-900 mb-2">TeamViewer</h3>
-                <p className="text-gray-600 mb-4">Acesso remoto para suporte técnico</p>
-                <Button variant="outline" size="sm" asChild>
-                  <a href="https://www.teamviewer.com/pt-br/" target="_blank" rel="noopener noreferrer">
-                    Download
-                  </a>
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow border-0 shadow-md">
-              <CardContent className="p-6 text-center">
-                <div className="p-4 bg-red-100 rounded-full w-fit mx-auto mb-4">
-                  <Shield className="h-8 w-8 text-red-600" />
-                </div>
-                <h3 className="font-semibold text-gray-900 mb-2">Malwarebytes</h3>
-                <p className="text-gray-600 mb-4">Proteção avançada contra malware</p>
-                <Button variant="outline" size="sm" asChild>
-                  <a href="https://www.malwarebytes.com/" target="_blank" rel="noopener noreferrer">
-                    Download
-                  </a>
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow border-0 shadow-md">
-              <CardContent className="p-6 text-center">
-                <div className="p-4 bg-yellow-100 rounded-full w-fit mx-auto mb-4">
-                  <CheckCircle className="h-8 w-8 text-yellow-600" />
-                </div>
-                <h3 className="font-semibold text-gray-900 mb-2">Windows Update</h3>
-                <p className="text-gray-600 mb-4">Atualizações automáticas do sistema</p>
-                <Button variant="outline" size="sm" asChild>
-                  <a href="ms-settings:windowsupdate" target="_blank" rel="noopener noreferrer">
-                    Acessar
-                  </a>
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow border-0 shadow-md">
-              <CardContent className="p-6 text-center">
-                <div className="p-4 bg-indigo-100 rounded-full w-fit mx-auto mb-4">
-                  <Clock className="h-8 w-8 text-indigo-600" />
-                </div>
-                <h3 className="font-semibold text-gray-900 mb-2">Backup Automático</h3>
-                <p className="text-gray-600 mb-4">Configuração de backup no Windows</p>
-                <Button variant="outline" size="sm" asChild>
-                  <a href="ms-settings:backup" target="_blank" rel="noopener noreferrer">
-                    Configurar
-                  </a>
-                </Button>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </section>
