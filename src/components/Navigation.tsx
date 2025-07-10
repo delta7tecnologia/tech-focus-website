@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Menu, X, Phone } from 'lucide-react';
+import { Menu, X, Phone, Headset } from 'lucide-react';
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -42,6 +42,12 @@ const Navigation = () => {
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
+            <Button variant="outline" size="sm" asChild>
+              <a href="/juridico#portal-chamados">
+                <Headset className="w-4 h-4 mr-2" />
+                Portal de Chamados
+              </a>
+            </Button>
             <Button className="bg-blue-600 hover:bg-blue-700">
               <Phone className="w-4 h-4 mr-2" />
               Contato

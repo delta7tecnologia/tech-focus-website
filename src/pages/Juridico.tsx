@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Scale, Shield, Monitor, Phone, Mail, MessageSquare, ArrowLeft, CheckCircle, Clock, Users, FileText } from 'lucide-react';
+import { Scale, Shield, Monitor, Phone, Mail, MessageSquare, ArrowLeft, CheckCircle, Clock, Users, FileText, Download, Play, Star, Quote } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Juridico = () => {
@@ -272,8 +272,68 @@ const Juridico = () => {
         </div>
       </section>
 
+      {/* Portfolio Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="mb-12">
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Nosso Portfólio
+            </h2>
+            <p className="text-xl text-gray-600">
+              Conheça nossos projetos e cases de sucesso
+            </p>
+          </div>
+          
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white">
+            <div className="p-4 bg-white/10 rounded-full w-fit mx-auto mb-6">
+              <Download className="h-12 w-12 text-white" />
+            </div>
+            <h3 className="text-2xl font-bold mb-4">Portfólio Completo</h3>
+            <p className="text-blue-100 mb-6">
+              Baixe nosso portfólio em PDF e conheça todos os nossos projetos, cases de sucesso e soluções implementadas
+            </p>
+            <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100" asChild>
+              <a href="/portfolio-delta7.pdf" download>
+                <Download className="mr-2 h-5 w-5" />
+                Baixar Portfólio PDF
+              </a>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Video Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="mb-12">
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Conheça a Delta7
+            </h2>
+            <p className="text-xl text-gray-600">
+              Vídeo institucional da nossa empresa
+            </p>
+          </div>
+          
+          <div className="bg-white rounded-2xl p-8 shadow-lg">
+            <div className="aspect-video bg-gray-100 rounded-lg mb-6 flex items-center justify-center relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-lg"></div>
+              <Button size="lg" className="bg-red-600 hover:bg-red-700 relative z-10" asChild>
+                <a href="https://youtube.com/@delta7tecnologia" target="_blank" rel="noopener noreferrer">
+                  <Play className="mr-2 h-6 w-6" />
+                  Assistir no YouTube
+                </a>
+              </Button>
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Delta7 Tecnologia</h3>
+            <p className="text-gray-600">
+              Conheça nossa história, valores e como podemos transformar a tecnologia da sua empresa
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Portal Section */}
-      <section className="py-20 bg-gradient-to-r from-green-600 to-blue-600">
+      <section id="portal-chamados" className="py-20 bg-gradient-to-r from-green-600 to-blue-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8">
             <h2 className="text-3xl font-bold text-white mb-4">
@@ -283,9 +343,85 @@ const Juridico = () => {
               Clientes com contrato de suporte podem abrir chamados técnicos através do nosso portal online
             </p>
             <Button size="lg" className="bg-white text-green-600 hover:bg-gray-100" asChild>
-              <a href="#" target="_blank" rel="noopener noreferrer">
+              <a href="https://portal.delta7tecnologia.com.br" target="_blank" rel="noopener noreferrer">
                 <Monitor className="mr-2 h-5 w-5" />
                 Acessar Portal de Chamados
+              </a>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Depoimentos dos Clientes
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Veja o que nossos clientes falam sobre nossos serviços
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            {[
+              {
+                name: "João Silva",
+                company: "Construnorte",
+                rating: 5,
+                text: "Excelente atendimento! A Delta7 resolveu todos os nossos problemas de TI com muita agilidade e profissionalismo."
+              },
+              {
+                name: "Maria Santos",
+                company: "Dinâmica Contabilidade",
+                rating: 5,
+                text: "Suporte técnico excepcional. Sempre prontos para ajudar e com soluções eficientes para nossa empresa."
+              },
+              {
+                name: "Carlos Oliveira",
+                company: "AgroTec",
+                rating: 5,
+                text: "Parceria de confiança! A Delta7 cuida de toda nossa infraestrutura de TI com excelência."
+              }
+            ].map((testimonial, index) => (
+              <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-shadow">
+                <CardContent className="p-8">
+                  <div className="flex items-center mb-4">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                    ))}
+                  </div>
+                  <div className="mb-6">
+                    <Quote className="h-8 w-8 text-blue-600 mb-4" />
+                    <p className="text-gray-600 italic">{testimonial.text}</p>
+                  </div>
+                  <div className="border-t pt-4">
+                    <p className="font-semibold text-gray-900">{testimonial.name}</p>
+                    <p className="text-gray-500 text-sm">{testimonial.company}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white text-center">
+            <h3 className="text-2xl font-bold mb-4">Avaliações Google</h3>
+            <div className="flex items-center justify-center mb-4">
+              <div className="flex mr-4">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="h-6 w-6 text-yellow-400 fill-current" />
+                ))}
+              </div>
+              <span className="text-2xl font-bold">4.9/5</span>
+            </div>
+            <p className="text-blue-100 mb-6">
+              Mais de 50 avaliações positivas no Google
+            </p>
+            <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100" asChild>
+              <a href="https://maps.app.goo.gl/5RbmwEGGWdrSRcqVA" target="_blank" rel="noopener noreferrer">
+                <Star className="mr-2 h-5 w-5" />
+                Ver Todas as Avaliações
               </a>
             </Button>
           </div>
