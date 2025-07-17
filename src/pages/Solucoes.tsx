@@ -41,6 +41,23 @@ const Solucoes = () => {
     }
   ];
 
+  const intelligentSolutions = [
+    {
+      icon: <Server className="h-8 w-8 text-indigo-600" />,
+      title: "Desenvolvimento de Sistemas",
+      description: "Sistemas sob medida para empresas com foco em eficiência",
+      features: ["Desenvolvimento de sistemas personalizados", "Arquitetura escalável e moderna", "Integração com sistemas existentes", "Metodologias ágeis de desenvolvimento"],
+      badge: "Custom"
+    },
+    {
+      icon: <Database className="h-8 w-8 text-cyan-600" />,
+      title: "Integração de IA e Automação",
+      description: "Inteligência artificial aplicada aos fluxos de atendimento",
+      features: ["Criação e treinamento de Chatbots personalizados", "Integração com n8n, WhatsApp, Telegram e CRMs", "Automatização de rotinas operacionais", "APIs e conectores personalizados"],
+      badge: "IA"
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Navigation */}
@@ -162,7 +179,7 @@ const Solucoes = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Nossos Serviços Especializados
+              Infraestrutura de TI
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Oferecemos soluções completas de TI com foco em ferramentas open-source 
@@ -199,6 +216,58 @@ const Solucoes = () => {
                   <Button variant="outline" className="w-full group" asChild>
                     <a href="#contact">
                       Saiba Mais
+                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </a>
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Intelligent Solutions Section */}
+      <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              🧠 Soluções Inteligentes e Desenvolvimento de Software
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Desenvolvimento de sistemas sob medida e integração de IA para automação 
+              e otimização dos processos empresariais.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {intelligentSolutions.map((solution, index) => (
+              <Card key={index} className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="p-3 bg-gray-50 rounded-lg group-hover:scale-110 transition-transform">
+                      {solution.icon}
+                    </div>
+                    <Badge variant="secondary" className="bg-indigo-50 text-indigo-700">
+                      {solution.badge}
+                    </Badge>
+                  </div>
+                  <CardTitle className="text-xl text-gray-900">{solution.title}</CardTitle>
+                  <CardDescription className="text-gray-600">
+                    {solution.description}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-3 mb-6">
+                    {solution.features.map((feature, idx) => (
+                      <li key={idx} className="flex items-start space-x-3">
+                        <div className="w-2 h-2 bg-indigo-600 rounded-full mt-2 flex-shrink-0"></div>
+                        <span className="text-gray-700 text-sm">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Button variant="outline" className="w-full group" asChild>
+                    <a href="#contact">
+                      Solicitar Consulta
                       <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                     </a>
                   </Button>
