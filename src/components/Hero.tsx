@@ -13,7 +13,7 @@ const Hero = () => {
             <div className="space-y-4">
               <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 leading-tight">
                 Infraestrutura de TI
-                <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                <span className="block bg-gradient-to-r from-blue-600 to-red-500 bg-clip-text text-transparent">
                   Profissional
                 </span>
               </h1>
@@ -60,7 +60,7 @@ const Hero = () => {
                   <p className="text-sm text-gray-600">Firewalls e monitoramento avançado</p>
                 </div>
                 <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
-                  <Monitor className="h-12 w-12 text-purple-600 mb-4" />
+                  <Monitor className="h-12 w-12 text-red-500 mb-4" />
                   <h3 className="font-semibold text-gray-900 mb-2">Monitoramento</h3>
                   <p className="text-sm text-gray-600">Supervisão 24x7 da infraestrutura</p>
                 </div>
@@ -71,7 +71,7 @@ const Hero = () => {
                   <h3 className="font-semibold text-gray-900 mb-2">Backup</h3>
                   <p className="text-sm text-gray-600">Proteção completa dos dados</p>
                 </div>
-                <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl p-6 text-white">
+                <div className="bg-gradient-to-br from-blue-500 to-red-500 rounded-xl p-6 text-white">
                   <h3 className="font-semibold mb-2">Suporte Especializado</h3>
                   <p className="text-sm opacity-90">Atendimento técnico qualificado</p>
                 </div>

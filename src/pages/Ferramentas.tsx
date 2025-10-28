@@ -23,8 +23,8 @@ const Ferramentas = () => {
     {
       name: "TeamViewer",
       description: "Acesso remoto para suporte técnico e controle de computadores à distância",
-      icon: <Monitor className="h-8 w-8 text-purple-600" />,
-      color: "bg-purple-100",
+      icon: <Monitor className="h-8 w-8 text-red-500" />,
+      color: "bg-red-100",
       link: "https://www.teamviewer.com/pt-br/"
     },
     {
@@ -79,7 +79,7 @@ const Ferramentas = () => {
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6">
             Ferramentas
-            <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="block bg-gradient-to-r from-blue-600 to-red-500 bg-clip-text text-transparent">
               Essenciais
             </span>
           </h1>

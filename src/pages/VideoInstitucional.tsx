@@ -33,7 +33,7 @@ const VideoInstitucional = () => {
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6">
             Conheça a
-            <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="block bg-gradient-to-r from-blue-600 to-red-500 bg-clip-text text-transparent">
               Delta7 Tecnologia
             </span>
           </h1>
@@ -47,8 +47,8 @@ const VideoInstitucional = () => {
       <section className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-2xl p-8 shadow-lg">
-            <div className="aspect-video bg-gradient-to-br from-blue-600/10 to-purple-600/10 rounded-lg mb-8 flex items-center justify-center relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-lg"></div>
+            <div className="aspect-video bg-gradient-to-br from-blue-600/10 to-red-500/10 rounded-lg mb-8 flex items-center justify-center relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-red-500/20 rounded-lg"></div>
               <div className="text-center relative z-10">
                 <div className="p-8 bg-white/20 backdrop-blur-sm rounded-full mb-6">
                   <Play className="h-16 w-16 text-blue-600" />

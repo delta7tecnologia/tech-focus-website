@@ -15,7 +15,7 @@ const Services = () => {
       badge: "Essencial"
     },
     {
-      icon: <BarChart3 className="h-8 w-8 text-purple-600" />,
+      icon: <BarChart3 className="h-8 w-8 text-red-500" />,
       title: "Monitoramento e Observabilidade",
       description: "Supervisão proativa com Zabbix e Grafana",
       features: ["Zabbix - Monitoramento de servidores e redes", "Grafana - Dashboards e análise visual", "Alertas em tempo real", "Relatórios de performance"],
@@ -86,7 +86,7 @@ const Services = () => {
         </div>
 
         <div className="text-center mt-16">
-          <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8">
+          <div className="bg-gradient-to-r from-blue-50 to-red-50 rounded-2xl p-8">
             <h3 className="text-2xl font-bold text-gray-900 mb-4">
               Precisa de uma solução personalizada?
             </h3>

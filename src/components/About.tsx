@@ -16,7 +16,7 @@ const About = () => {
       description: "Relacionamento de longo prazo com nossos clientes"
     },
     {
-      icon: <Clock className="h-6 w-6 text-purple-600" />,
+      icon: <Clock className="h-6 w-6 text-red-500" />,
       title: "Agilidade",
       description: "Respostas rápidas e soluções eficientes"
     },
@@ -93,7 +93,7 @@ const About = () => {
               ))}
             </div>
 
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 text-white">
+            <div className="bg-gradient-to-r from-blue-600 to-red-500 rounded-xl p-6 text-white">
               <h4 className="font-semibold mb-2">Suporte 24x7</h4>
               <p className="text-blue-100 text-sm">
                 Monitoramento contínuo e suporte técnico especializado 

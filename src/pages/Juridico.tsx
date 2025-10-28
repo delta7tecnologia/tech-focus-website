@@ -66,7 +66,7 @@ const Juridico = () => {
       description: "Sigilo absoluto de dados e informações sensíveis"
     },
     {
-      icon: <FileText className="h-6 w-6 text-purple-600" />,
+      icon: <FileText className="h-6 w-6 text-red-500" />,
       title: "Adequação LGPD",
       description: "Consultoria para adequação à Lei Geral de Proteção de Dados"
     }
@@ -108,7 +108,7 @@ const Juridico = () => {
             <Badge className="bg-blue-100 text-blue-800 mb-4">Criada para empresas</Badge>
             <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6">
               Tecnologia com
-              <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-blue-600 to-red-500 bg-clip-text text-transparent">
                 Confidencialidade e Agilidade
               </span>
             </h1>
@@ -293,10 +293,10 @@ const Juridico = () => {
               </Button>
             </div>
 
-            <div className="bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl p-6 text-white hover:shadow-lg transition-shadow">
+            <div className="bg-gradient-to-br from-red-500 to-red-600 rounded-xl p-6 text-white hover:shadow-lg transition-shadow">
               <Play className="h-8 w-8 mb-4" />
               <h3 className="text-lg font-semibold mb-2">Vídeo Institucional</h3>
-              <p className="text-purple-100 mb-4 text-sm">Conheça nossa história e valores</p>
+              <p className="text-red-100 mb-4 text-sm">Conheça nossa história e valores</p>
               <Button size="sm" variant="secondary" asChild>
                 <Link to="/video-institucional">Assistir</Link>
               </Button>
@@ -388,8 +388,8 @@ const Juridico = () => {
 
             <Card className="text-center border-0 shadow-lg hover:shadow-xl transition-shadow">
               <CardContent className="p-8">
-                <div className="p-4 bg-purple-100 rounded-full w-fit mx-auto mb-4">
-                  <Mail className="h-8 w-8 text-purple-600" />
+                <div className="p-4 bg-red-100 rounded-full w-fit mx-auto mb-4">
+                  <Mail className="h-8 w-8 text-red-500" />
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-2">E-mail</h3>
                 <p className="text-gray-600 mb-4">Contato profissional</p>
@@ -402,7 +402,7 @@ const Juridico = () => {
             </Card>
           </div>
 
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white text-center">
+          <div className="bg-gradient-to-r from-blue-600 to-red-500 rounded-2xl p-8 text-white text-center">
             <h3 className="text-2xl font-bold mb-4">Atendimento Especializado</h3>
             <p className="text-blue-100 mb-6">
               Horário comercial: Segunda a Sexta, 8h às 18h

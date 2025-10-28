@@ -73,7 +73,7 @@ const Depoimentos = () => {
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6">
             Depoimentos dos
-            <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="block bg-gradient-to-r from-blue-600 to-red-500 bg-clip-text text-transparent">
               Nossos Clientes
             </span>
           </h1>
@@ -109,7 +109,7 @@ const Depoimentos = () => {
           </div>
 
           {/* Google Reviews Section */}
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-12 text-white text-center">
+          <div className="bg-gradient-to-r from-blue-600 to-red-500 rounded-2xl p-12 text-white text-center">
             <h2 className="text-3xl font-bold mb-6">Avaliações Google</h2>
             <div className="flex items-center justify-center mb-6">
               <div className="flex mr-4">

@@ -19,7 +19,7 @@ const Index = () => {
               alt="Delta7 Tecnologia" 
               className="h-20 lg:h-24 object-contain"
             />
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-blue-600 to-red-500 bg-clip-text text-transparent">
               
             </span>
           </h1>
@@ -75,8 +75,8 @@ const Index = () => {
           <Card className="group hover:shadow-2xl transition-all duration-300 border-0 shadow-lg overflow-hidden bg-white">
             <CardHeader className="text-center pb-6 pt-12">
               <div className="flex items-center justify-center mb-8">
-                <div className="p-6 bg-purple-50 rounded-full group-hover:scale-110 transition-transform">
-                  <Monitor className="h-16 w-16 text-purple-600" />
+                <div className="p-6 bg-red-50 rounded-full group-hover:scale-110 transition-transform">
+                  <Monitor className="h-16 w-16 text-red-500" />
                 </div>
               </div>
               <CardTitle className="text-2xl text-gray-900 mb-4">
@@ -89,20 +89,20 @@ const Index = () => {
             <CardContent className="px-8 pb-8">
               <div className="space-y-4 mb-8">
                 <div className="flex items-center space-x-3 text-gray-700">
-                  <Shield className="h-5 w-5 text-purple-600 flex-shrink-0" />
+                  <Shield className="h-5 w-5 text-red-500 flex-shrink-0" />
                   <span>GLPI, Zabbix, Proxmox</span>
                 </div>
                 <div className="flex items-center space-x-3 text-gray-700">
-                  <Monitor className="h-5 w-5 text-purple-600 flex-shrink-0" />
+                  <Monitor className="h-5 w-5 text-red-500 flex-shrink-0" />
                   <span>Monitoramento 24x7</span>
                 </div>
                 <div className="flex items-center space-x-3 text-gray-700">
-                  <Users className="h-5 w-5 text-purple-600 flex-shrink-0" />
+                  <Users className="h-5 w-5 text-red-500 flex-shrink-0" />
                   <span>Suporte especializado</span>
                 </div>
               </div>
               <Link to="/solucoes">
-                <Button className="w-full bg-purple-600 hover:bg-purple-700 text-lg py-6 group">
+                <Button className="w-full bg-red-500 hover:bg-red-600 text-lg py-6 group">
                   Acessar Soluções Empresariais
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Button>

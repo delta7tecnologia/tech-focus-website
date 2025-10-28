@@ -45,7 +45,7 @@ const Contact = () => {
       link: "https://wa.me/5591982370332"
     },
     {
-      icon: <Mail className="h-6 w-6 text-purple-600" />,
+      icon: <Mail className="h-6 w-6 text-red-500" />,
       title: "E-mail",
       info: "contato@delta7tecnologia.com.br",
       link: "mailto:contato@delta7tecnologia.com.br"
@@ -166,7 +166,7 @@ const Contact = () => {
               </div>
             </div>
 
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-8 text-white">
+            <div className="bg-gradient-to-r from-blue-600 to-red-500 rounded-xl p-8 text-white">
               <h4 className="text-xl font-bold mb-4">
                 Consultoria Gratuita
               </h4>

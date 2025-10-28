@@ -33,7 +33,7 @@ const Portfolio = () => {
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6">
             Nosso
-            <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="block bg-gradient-to-r from-blue-600 to-red-500 bg-clip-text text-transparent">
               Portfólio
             </span>
           </h1>
@@ -46,7 +46,7 @@ const Portfolio = () => {
       {/* Portfolio Download Section */}
       <section className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-12 text-white">
+          <div className="bg-gradient-to-r from-blue-600 to-red-500 rounded-2xl p-12 text-white">
             <div className="p-6 bg-white/10 rounded-full w-fit mx-auto mb-8">
               <Download className="h-16 w-16 text-white" />
             </div>
