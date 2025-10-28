@@ -1,7 +1,13 @@
 
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Menu, X, Phone, Headset } from 'lucide-react';
+import { Menu, X, Phone, Headset, ExternalLink, Link2 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -42,6 +48,61 @@ const Navigation = () => {
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Link2 className="w-4 h-4 mr-2" />
+                  Links Úteis
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56 bg-white">
+                <DropdownMenuItem asChild>
+                  <a 
+                    href="https://anydesk.com/pt/downloads/windows" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between cursor-pointer"
+                  >
+                    <span>AnyDesk</span>
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <a 
+                    href="https://rustdesk.com/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between cursor-pointer"
+                  >
+                    <span>RustDesk</span>
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <a 
+                    href="https://www.win-rar.com/download.html" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between cursor-pointer"
+                  >
+                    <span>WinRAR</span>
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <a 
+                    href="https://www.7-zip.org/download.html" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between cursor-pointer"
+                  >
+                    <span>7-Zip</span>
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <Button variant="outline" size="sm" asChild>
               <a href="/juridico#portal-chamados">
                 <Headset className="w-4 h-4 mr-2" />
@@ -79,6 +140,50 @@ const Navigation = () => {
                   {item.name}
                 </a>
               ))}
+              
+              <div className="border-t pt-2 mt-2">
+                <p className="px-3 py-2 text-sm font-semibold text-gray-500">Links Úteis</p>
+                <a
+                  href="https://anydesk.com/pt/downloads/windows"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium flex items-center justify-between"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <span>AnyDesk</span>
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+                <a
+                  href="https://rustdesk.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium flex items-center justify-between"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <span>RustDesk</span>
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+                <a
+                  href="https://www.win-rar.com/download.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium flex items-center justify-between"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <span>WinRAR</span>
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+                <a
+                  href="https://www.7-zip.org/download.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium flex items-center justify-between"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <span>7-Zip</span>
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              </div>
             </div>
           </div>
         )}
