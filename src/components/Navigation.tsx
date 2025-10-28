@@ -79,7 +79,7 @@ const Navigation = () => {
             </DropdownMenu>
 
             <Button variant="outline" size="sm" asChild>
-              <a href="/juridico#portal-chamados">
+              <a href="https://www.app.delta7tecnologia.com.br/front/login.php">
                 <Headset className="w-4 h-4 mr-2" />
                 Portal de Chamados
               </a>
@@ -149,7 +149,7 @@ const Navigation = () => {
               
               <div className="border-t pt-2 mt-2">
                 <a
-                  href="/juridico#portal-chamados"
+                  href="https://www.app.delta7tecnologia.com.br/front/login.php"
                   className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium"
                   onClick={() => setIsMenuOpen(false)}
                 >
