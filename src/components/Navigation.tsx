@@ -12,14 +12,6 @@ import {
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const menuItems = [
-    { name: 'Início', href: '#home' },
-    { name: 'Serviços', href: '#services' },
-    { name: 'Quem Somos', href: '#about' },
-    { name: 'Tecnologias', href: '#tech' },
-    { name: 'Contato', href: '#contact' },
-  ];
-
   return (
     <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-sm border-b border-gray-200 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -29,21 +21,6 @@ const Navigation = () => {
               <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 TechSolutions
               </h2>
-            </div>
-          </div>
-
-          {/* Desktop Menu */}
-          <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-4">
-              {menuItems.map((item) => (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-                >
-                  {item.name}
-                </a>
-              ))}
             </div>
           </div>
 
@@ -129,59 +106,63 @@ const Navigation = () => {
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
-              {menuItems.map((item) => (
+            <div className="px-2 pt-2 pb-3 space-y-2 sm:px-3 bg-white border-t">
+              <p className="px-3 py-2 text-sm font-semibold text-gray-500">Links Úteis</p>
+              <a
+                href="https://anydesk.com/pt/downloads/windows"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium flex items-center justify-between"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <span>AnyDesk</span>
+                <ExternalLink className="w-4 h-4" />
+              </a>
+              <a
+                href="https://rustdesk.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium flex items-center justify-between"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <span>RustDesk</span>
+                <ExternalLink className="w-4 h-4" />
+              </a>
+              <a
+                href="https://www.win-rar.com/download.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium flex items-center justify-between"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <span>WinRAR</span>
+                <ExternalLink className="w-4 h-4" />
+              </a>
+              <a
+                href="https://www.7-zip.org/download.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium flex items-center justify-between"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <span>7-Zip</span>
+                <ExternalLink className="w-4 h-4" />
+              </a>
+              
+              <div className="border-t pt-2 mt-2">
                 <a
-                  key={item.name}
-                  href={item.href}
+                  href="/juridico#portal-chamados"
                   className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  {item.name}
-                </a>
-              ))}
-              
-              <div className="border-t pt-2 mt-2">
-                <p className="px-3 py-2 text-sm font-semibold text-gray-500">Links Úteis</p>
-                <a
-                  href="https://anydesk.com/pt/downloads/windows"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium flex items-center justify-between"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <span>AnyDesk</span>
-                  <ExternalLink className="w-4 h-4" />
+                  Portal de Chamados
                 </a>
                 <a
-                  href="https://rustdesk.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium flex items-center justify-between"
+                  href="#contact"
+                  className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  <span>RustDesk</span>
-                  <ExternalLink className="w-4 h-4" />
-                </a>
-                <a
-                  href="https://www.win-rar.com/download.html"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium flex items-center justify-between"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <span>WinRAR</span>
-                  <ExternalLink className="w-4 h-4" />
-                </a>
-                <a
-                  href="https://www.7-zip.org/download.html"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium flex items-center justify-between"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <span>7-Zip</span>
-                  <ExternalLink className="w-4 h-4" />
+                  Contato
                 </a>
               </div>
             </div>
