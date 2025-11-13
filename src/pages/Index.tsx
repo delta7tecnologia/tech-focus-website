@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, Scale, Monitor, Shield, Users } from 'lucide-react';
+import { ArrowRight, Scale, Monitor, Shield, Users, Code2, Mail, Cloud, Server } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
 
@@ -32,7 +32,7 @@ const Index = () => {
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-          {/* Card Suporte Jurídico */}
+          {/* Card Suporte Empresarial */}
           <Card className="group hover:shadow-2xl transition-all duration-300 border-0 shadow-lg overflow-hidden bg-white">
             <CardHeader className="text-center pb-6 pt-12">
               <div className="flex items-center justify-center mb-8">
@@ -104,6 +104,84 @@ const Index = () => {
               <Link to="/solucoes">
                 <Button className="w-full bg-red-500 hover:bg-red-600 text-lg py-6 group">
                   Acessar Soluções Empresariais
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          {/* Card Desenvolvimento Web */}
+          <Card className="group hover:shadow-2xl transition-all duration-300 border-0 shadow-lg overflow-hidden bg-white">
+            <CardHeader className="text-center pb-6 pt-12">
+              <div className="flex items-center justify-center mb-8">
+                <div className="p-6 bg-green-50 rounded-full group-hover:scale-110 transition-transform">
+                  <Code2 className="h-16 w-16 text-green-600" />
+                </div>
+              </div>
+              <CardTitle className="text-2xl text-gray-900 mb-4">
+                Desenvolvimento Web
+              </CardTitle>
+              <CardDescription className="text-gray-600 text-lg px-4">
+                Sites profissionais e e-mail corporativo
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="px-8 pb-8">
+              <div className="space-y-4 mb-8">
+                <div className="flex items-center space-x-3 text-gray-700">
+                  <Code2 className="h-5 w-5 text-green-600 flex-shrink-0" />
+                  <span>Sites modernos e responsivos</span>
+                </div>
+                <div className="flex items-center space-x-3 text-gray-700">
+                  <Mail className="h-5 w-5 text-green-600 flex-shrink-0" />
+                  <span>E-mail corporativo profissional</span>
+                </div>
+                <div className="flex items-center space-x-3 text-gray-700">
+                  <Shield className="h-5 w-5 text-green-600 flex-shrink-0" />
+                  <span>SEO otimizado e seguro</span>
+                </div>
+              </div>
+              <Link to="/desenvolvimento-web">
+                <Button className="w-full bg-green-600 hover:bg-green-700 text-lg py-6 group">
+                  Acessar Desenvolvimento Web
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          {/* Card Infraestrutura em Nuvem */}
+          <Card className="group hover:shadow-2xl transition-all duration-300 border-0 shadow-lg overflow-hidden bg-white">
+            <CardHeader className="text-center pb-6 pt-12">
+              <div className="flex items-center justify-center mb-8">
+                <div className="p-6 bg-purple-50 rounded-full group-hover:scale-110 transition-transform">
+                  <Cloud className="h-16 w-16 text-purple-600" />
+                </div>
+              </div>
+              <CardTitle className="text-2xl text-gray-900 mb-4">
+                Infraestrutura em Nuvem
+              </CardTitle>
+              <CardDescription className="text-gray-600 text-lg px-4">
+                Cloud computing empresarial de alta performance
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="px-8 pb-8">
+              <div className="space-y-4 mb-8">
+                <div className="flex items-center space-x-3 text-gray-700">
+                  <Server className="h-5 w-5 text-purple-600 flex-shrink-0" />
+                  <span>Servidores VPS e Dedicados</span>
+                </div>
+                <div className="flex items-center space-x-3 text-gray-700">
+                  <Shield className="h-5 w-5 text-purple-600 flex-shrink-0" />
+                  <span>Backup e segurança avançada</span>
+                </div>
+                <div className="flex items-center space-x-3 text-gray-700">
+                  <Cloud className="h-5 w-5 text-purple-600 flex-shrink-0" />
+                  <span>Armazenamento em nuvem S3</span>
+                </div>
+              </div>
+              <Link to="/infraestrutura-nuvem">
+                <Button className="w-full bg-purple-600 hover:bg-purple-700 text-lg py-6 group">
+                  Acessar Infraestrutura em Nuvem
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
