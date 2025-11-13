@@ -11,6 +11,8 @@ import Portfolio from "./pages/Portfolio";
 import Depoimentos from "./pages/Depoimentos";
 import Ferramentas from "./pages/Ferramentas";
 import VideoInstitucional from "./pages/VideoInstitucional";
+import DesenvolvimentoWeb from "./pages/DesenvolvimentoWeb";
+import InfraestruturaNuvem from "./pages/InfraestruturaNuvem";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +31,8 @@ const App = () => (
           <Route path="/depoimentos" element={<Depoimentos />} />
           <Route path="/ferramentas" element={<Ferramentas />} />
           <Route path="/video-institucional" element={<VideoInstitucional />} />
+          <Route path="/desenvolvimento-web" element={<DesenvolvimentoWeb />} />
+          <Route path="/infraestrutura-nuvem" element={<InfraestruturaNuvem />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

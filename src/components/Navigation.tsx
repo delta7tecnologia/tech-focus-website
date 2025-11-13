@@ -75,6 +75,30 @@ const Navigation = () => {
                     <ExternalLink className="w-4 h-4" />
                   </a>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <a href="/solucoes">Soluções Empresariais</a>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <a href="/juridico">Soluções Jurídicas</a>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <a href="/desenvolvimento-web">Desenvolvimento Web</a>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <a href="/infraestrutura-nuvem">Infraestrutura em Nuvem</a>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <a href="/portfolio">Portfolio</a>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <a href="/depoimentos">Depoimentos</a>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <a href="/ferramentas">Ferramentas</a>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <a href="/video-institucional">Vídeo Institucional</a>
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -146,6 +170,34 @@ const Navigation = () => {
                 <span>7-Zip</span>
                 <ExternalLink className="w-4 h-4" />
               </a>
+
+              <div className="border-t pt-2 mt-2">
+                <p className="px-3 py-2 text-sm font-semibold text-gray-500">Páginas</p>
+                <a href="/solucoes" className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
+                  Soluções Empresariais
+                </a>
+                <a href="/juridico" className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
+                  Soluções Jurídicas
+                </a>
+                <a href="/desenvolvimento-web" className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
+                  Desenvolvimento Web
+                </a>
+                <a href="/infraestrutura-nuvem" className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
+                  Infraestrutura em Nuvem
+                </a>
+                <a href="/portfolio" className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
+                  Portfolio
+                </a>
+                <a href="/depoimentos" className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
+                  Depoimentos
+                </a>
+                <a href="/ferramentas" className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
+                  Ferramentas
+                </a>
+                <a href="/video-institucional" className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
+                  Vídeo Institucional
+                </a>
+              </div>
               
               <div className="border-t pt-2 mt-2">
                 <a
