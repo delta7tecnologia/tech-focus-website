@@ -24,16 +24,9 @@ const Footer = () => {
     { name: "Consultoria de TI", href: "/#services" },
   ];
 
-  const solutions = [
-    { name: "Soluções Empresariais", href: "/solucoes" },
-    { name: "Suporte para Escritórios", href: "/juridico" },
-    { name: "Desenvolvimento Web", href: "/desenvolvimento-web" },
-    { name: "Infraestrutura em Nuvem", href: "/infraestrutura-nuvem" },
-  ];
-
-  const company = [
+  const quickLinks = [
+    { name: "Soluções", href: "/solucoes" },
     { name: "Quem Somos", href: "/#about" },
-    { name: "Diferenciais", href: "/#about" },
     { name: "Depoimentos", href: "/depoimentos" },
     { name: "Contato", href: "/#contact" },
   ];
@@ -99,31 +92,27 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Solutions */}
+          {/* Quick Links */}
           <div>
-            <h4 className="text-lg font-bold mb-6">Soluções</h4>
+            <h4 className="text-lg font-bold mb-6">Links Rápidos</h4>
             <ul className="space-y-3">
-              {solutions.map((solution) => (
-                <li key={solution.name}>
-                  <Link 
-                    to={solution.href}
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    {solution.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <h4 className="text-lg font-bold mb-4 mt-8">Empresa</h4>
-            <ul className="space-y-3">
-              {company.map((item) => (
-                <li key={item.name}>
-                  <a 
-                    href={item.href}
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    {item.name}
-                  </a>
+              {quickLinks.map((link) => (
+                <li key={link.name}>
+                  {link.href.startsWith('/') && !link.href.includes('#') ? (
+                    <Link 
+                      to={link.href}
+                      className="text-gray-400 hover:text-white transition-colors"
+                    >
+                      {link.name}
+                    </Link>
+                  ) : (
+                    <a 
+                      href={link.href}
+                      className="text-gray-400 hover:text-white transition-colors"
+                    >
+                      {link.name}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>

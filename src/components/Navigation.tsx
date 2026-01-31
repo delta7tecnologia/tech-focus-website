@@ -1,13 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Menu, X, Phone, Headset, ChevronDown } from 'lucide-react';
+import { Menu, X, Phone, Headset } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -26,15 +20,9 @@ const Navigation = () => {
   const navLinks = [
     { name: 'Início', href: '/' },
     { name: 'Serviços', href: '/#services' },
+    { name: 'Soluções', href: '/solucoes' },
     { name: 'Quem Somos', href: '/#about' },
     { name: 'Contato', href: '/#contact' }
-  ];
-
-  const solutionLinks = [
-    { name: 'Soluções Empresariais', href: '/solucoes' },
-    { name: 'Suporte para Escritórios', href: '/juridico' },
-    { name: 'Desenvolvimento Web', href: '/desenvolvimento-web' },
-    { name: 'Infraestrutura em Nuvem', href: '/infraestrutura-nuvem' }
   ];
 
   return (
@@ -57,40 +45,32 @@ const Navigation = () => {
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-8">
             {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                className={`font-medium transition-colors ${
-                  isScrolled || !isHome
-                    ? 'text-gray-700 hover:text-blue-600' 
-                    : 'text-white/90 hover:text-white'
-                }`}
-              >
-                {link.name}
-              </a>
+              link.href.startsWith('/') && !link.href.includes('#') ? (
+                <Link
+                  key={link.name}
+                  to={link.href}
+                  className={`font-medium transition-colors ${
+                    isScrolled || !isHome
+                      ? 'text-gray-700 hover:text-blue-600' 
+                      : 'text-white/90 hover:text-white'
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              ) : (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  className={`font-medium transition-colors ${
+                    isScrolled || !isHome
+                      ? 'text-gray-700 hover:text-blue-600' 
+                      : 'text-white/90 hover:text-white'
+                  }`}
+                >
+                  {link.name}
+                </a>
+              )
             ))}
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className={`flex items-center font-medium transition-colors ${
-                  isScrolled || !isHome
-                    ? 'text-gray-700 hover:text-blue-600' 
-                    : 'text-white/90 hover:text-white'
-                }`}>
-                  Soluções
-                  <ChevronDown className="ml-1 h-4 w-4" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 bg-white">
-                {solutionLinks.map((link) => (
-                  <DropdownMenuItem key={link.name} asChild>
-                    <Link to={link.href} className="cursor-pointer">
-                      {link.name}
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
 
           {/* Desktop CTA Buttons */}
@@ -134,29 +114,26 @@ const Navigation = () => {
           <div className="lg:hidden bg-white border-t shadow-lg">
             <div className="px-4 py-4 space-y-2">
               {navLinks.map((link) => (
-                <a
-                  key={link.name}
-                  href={link.href}
-                  className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md font-medium"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {link.name}
-                </a>
-              ))}
-
-              <div className="border-t pt-2 mt-2">
-                <p className="px-3 py-2 text-sm font-semibold text-gray-500">Soluções</p>
-                {solutionLinks.map((link) => (
+                link.href.startsWith('/') && !link.href.includes('#') ? (
                   <Link
                     key={link.name}
                     to={link.href}
-                    className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md"
+                    className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md font-medium"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {link.name}
                   </Link>
-                ))}
-              </div>
+                ) : (
+                  <a
+                    key={link.name}
+                    href={link.href}
+                    className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md font-medium"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {link.name}
+                  </a>
+                )
+              ))}
 
               <div className="border-t pt-4 mt-4 space-y-2">
                 <Button variant="outline" className="w-full" asChild>
