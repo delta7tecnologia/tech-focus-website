@@ -1,284 +1,472 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ArrowRight, Shield, Monitor, Cloud, BarChart3, Server, Database } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { 
+  ArrowLeft, ArrowRight, Shield, Monitor, Cloud, BarChart3, Server, Database,
+  Code2, Mail, Globe, Smartphone, Zap, Users, HardDrive, Wrench, CheckCircle,
+  Scale, Lock, HeadphonesIcon
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
-import About from '@/components/About';
-import Technologies from '@/components/Technologies';
-import Contact from '@/components/Contact';
+import Navigation from '@/components/Navigation';
+import Footer from '@/components/Footer';
 
 const Solucoes = () => {
-  const services = [
+  const infraServices = [
     {
-      icon: <Monitor className="h-8 w-8 text-blue-600" />,
+      icon: <Monitor className="h-7 w-7" />,
       title: "Gerenciamento e Suporte de TI",
       description: "Gestão completa da infraestrutura com soluções integradas",
-      features: ["Sistema de chamados e controle de ativos", "Plataforma de virtualização com alta disponibilidade", "Inventário automatizado de equipamentos e sistemas", "Gestão eficiente de incidentes e problemas"],
-      badge: "Essencial"
+      features: ["Sistema de chamados e controle de ativos", "Plataforma de virtualização", "Inventário automatizado", "Gestão de incidentes"],
+      badge: "Essencial",
+      gradient: "from-blue-500 to-blue-600"
     },
     {
-      icon: <BarChart3 className="h-8 w-8 text-red-500" />,
+      icon: <BarChart3 className="h-7 w-7" />,
       title: "Monitoramento e Observabilidade",
-      description: "Supervisão proativa com ferramentas de monitoramento e visualização",
-      features: ["Monitoramento contínuo de servidores e redes", "Painéis visuais para análise de dados", "Alertas em tempo real", "Relatórios de desempenho e disponibilidade"],
-      badge: "Crítico"
+      description: "Supervisão proativa com ferramentas avançadas",
+      features: ["Monitoramento 24x7 de servidores", "Dashboards personalizados", "Alertas em tempo real", "Relatórios de SLA"],
+      badge: "Crítico",
+      gradient: "from-orange-500 to-red-500"
     },
     {
-      icon: <Shield className="h-8 w-8 text-red-600" />,
+      icon: <Shield className="h-7 w-7" />,
       title: "Segurança e Firewall",
       description: "Proteção avançada com PfSense e Wazuh",
-      features: ["PfSense - Firewall e VPN", "Wazuh - Detecção de intrusão e SIEM", "Balanceamento de carga", "Compliance e auditoria"],
-      badge: "Segurança"
+      features: ["Firewall e VPN corporativa", "Detecção de intrusão (SIEM)", "Balanceamento de carga", "Compliance e auditoria"],
+      badge: "Segurança",
+      gradient: "from-red-500 to-rose-600"
     },
     {
-      icon: <Cloud className="h-8 w-8 text-green-600" />,
+      icon: <Cloud className="h-7 w-7" />,
       title: "Backup e Alta Disponibilidade",
       description: "Proteção total dos dados e continuidade do negócio",
-      features: ["Backup automatizado em nuvem", "Replicações e snapshots", "Recuperação de desastres", "Testes de integridade"],
-      badge: "Proteção"
+      features: ["Backup automatizado em nuvem", "Replicações e snapshots", "Disaster recovery", "Testes de integridade"],
+      badge: "Proteção",
+      gradient: "from-cyan-500 to-teal-600"
     }
   ];
 
-  const intelligentSolutions = [
+  const cloudServices = [
     {
-      icon: <Server className="h-8 w-8 text-indigo-600" />,
-      title: "Desenvolvimento de Sistemas",
-      description: "Sistemas sob medida para empresas com foco em eficiência",
-      features: ["Desenvolvimento de sistemas personalizados", "Arquitetura escalável e moderna", "Integração com sistemas existentes", "Metodologias ágeis de desenvolvimento"],
-      badge: "Custom"
+      icon: <Server className="h-6 w-6" />,
+      title: "Servidores VPS",
+      description: "Servidores virtuais com recursos dedicados e desempenho garantido",
+      features: ["Painel intuitivo", "Backup automático", "Escalabilidade", "Suporte dedicado"]
     },
     {
-      icon: <Database className="h-8 w-8 text-cyan-600" />,
+      icon: <HardDrive className="h-6 w-6" />,
+      title: "Servidores Dedicados",
+      description: "Hardware exclusivo para aplicações que exigem máxima potência",
+      features: ["Hardware exclusivo", "Monitoramento 24h", "Suporte técnico", "SLA garantido"]
+    },
+    {
+      icon: <Database className="h-6 w-6" />,
+      title: "Colocation",
+      description: "Hospede seus equipamentos em nossa infraestrutura certificada",
+      features: ["Energia redundante", "Conectividade alta", "Segurança 24h", "Climatização"]
+    },
+    {
+      icon: <Cloud className="h-6 w-6" />,
+      title: "Armazenamento S3",
+      description: "Armazenamento de objetos escalável compatível com protocolo S3",
+      features: ["API compatível", "Integração fácil", "Escalabilidade", "Backup integrado"]
+    }
+  ];
+
+  const webServices = [
+    {
+      icon: <Globe className="h-6 w-6" />,
+      title: "Sites Institucionais",
+      description: "Sites modernos, responsivos e otimizados para SEO"
+    },
+    {
+      icon: <Smartphone className="h-6 w-6" />,
+      title: "E-commerce",
+      description: "Lojas virtuais completas com gateway de pagamento"
+    },
+    {
+      icon: <Mail className="h-6 w-6" />,
+      title: "E-mail Corporativo",
+      description: "Infraestrutura profissional com seu domínio próprio"
+    },
+    {
+      icon: <Zap className="h-6 w-6" />,
+      title: "Landing Pages",
+      description: "Páginas de alta conversão e carregamento rápido"
+    }
+  ];
+
+  const aiServices = [
+    {
+      icon: <Code2 className="h-7 w-7" />,
+      title: "Desenvolvimento de Sistemas",
+      description: "Sistemas sob medida para empresas com foco em eficiência",
+      features: ["Sistemas personalizados", "Arquitetura escalável", "Integração com sistemas existentes", "Metodologias ágeis"],
+      badge: "Custom",
+      gradient: "from-indigo-500 to-purple-600"
+    },
+    {
+      icon: <Database className="h-7 w-7" />,
       title: "Integração de IA e Automação",
       description: "Inteligência artificial aplicada aos fluxos de atendimento",
-      features: ["Criação e treinamento de Chatbots personalizados", "Integração com n8n, WhatsApp, Telegram e CRMs", "Automatização de rotinas operacionais", "APIs e conectores personalizados"],
-      badge: "IA"
+      features: ["Chatbots personalizados", "Integração n8n, WhatsApp, Telegram", "Automatização de rotinas", "APIs customizadas"],
+      badge: "IA",
+      gradient: "from-cyan-500 to-blue-600"
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-sm border-b border-gray-200 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
-              <Link to="/">
-                <Button variant="ghost" size="sm">
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Voltar ao Menu
-                </Button>
-              </Link>
-              <div className="h-6 w-px bg-gray-300"></div>
-              <img 
-                src="/logo.png" 
-                alt="Delta7 Tecnologia"
-                className="h-12 w-auto"
-              />
-            </div>
-            
-            <div className="hidden md:flex space-x-6">
-              <a href="#home" className="text-gray-700 hover:text-blue-600 font-medium">Início</a>
-              <a href="#services" className="text-gray-700 hover:text-blue-600 font-medium">Serviços</a>
-              <a href="#about" className="text-gray-700 hover:text-blue-600 font-medium">Quem Somos</a>
-              <a href="#tech" className="text-gray-700 hover:text-blue-600 font-medium">Tecnologias</a>
-              <a href="#contact" className="text-gray-700 hover:text-blue-600 font-medium">Contato</a>
-            </div>
-          </div>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-white">
+      <Navigation />
 
       {/* Hero Section */}
-      <section id="home" className="pt-20 pb-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left Column - Content */}
-            <div className="space-y-8">
-              <div className="space-y-4">
-                <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                  Infraestrutura de TI
-                  <span className="block bg-gradient-to-r from-blue-600 to-red-500 bg-clip-text text-transparent">
-                    Profissional
-                  </span>
-                </h1>
-                <p className="text-xl text-gray-600 leading-relaxed">
-                  Especialistas em sistemas de monitoramento, servidores virtualizados, firewalls avançados e proteção cibernética.
-                  Oferecemos soluções completas de monitoramento, virtualização, 
-                  segurança e backup para sua empresa.
-                </p>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 group" asChild>
-                  <a href="https://wa.me/5591982370332?text=Olá! Gostaria de solicitar um orçamento para soluções empresariais.">
-                    Solicitar Orçamento
-                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </a>
-                </Button>
-                <Button size="lg" variant="outline" className="border-gray-300" asChild>
-                  <a href="#services">
-                    Nossos Serviços
-                  </a>
-                </Button>
-              </div>
-
-              <div className="flex items-center space-x-8 pt-8">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-900">10+</div>
-                  <div className="text-sm text-gray-600">Anos de Experiência</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-900">200+</div>
-                  <div className="text-sm text-gray-600">Clientes Atendidos</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-900">24/7</div>
-                  <div className="text-sm text-gray-600">Suporte Disponível</div>
-                </div>
-              </div>
+      <section className="pt-24 pb-16 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+                             linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
+            backgroundSize: '50px 50px'
+          }} />
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <motion.div 
+            className="text-center text-white"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <Badge className="bg-blue-500/20 text-blue-300 border-blue-400/30 mb-6">
+              Soluções Completas
+            </Badge>
+            <h1 className="text-4xl lg:text-5xl font-bold mb-6">
+              Todas as Soluções de TI que sua{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">
+                Empresa Precisa
+              </span>
+            </h1>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
+              Infraestrutura, segurança, cloud, desenvolvimento web e automação com IA. 
+              Tudo integrado para impulsionar seu negócio.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button size="lg" className="bg-blue-600 hover:bg-blue-700" asChild>
+                <a href="https://wa.me/5591982370332?text=Olá! Gostaria de solicitar um orçamento.">
+                  Solicitar Orçamento
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </a>
+              </Button>
+              <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
+                <a href="#infra">Ver Soluções</a>
+              </Button>
             </div>
+          </motion.div>
+        </div>
+      </section>
 
-            {/* Right Column - Visual Elements */}
-            <div className="relative">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-4">
-                  <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
-                    <Shield className="h-12 w-12 text-blue-600 mb-4" />
-                    <h3 className="font-semibold text-gray-900 mb-2">Segurança</h3>
-                    <p className="text-sm text-gray-600">Firewalls e monitoramento avançado</p>
-                  </div>
-                  <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
-                    <Monitor className="h-12 w-12 text-red-500 mb-4" />
-                    <h3 className="font-semibold text-gray-900 mb-2">Monitoramento</h3>
-                    <p className="text-sm text-gray-600">Supervisão 24x7 da infraestrutura</p>
-                  </div>
-                </div>
-                <div className="space-y-4 mt-8">
-                  <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
-                    <Cloud className="h-12 w-12 text-green-600 mb-4" />
-                    <h3 className="font-semibold text-gray-900 mb-2">Backup</h3>
-                    <p className="text-sm text-gray-600">Proteção completa dos dados</p>
-                  </div>
-                  <div className="bg-gradient-to-br from-blue-500 to-red-500 rounded-xl p-6 text-white">
-                    <h3 className="font-semibold mb-2">Suporte Especializado</h3>
-                    <p className="text-sm opacity-90">Atendimento técnico qualificado</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+      {/* Infraestrutura de TI */}
+      <section id="infra" className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <Badge className="bg-blue-100 text-blue-700 mb-4">Infraestrutura</Badge>
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Infraestrutura de TI Profissional
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Soluções completas de monitoramento, virtualização, segurança e backup para sua empresa
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            {infraServices.map((service, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Card className="h-full hover:shadow-xl transition-all border-0 shadow-lg overflow-hidden">
+                  <div className={`h-1 bg-gradient-to-r ${service.gradient}`} />
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className={`p-3 rounded-xl bg-gradient-to-br ${service.gradient} text-white`}>
+                        {service.icon}
+                      </div>
+                      <Badge variant="secondary">{service.badge}</Badge>
+                    </div>
+                    <CardTitle className="text-xl">{service.title}</CardTitle>
+                    <CardDescription>{service.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2">
+                      {service.features.map((feature, idx) => (
+                        <li key={idx} className="flex items-center gap-2 text-sm text-gray-700">
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Services Section */}
-      <section id="services" className="py-20 bg-white">
+      {/* Cloud Services */}
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <Badge className="bg-cyan-100 text-cyan-700 mb-4">Cloud</Badge>
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Infraestrutura de TI
+              Infraestrutura em Nuvem
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Oferecemos soluções completas de TI com foco em ferramentas open-source 
-              e tecnologias enterprise para máxima eficiência e economia.
+              Servidores, backup e armazenamento com alta disponibilidade e pagamento em moeda nacional
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {services.map((service, index) => (
-              <Card key={index} className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg">
-                <CardHeader className="pb-4">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-3 bg-gray-50 rounded-lg group-hover:scale-110 transition-transform">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {cloudServices.map((service, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ y: -5 }}
+              >
+                <Card className="h-full hover:shadow-lg transition-all border hover:border-cyan-200">
+                  <CardHeader>
+                    <div className="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center text-cyan-600 mb-4">
                       {service.icon}
                     </div>
-                    <Badge variant="secondary" className="bg-blue-50 text-blue-700">
-                      {service.badge}
-                    </Badge>
-                  </div>
-                  <CardTitle className="text-xl text-gray-900">{service.title}</CardTitle>
-                  <CardDescription className="text-gray-600">
-                    {service.description}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3 mb-6">
-                    {service.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-start space-x-3">
-                        <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
-                        <span className="text-gray-700 text-sm">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Button variant="outline" className="w-full group" asChild>
-                    <a href="#contact">
-                      Saiba Mais
-                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                    </a>
-                  </Button>
-                </CardContent>
-              </Card>
+                    <CardTitle className="text-lg">{service.title}</CardTitle>
+                    <CardDescription>{service.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-1">
+                      {service.features.map((feature, idx) => (
+                        <li key={idx} className="text-sm text-gray-600 flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 bg-cyan-500 rounded-full" />
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Intelligent Solutions Section */}
-      <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
+      {/* Web & Email */}
+      <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <Badge className="bg-purple-100 text-purple-700 mb-4">Web & E-mail</Badge>
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              🧠 Soluções Inteligentes e Desenvolvimento de Software
+              Desenvolvimento Web & E-mail Corporativo
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Desenvolvimento de sistemas sob medida e integração de IA para automação 
-              e otimização dos processos empresariais.
+              Presença digital profissional e infraestrutura de comunicação empresarial
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {intelligentSolutions.map((solution, index) => (
-              <Card key={index} className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg">
-                <CardHeader className="pb-4">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-3 bg-gray-50 rounded-lg group-hover:scale-110 transition-transform">
-                      {solution.icon}
-                    </div>
-                    <Badge variant="secondary" className="bg-indigo-50 text-indigo-700">
-                      {solution.badge}
-                    </Badge>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {webServices.map((service, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ y: -5 }}
+              >
+                <Card className="h-full hover:shadow-lg transition-all text-center border hover:border-purple-200 p-6">
+                  <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center text-purple-600 mx-auto mb-4">
+                    {service.icon}
                   </div>
-                  <CardTitle className="text-xl text-gray-900">{solution.title}</CardTitle>
-                  <CardDescription className="text-gray-600">
-                    {solution.description}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3 mb-6">
-                    {solution.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-start space-x-3">
-                        <div className="w-2 h-2 bg-indigo-600 rounded-full mt-2 flex-shrink-0"></div>
-                        <span className="text-gray-700 text-sm">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Button variant="outline" className="w-full group" asChild>
-                    <a href="#contact">
-                      Solicitar Consulta
-                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                    </a>
-                  </Button>
-                </CardContent>
-              </Card>
+                  <h3 className="font-bold text-gray-900 mb-2">{service.title}</h3>
+                  <p className="text-sm text-gray-600">{service.description}</p>
+                </Card>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      <About />
-      <Technologies />
-      <Contact />
+      {/* AI & Development */}
+      <section className="py-20 bg-gradient-to-br from-slate-900 via-indigo-900 to-slate-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <Badge className="bg-indigo-500/20 text-indigo-300 border-indigo-400/30 mb-4">
+              🧠 Inovação
+            </Badge>
+            <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
+              Soluções Inteligentes e Desenvolvimento
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              Sistemas sob medida e integração de IA para automação e otimização de processos
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {aiServices.map((service, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Card className="h-full bg-white/10 backdrop-blur-sm border-white/10 hover:bg-white/15 transition-all">
+                  <CardHeader>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className={`p-3 rounded-xl bg-gradient-to-br ${service.gradient} text-white`}>
+                        {service.icon}
+                      </div>
+                      <Badge className="bg-white/20 text-white border-white/30">{service.badge}</Badge>
+                    </div>
+                    <CardTitle className="text-xl text-white">{service.title}</CardTitle>
+                    <CardDescription className="text-gray-300">{service.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2">
+                      {service.features.map((feature, idx) => (
+                        <li key={idx} className="flex items-center gap-2 text-sm text-gray-300">
+                          <CheckCircle className="w-4 h-4 text-cyan-400" />
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Support for Offices */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+            >
+              <Badge className="bg-green-100 text-green-700 mb-4">Empresarial</Badge>
+              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-6">
+                Suporte Especializado para Escritórios
+              </h2>
+              <p className="text-lg text-gray-600 mb-6">
+                Atendimento técnico confiável, seguro e sob medida para manter sua operação 
+                funcionando sem interrupções. Ideal para escritórios de advocacia, contabilidades, 
+                clínicas e empresas que precisam de confidencialidade.
+              </p>
+              <ul className="space-y-3 mb-8">
+                {[
+                  "Formatação e otimização de computadores",
+                  "Instalação de impressoras e scanners",
+                  "Manutenção preventiva e corretiva",
+                  "Backup seguro de documentos",
+                  "Adequação à LGPD",
+                  "Suporte a softwares específicos"
+                ].map((item, i) => (
+                  <li key={i} className="flex items-center gap-3 text-gray-700">
+                    <CheckCircle className="w-5 h-5 text-green-500" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <Button size="lg" className="bg-green-600 hover:bg-green-700" asChild>
+                <a href="https://wa.me/5591982370332?text=Olá! Preciso de suporte técnico para meu escritório.">
+                  Agendar Atendimento
+                </a>
+              </Button>
+            </motion.div>
+
+            <motion.div
+              className="grid grid-cols-2 gap-4"
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+            >
+              {[
+                { icon: <Scale className="w-6 h-6" />, title: "Advocacia", desc: "SAJ, Projudi, PJe" },
+                { icon: <Shield className="w-6 h-6" />, title: "Confidencialidade", desc: "Sigilo absoluto" },
+                { icon: <HeadphonesIcon className="w-6 h-6" />, title: "Suporte Remoto", desc: "Atendimento rápido" },
+                { icon: <Lock className="w-6 h-6" />, title: "LGPD", desc: "Conformidade total" }
+              ].map((item, i) => (
+                <Card key={i} className="p-5 hover:shadow-lg transition-all border hover:border-green-200">
+                  <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-green-600 mb-3">
+                    {item.icon}
+                  </div>
+                  <h3 className="font-bold text-gray-900">{item.title}</h3>
+                  <p className="text-sm text-gray-600">{item.desc}</p>
+                </Card>
+              ))}
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Final */}
+      <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-700">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
+              Pronto para Transformar sua TI?
+            </h2>
+            <p className="text-xl text-blue-100 mb-8">
+              Agende uma consultoria gratuita e descubra a solução ideal para o seu negócio
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50 px-8" asChild>
+                <a href="https://wa.me/5591982370332?text=Olá! Gostaria de agendar uma consultoria gratuita.">
+                  Agendar Consultoria Gratuita
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </a>
+              </Button>
+              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10" asChild>
+                <Link to="/#contact">Falar com Especialista</Link>
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      <Footer />
     </div>
   );
 };
