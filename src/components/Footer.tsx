@@ -7,7 +7,8 @@ import {
   Facebook, 
   Instagram, 
   Linkedin,
-  ArrowUp
+  ArrowUp,
+  Settings
 } from 'lucide-react';
 
 const Footer = () => {
@@ -174,6 +175,13 @@ const Footer = () => {
               <a href="/termos-uso" className="hover:text-white transition-colors">
                 Termos de Uso
               </a>
+              <Link 
+                to="/admin/login"
+                className="flex items-center gap-1.5 hover:text-white transition-colors"
+              >
+                <Settings className="w-4 h-4" />
+                Admin
+              </Link>
               <button 
                 onClick={scrollToTop}
                 className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-colors"
