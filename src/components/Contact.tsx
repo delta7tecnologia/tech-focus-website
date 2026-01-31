@@ -104,7 +104,7 @@ const Contact = () => {
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Nome completo
+                    Nome completo *
                   </label>
                   <Input 
                     placeholder="Seu nome"
@@ -131,7 +131,7 @@ const Contact = () => {
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    E-mail
+                    E-mail *
                   </label>
                   <Input 
                     type="email" 
@@ -158,7 +158,7 @@ const Contact = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Como podemos ajudar?
+                  Como podemos ajudar? *
                 </label>
                 <Textarea 
                   placeholder="Descreva brevemente sua necessidade..."
@@ -187,26 +187,26 @@ const Contact = () => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            {/* Contact Cards */}
-            <div className="grid sm:grid-cols-2 gap-4">
+            {/* Contact Cards - Grid 2x2 */}
+            <div className="grid grid-cols-2 gap-4">
               {contactInfo.map((info, index) => (
                 <motion.div
                   key={index}
                   className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:border-blue-200 transition-all"
                   whileHover={{ y: -3 }}
                 >
-                  <div className="flex items-start gap-4">
+                  <div className="flex items-start gap-3">
                     <div className="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0">
                       {info.icon}
                     </div>
-                    <div>
-                      <div className="text-sm text-gray-500 mb-1">{info.title}</div>
+                    <div className="min-w-0">
+                      <div className="text-xs text-gray-500 mb-0.5">{info.title}</div>
                       {info.link ? (
-                        <a href={info.link} className="font-medium text-gray-900 hover:text-blue-600 transition-colors">
+                        <a href={info.link} className="font-medium text-gray-900 hover:text-blue-600 transition-colors text-sm break-all">
                           {info.value}
                         </a>
                       ) : (
-                        <div className="font-medium text-gray-900">{info.value}</div>
+                        <div className="font-medium text-gray-900 text-sm">{info.value}</div>
                       )}
                     </div>
                   </div>
@@ -228,7 +228,7 @@ const Contact = () => {
                   <p className="text-green-100 text-sm">Resposta rápida e direta</p>
                 </div>
               </div>
-              <p className="text-green-50 mb-4">
+              <p className="text-green-50 mb-4 text-sm">
                 Prefere conversar diretamente? Nosso time está pronto para 
                 atender você pelo WhatsApp.
               </p>
@@ -249,7 +249,7 @@ const Contact = () => {
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3984.4080858009606!2d-47.3582811!3d-2.9841332000000005!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x92b75df6c286c857%3A0xdb62e4ebaaf76857!2sDelta7%20Solu%C3%A7%C3%B5es%20em%20Tecnologia!5e0!3m2!1spt-BR!2sbr!4v1752178438389!5m2!1spt-BR!2sbr"
                 width="100%"
-                height="200"
+                height="180"
                 style={{ border: 0 }}
                 allowFullScreen
                 loading="lazy"

@@ -9,7 +9,18 @@ import Portfolio from "./pages/Portfolio";
 import Depoimentos from "./pages/Depoimentos";
 import Ferramentas from "./pages/Ferramentas";
 import VideoInstitucional from "./pages/VideoInstitucional";
+import LinksUteis from "./pages/LinksUteis";
 import NotFound from "./pages/NotFound";
+
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminSetup from "./pages/admin/AdminSetup";
+import AdminLayout from "./pages/admin/AdminLayout";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminTestimonials from "./pages/admin/AdminTestimonials";
+import AdminProducts from "./pages/admin/AdminProducts";
+import AdminServices from "./pages/admin/AdminServices";
+import AdminLinks from "./pages/admin/AdminLinks";
+import AdminFaq from "./pages/admin/AdminFaq";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +37,20 @@ const App = () => (
           <Route path="/depoimentos" element={<Depoimentos />} />
           <Route path="/ferramentas" element={<Ferramentas />} />
           <Route path="/video-institucional" element={<VideoInstitucional />} />
+          <Route path="/links-uteis" element={<LinksUteis />} />
+          
+          {/* Admin Routes */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/setup" element={<AdminSetup />} />
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="avaliacoes" element={<AdminTestimonials />} />
+            <Route path="produtos" element={<AdminProducts />} />
+            <Route path="servicos" element={<AdminServices />} />
+            <Route path="links" element={<AdminLinks />} />
+            <Route path="faq" element={<AdminFaq />} />
+          </Route>
+          
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
