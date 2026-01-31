@@ -7,8 +7,11 @@ import About from '@/components/About';
 import Differentials from '@/components/Differentials';
 import Testimonials from '@/components/Testimonials';
 import Technologies from '@/components/Technologies';
+import FAQSection from '@/components/FAQSection';
+import UsefulLinksSection from '@/components/UsefulLinksSection';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
+import WhatsAppButton from '@/components/WhatsAppButton';
 
 const Index = () => {
   return (
@@ -21,8 +24,11 @@ const Index = () => {
       <Differentials />
       <Testimonials />
       <Technologies />
+      <FAQSection />
+      <UsefulLinksSection />
       <Contact />
       <Footer />
+      <WhatsAppButton />
     </div>
   );
 };
