@@ -10,7 +10,8 @@ import {
   LogOut,
   Menu,
   X,
-  ExternalLink
+  ExternalLink,
+  Building2
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { supabase } from '@/integrations/supabase/client';
@@ -76,6 +77,7 @@ const AdminLayout = () => {
     { name: 'Avaliações', icon: Star, path: '/admin/avaliacoes' },
     { name: 'Produtos', icon: Package, path: '/admin/produtos' },
     { name: 'Serviços', icon: Settings, path: '/admin/servicos' },
+    { name: 'Clientes', icon: Building2, path: '/admin/clientes' },
     { name: 'Links Úteis', icon: LinkIcon, path: '/admin/links' },
     { name: 'FAQ', icon: HelpCircle, path: '/admin/faq' },
   ];

@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Star, Package, Settings, Link as LinkIcon, HelpCircle, Plus, ExternalLink } from 'lucide-react';
+import { Star, Package, Settings, Link as LinkIcon, HelpCircle, Plus, ExternalLink, Building2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -47,10 +47,19 @@ const AdminDashboard = () => {
     }
   });
 
+  const { data: clientCount } = useQuery({
+    queryKey: ['admin-clients-count'],
+    queryFn: async () => {
+      const { count } = await supabase.from('clients').select('*', { count: 'exact', head: true });
+      return count || 0;
+    }
+  });
+
   const stats = [
     { name: 'Avaliações', count: testimonialCount, icon: Star, color: 'bg-yellow-500', path: '/admin/avaliacoes' },
     { name: 'Produtos', count: productCount, icon: Package, color: 'bg-blue-500', path: '/admin/produtos' },
     { name: 'Serviços', count: serviceCount, icon: Settings, color: 'bg-green-500', path: '/admin/servicos' },
+    { name: 'Clientes', count: clientCount, icon: Building2, color: 'bg-cyan-500', path: '/admin/clientes' },
     { name: 'Links Úteis', count: linkCount, icon: LinkIcon, color: 'bg-purple-500', path: '/admin/links' },
     { name: 'FAQs', count: faqCount, icon: HelpCircle, color: 'bg-orange-500', path: '/admin/faq' },
   ];

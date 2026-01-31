@@ -1,16 +1,34 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { Building2 } from 'lucide-react';
+
+interface Client {
+  id: string;
+  name: string;
+  logo_url: string | null;
+  website_url: string | null;
+}
 
 const ClientsSection = () => {
-  // Placeholder client logos - representando segmentos atendidos
-  const clientSegments = [
-    { name: "Escritórios de Advocacia", count: "50+" },
-    { name: "Clínicas e Consultórios", count: "35+" },
-    { name: "Comércio e Varejo", count: "40+" },
-    { name: "Indústrias", count: "25+" },
-    { name: "Construtoras", count: "20+" },
-    { name: "Contabilidades", count: "30+" },
-  ];
+  const { data: clients } = useQuery({
+    queryKey: ['clients'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('clients')
+        .select('*')
+        .eq('is_active', true)
+        .order('order_index', { ascending: true });
+      
+      if (error) throw error;
+      return data as Client[];
+    },
+  });
+
+  if (!clients || clients.length === 0) {
+    return null;
+  }
 
   return (
     <section className="py-16 bg-gray-50 overflow-hidden">
@@ -23,27 +41,40 @@ const ClientsSection = () => {
           viewport={{ once: true }}
         >
           <p className="text-blue-600 font-semibold text-sm uppercase tracking-wider mb-2">
-            Confiança de quem usa
+            Nossos Clientes
           </p>
-          <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">
-            + de 200 empresas confiam na Delta7
+          <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-4">
+            Empresas que confiam na Delta7
           </h2>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            A Delta7 Tecnologia tem orgulho de atender empresas que são referência em seus segmentos
+          </p>
         </motion.div>
 
-        {/* Client Segments Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-12">
-          {clientSegments.map((segment, index) => (
+        {/* Clients Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-12">
+          {clients.map((client, index) => (
             <motion.div
-              key={segment.name}
-              className="bg-white rounded-xl p-6 text-center shadow-sm border border-gray-100 hover:shadow-md hover:border-blue-200 transition-all"
+              key={client.id}
+              className="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-100 hover:shadow-md hover:border-blue-200 transition-all"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
+              transition={{ delay: (index % 12) * 0.05 }}
               whileHover={{ y: -5 }}
             >
-              <div className="text-3xl font-bold text-blue-600 mb-1">{segment.count}</div>
-              <div className="text-xs text-gray-600">{segment.name}</div>
+              {client.logo_url ? (
+                <img 
+                  src={client.logo_url} 
+                  alt={client.name} 
+                  className="w-16 h-16 object-contain mx-auto mb-2"
+                />
+              ) : (
+                <div className="w-16 h-16 bg-blue-50 rounded-lg flex items-center justify-center mx-auto mb-2">
+                  <Building2 className="w-8 h-8 text-blue-600" />
+                </div>
+              )}
+              <p className="text-sm font-medium text-gray-700 truncate">{client.name}</p>
             </motion.div>
           ))}
         </div>
