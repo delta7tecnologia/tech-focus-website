@@ -1,99 +1,143 @@
 import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
+import { motion } from 'framer-motion';
 import { Star, Quote } from 'lucide-react';
 
 const Testimonials = () => {
   const testimonials = [
     {
-      name: "Carlos Mendes",
-      role: "Diretor de Operações",
-      company: "Logística Express",
-      content: "A Delta7 transformou nossa infraestrutura de TI. O monitoramento proativo reduziu significativamente nossos tempos de inatividade.",
-      rating: 5
+      name: "Ricardo Santos",
+      role: "Diretor de TI",
+      company: "Construtora Amazônia",
+      content: "A Delta7 transformou nossa infraestrutura de TI. O monitoramento 24/7 e o suporte rápido nos deram tranquilidade para focar no crescimento do negócio.",
+      rating: 5,
+      image: "RS"
     },
     {
-      name: "Ana Paula Silva",
-      role: "Gerente Administrativa",
-      company: "Escritório Advocacia Silva",
-      content: "Excelente suporte técnico e atendimento. A equipe sempre resolve nossos problemas com agilidade e profissionalismo.",
-      rating: 5
+      name: "Dra. Carla Mendes",
+      role: "Sócia",
+      company: "Mendes & Associados Advocacia",
+      content: "Migrar para a nuvem foi mais simples do que imaginávamos. A equipe da Delta7 nos acompanhou em cada etapa e hoje temos 100% de mobilidade.",
+      rating: 5,
+      image: "CM"
     },
     {
-      name: "Roberto Almeida",
+      name: "Fernando Lima",
       role: "CEO",
-      company: "Indústria Almeida",
-      content: "Implementaram nosso firewall e backup em nuvem com perfeição. Hoje temos total confiança na segurança dos nossos dados.",
-      rating: 5
+      company: "TechParts Distribuição",
+      content: "O sistema de backup implementado pela Delta7 nos salvou de uma situação crítica. Recuperamos todos os dados em menos de 2 horas.",
+      rating: 5,
+      image: "FL"
     },
     {
-      name: "Fernanda Costa",
-      role: "Coordenadora de TI",
-      company: "Grupo Educacional Costa",
-      content: "A consultoria da Delta7 nos ajudou a reduzir custos e otimizar toda a infraestrutura. Recomendo fortemente!",
-      rating: 5
+      name: "Ana Paula Ferreira",
+      role: "Gerente Financeiro",
+      company: "Clínica Saúde Integral",
+      content: "Excelente atendimento! O firewall e as políticas de segurança implementadas nos deram a conformidade que precisávamos para a LGPD.",
+      rating: 5,
+      image: "AF"
     }
   ];
 
-  const stats = [
-    { value: "200+", label: "Clientes Satisfeitos" },
-    { value: "98%", label: "Taxa de Resolução" },
-    { value: "< 2h", label: "Tempo Médio de Resposta" },
-    { value: "10+", label: "Anos de Experiência" }
-  ];
-
   return (
-    <section className="py-20 bg-white">
+    <section className="py-20 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-          {stats.map((stat, index) => (
-            <div key={index} className="text-center p-6 bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl">
-              <div className="text-3xl lg:text-4xl font-bold text-blue-600 mb-2">{stat.value}</div>
-              <div className="text-gray-600 font-medium">{stat.label}</div>
-            </div>
-          ))}
-        </div>
-
-        <div className="text-center mb-12">
-          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-            O que nossos clientes dizem
+        {/* Header */}
+        <motion.div 
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          <span className="text-blue-400 font-semibold text-sm uppercase tracking-wider">
+            Depoimentos
+          </span>
+          <h2 className="text-3xl lg:text-4xl font-bold text-white mt-2 mb-4">
+            O que nossos <span className="text-cyan-400">clientes</span> dizem
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            A satisfação dos nossos clientes é a melhor prova da qualidade dos nossos serviços.
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            A satisfação dos nossos clientes é o nosso maior indicador de sucesso
           </p>
-        </div>
+        </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        {/* Stats Bar */}
+        <motion.div 
+          className="flex flex-wrap justify-center gap-8 lg:gap-16 mb-16 py-8 border-y border-white/10"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+        >
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-1 mb-1">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+              ))}
+            </div>
+            <div className="text-sm text-gray-400">4.9/5 de avaliação</div>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl font-bold text-white">98%</div>
+            <div className="text-sm text-gray-400">Taxa de satisfação</div>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl font-bold text-white">200+</div>
+            <div className="text-sm text-gray-400">Clientes ativos</div>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl font-bold text-white">15min</div>
+            <div className="text-sm text-gray-400">Tempo médio de resposta</div>
+          </div>
+        </motion.div>
+
+        {/* Testimonials Grid */}
+        <div className="grid md:grid-cols-2 gap-6">
           {testimonials.map((testimonial, index) => (
-            <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-shadow">
-              <CardContent className="p-8">
-                <div className="flex items-center mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-yellow-400" />
-                  ))}
-                </div>
-                
-                <div className="relative mb-6">
-                  <Quote className="absolute -top-2 -left-2 h-8 w-8 text-blue-100" />
-                  <p className="text-gray-700 leading-relaxed pl-6">
+            <motion.div
+              key={index}
+              className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:bg-white/10 transition-all"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+              whileHover={{ y: -5 }}
+            >
+              <div className="flex items-start gap-4">
+                <Quote className="w-8 h-8 text-blue-400 flex-shrink-0 opacity-50" />
+                <div className="flex-1">
+                  <p className="text-gray-300 leading-relaxed mb-4">
                     "{testimonial.content}"
                   </p>
-                </div>
-                
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                    {testimonial.name.charAt(0)}
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold">
+                      {testimonial.image}
+                    </div>
+                    <div>
+                      <div className="font-semibold text-white">{testimonial.name}</div>
+                      <div className="text-sm text-gray-400">
+                        {testimonial.role} • {testimonial.company}
+                      </div>
+                    </div>
                   </div>
-                  <div className="ml-4">
-                    <div className="font-semibold text-gray-900">{testimonial.name}</div>
-                    <div className="text-sm text-gray-600">{testimonial.role}</div>
-                    <div className="text-sm text-blue-600">{testimonial.company}</div>
-                  </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </motion.div>
           ))}
         </div>
+
+        {/* CTA */}
+        <motion.div 
+          className="text-center mt-12"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+        >
+          <p className="text-gray-400 mb-4">Junte-se a mais de 200 empresas satisfeitas</p>
+          <a 
+            href="https://wa.me/5591982370332?text=Olá! Gostaria de saber mais sobre os serviços da Delta7."
+            className="inline-flex items-center gap-2 bg-white text-blue-600 font-semibold px-6 py-3 rounded-full hover:bg-blue-50 transition-colors"
+          >
+            Fale com nosso time
+          </a>
+        </motion.div>
       </div>
     </section>
   );

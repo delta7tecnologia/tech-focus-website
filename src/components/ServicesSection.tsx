@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { motion } from 'framer-motion';
 import { 
   Monitor, 
   Shield, 
@@ -10,141 +11,155 @@ import {
   BarChart3, 
   Network, 
   Settings, 
-  ArrowRight 
+  ArrowRight,
+  CheckCircle
 } from 'lucide-react';
 
 const ServicesSection = () => {
   const services = [
     {
-      icon: <Monitor className="h-8 w-8" />,
+      icon: <Monitor className="h-7 w-7" />,
       title: "Suporte Técnico e TI Gerenciada",
-      description: "Gestão completa da infraestrutura de TI com atendimento especializado",
+      description: "Gestão completa da infraestrutura de TI com atendimento especializado e proativo",
       features: ["Help desk e suporte remoto", "Gestão de chamados (GLPI)", "Manutenção preventiva", "Inventário de ativos"],
       badge: "Essencial",
-      color: "blue"
+      gradient: "from-blue-500 to-blue-600"
     },
     {
-      icon: <Server className="h-8 w-8" />,
+      icon: <Server className="h-7 w-7" />,
       title: "Servidores e Virtualização",
-      description: "Infraestrutura robusta com alta disponibilidade",
+      description: "Infraestrutura robusta com alta disponibilidade e performance",
       features: ["Proxmox VE", "VMware vSphere", "Windows Server", "Linux Enterprise"],
       badge: "Enterprise",
-      color: "green"
+      gradient: "from-green-500 to-emerald-600"
     },
     {
-      icon: <Shield className="h-8 w-8" />,
+      icon: <Shield className="h-7 w-7" />,
       title: "Firewall e Segurança",
-      description: "Proteção avançada contra ameaças e invasões",
+      description: "Proteção avançada contra ameaças cibernéticas e invasões",
       features: ["PfSense / OPNsense", "VPN Site-to-Site", "Wazuh SIEM", "Análise de vulnerabilidades"],
       badge: "Segurança",
-      color: "red"
+      gradient: "from-red-500 to-rose-600"
     },
     {
-      icon: <Cloud className="h-8 w-8" />,
+      icon: <Cloud className="h-7 w-7" />,
       title: "Backup Local e em Nuvem",
-      description: "Proteção total dos dados e recuperação de desastres",
+      description: "Proteção total dos dados com recuperação de desastres garantida",
       features: ["Backup automatizado", "Replicação em nuvem", "Disaster recovery", "Testes de integridade"],
       badge: "Proteção",
-      color: "cyan"
+      gradient: "from-cyan-500 to-teal-600"
     },
     {
-      icon: <BarChart3 className="h-8 w-8" />,
-      title: "Monitoramento",
-      description: "Supervisão proativa 24x7 da infraestrutura",
-      features: ["Zabbix", "Grafana dashboards", "Alertas em tempo real", "Relatórios de SLA"],
+      icon: <BarChart3 className="h-7 w-7" />,
+      title: "Monitoramento 24x7",
+      description: "Supervisão proativa da infraestrutura com alertas em tempo real",
+      features: ["Zabbix", "Grafana dashboards", "Alertas inteligentes", "Relatórios de SLA"],
       badge: "Crítico",
-      color: "orange"
+      gradient: "from-orange-500 to-amber-600"
     },
     {
-      icon: <Network className="h-8 w-8" />,
+      icon: <Network className="h-7 w-7" />,
       title: "Infraestrutura de Redes",
-      description: "Projetos e implementação de redes corporativas",
+      description: "Projetos e implementação de redes corporativas de alto desempenho",
       features: ["Switching e routing", "Wi-Fi corporativo", "Cabeamento estruturado", "VLANs e segmentação"],
       badge: "Redes",
-      color: "purple"
+      gradient: "from-purple-500 to-violet-600"
     },
     {
-      icon: <Settings className="h-8 w-8" />,
+      icon: <Settings className="h-7 w-7" />,
       title: "Consultoria e Projetos de TI",
-      description: "Planejamento estratégico e projetos sob medida",
+      description: "Planejamento estratégico e projetos sob medida para seu negócio",
       features: ["Análise de ambiente", "Roadmap tecnológico", "Migração de sistemas", "Documentação técnica"],
       badge: "Consultoria",
-      color: "indigo"
+      gradient: "from-indigo-500 to-blue-600"
     }
   ];
 
-  const getColorClasses = (color: string) => {
-    const colors: Record<string, { icon: string; badge: string; border: string }> = {
-      blue: { icon: "text-blue-600", badge: "bg-blue-50 text-blue-700", border: "hover:border-blue-200" },
-      green: { icon: "text-green-600", badge: "bg-green-50 text-green-700", border: "hover:border-green-200" },
-      red: { icon: "text-red-500", badge: "bg-red-50 text-red-700", border: "hover:border-red-200" },
-      cyan: { icon: "text-cyan-600", badge: "bg-cyan-50 text-cyan-700", border: "hover:border-cyan-200" },
-      orange: { icon: "text-orange-500", badge: "bg-orange-50 text-orange-700", border: "hover:border-orange-200" },
-      purple: { icon: "text-purple-600", badge: "bg-purple-50 text-purple-700", border: "hover:border-purple-200" },
-      indigo: { icon: "text-indigo-600", badge: "bg-indigo-50 text-indigo-700", border: "hover:border-indigo-200" }
-    };
-    return colors[color] || colors.blue;
-  };
-
   return (
-    <section id="services" className="py-20 bg-white">
+    <section id="services" className="py-20 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <Badge className="bg-blue-100 text-blue-700 mb-4">Nossos Serviços</Badge>
-          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-            Soluções Completas em TI
+        {/* Header */}
+        <motion.div 
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          <span className="text-blue-600 font-semibold text-sm uppercase tracking-wider">
+            Nossos Serviços
+          </span>
+          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mt-2 mb-4">
+            Soluções Completas em <span className="text-blue-600">TI</span>
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Oferecemos uma gama completa de serviços de tecnologia para manter 
+            Oferecemos um ecossistema completo de serviços tecnológicos para manter 
             sua empresa segura, conectada e sempre operacional.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {services.map((service, index) => {
-            const colorClasses = getColorClasses(service.color);
-            return (
-              <Card 
-                key={index} 
-                className={`group hover:shadow-xl transition-all duration-300 border ${colorClasses.border}`}
-              >
+        {/* Services Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          {services.map((service, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+            >
+              <Card className="h-full group hover:shadow-xl transition-all duration-300 border-0 shadow-md overflow-hidden">
+                {/* Gradient Top Bar */}
+                <div className={`h-1 bg-gradient-to-r ${service.gradient}`} />
+                
                 <CardHeader className="pb-4">
                   <div className="flex items-center justify-between mb-4">
-                    <div className={`p-3 bg-gray-50 rounded-lg group-hover:scale-110 transition-transform ${colorClasses.icon}`}>
+                    <div className={`p-3 rounded-xl bg-gradient-to-br ${service.gradient} text-white shadow-lg group-hover:scale-110 transition-transform`}>
                       {service.icon}
                     </div>
-                    <Badge variant="secondary" className={colorClasses.badge}>
+                    <Badge variant="secondary" className="bg-gray-100 text-gray-700 font-medium">
                       {service.badge}
                     </Badge>
                   </div>
-                  <CardTitle className="text-lg text-gray-900">{service.title}</CardTitle>
+                  <CardTitle className="text-lg text-gray-900 group-hover:text-blue-600 transition-colors">
+                    {service.title}
+                  </CardTitle>
                   <CardDescription className="text-gray-600">
                     {service.description}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ul className="space-y-2 mb-4">
+                  <ul className="space-y-2">
                     {service.features.map((feature, idx) => (
                       <li key={idx} className="flex items-center space-x-2 text-sm text-gray-700">
-                        <div className="w-1.5 h-1.5 bg-blue-600 rounded-full flex-shrink-0"></div>
+                        <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
                         <span>{feature}</span>
                       </li>
                     ))}
                   </ul>
                 </CardContent>
               </Card>
-            );
-          })}
+            </motion.div>
+          ))}
         </div>
 
-        <div className="text-center mt-12">
-          <Button size="lg" className="bg-blue-600 hover:bg-blue-700" asChild>
+        {/* CTA */}
+        <motion.div 
+          className="text-center"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          <Button 
+            size="lg" 
+            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/25 px-8"
+            asChild
+          >
             <a href="#contact">
               Solicitar Orçamento
-              <ArrowRight className="ml-2 h-4 w-4" />
+              <ArrowRight className="ml-2 h-5 w-5" />
             </a>
           </Button>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
