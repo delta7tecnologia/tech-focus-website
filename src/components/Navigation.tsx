@@ -1,7 +1,7 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Menu, X, Phone, Headset, ExternalLink, Link2 } from 'lucide-react';
+import { Menu, X, Phone, Headset, ChevronDown } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,114 +11,118 @@ import {
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const location = useLocation();
+  const isHome = location.pathname === '/';
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const navLinks = [
+    { name: 'Início', href: '/' },
+    { name: 'Serviços', href: '/#services' },
+    { name: 'Quem Somos', href: '/#about' },
+    { name: 'Contato', href: '/#contact' }
+  ];
+
+  const solutionLinks = [
+    { name: 'Soluções Empresariais', href: '/solucoes' },
+    { name: 'Suporte para Escritórios', href: '/juridico' },
+    { name: 'Desenvolvimento Web', href: '/desenvolvimento-web' },
+    { name: 'Infraestrutura em Nuvem', href: '/infraestrutura-nuvem' }
+  ];
 
   return (
-    <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-sm border-b border-gray-200 z-50">
+    <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+      isScrolled || !isHome
+        ? 'bg-white shadow-md' 
+        : 'bg-transparent'
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              {/* Logo space */}
-            </div>
-          </div>
+          {/* Logo */}
+          <Link to="/" className="flex-shrink-0">
+            <img 
+              src={isScrolled || !isHome ? "/logo.png" : "/logo-branco.png"}
+              alt="Delta7 Tecnologia" 
+              className="h-10 w-auto"
+            />
+          </Link>
 
-          <div className="hidden md:flex items-center space-x-4">
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex items-center space-x-8">
+            {navLinks.map((link) => (
+              <a
+                key={link.name}
+                href={link.href}
+                className={`font-medium transition-colors ${
+                  isScrolled || !isHome
+                    ? 'text-gray-700 hover:text-blue-600' 
+                    : 'text-white/90 hover:text-white'
+                }`}
+              >
+                {link.name}
+              </a>
+            ))}
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <Link2 className="w-4 h-4 mr-2" />
-                  Links Úteis
-                </Button>
+                <button className={`flex items-center font-medium transition-colors ${
+                  isScrolled || !isHome
+                    ? 'text-gray-700 hover:text-blue-600' 
+                    : 'text-white/90 hover:text-white'
+                }`}>
+                  Soluções
+                  <ChevronDown className="ml-1 h-4 w-4" />
+                </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56 bg-white">
-                <DropdownMenuItem asChild>
-                  <a 
-                    href="https://anydesk.com/pt/downloads/windows" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between cursor-pointer"
-                  >
-                    <span>AnyDesk</span>
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <a 
-                    href="https://rustdesk.com/" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between cursor-pointer"
-                  >
-                    <span>RustDesk</span>
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <a 
-                    href="https://www.win-rar.com/download.html" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between cursor-pointer"
-                  >
-                    <span>WinRAR</span>
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <a 
-                    href="https://www.7-zip.org/download.html" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between cursor-pointer"
-                  >
-                    <span>7-Zip</span>
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <a href="/solucoes">Soluções Empresariais</a>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <a href="/juridico">Soluções Jurídicas</a>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <a href="/desenvolvimento-web">Desenvolvimento Web</a>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <a href="/infraestrutura-nuvem">Infraestrutura em Nuvem</a>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <a href="/portfolio">Portfolio</a>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <a href="/depoimentos">Depoimentos</a>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <a href="/ferramentas">Ferramentas</a>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <a href="/video-institucional">Vídeo Institucional</a>
-                </DropdownMenuItem>
+                {solutionLinks.map((link) => (
+                  <DropdownMenuItem key={link.name} asChild>
+                    <Link to={link.href} className="cursor-pointer">
+                      {link.name}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
               </DropdownMenuContent>
             </DropdownMenu>
+          </div>
 
-            <Button variant="outline" size="sm" asChild>
+          {/* Desktop CTA Buttons */}
+          <div className="hidden lg:flex items-center space-x-4">
+            <Button 
+              variant={isScrolled || !isHome ? "outline" : "ghost"}
+              size="sm" 
+              className={!isScrolled && isHome ? "text-white border-white/30 hover:bg-white/10" : ""}
+              asChild
+            >
               <a href="https://www.app.delta7tecnologia.com.br/front/login.php">
                 <Headset className="w-4 h-4 mr-2" />
-                Portal de Chamados
+                Portal
               </a>
             </Button>
-            <Button className="bg-blue-600 hover:bg-blue-700">
-              <Phone className="w-4 h-4 mr-2" />
-              Contato
+            <Button 
+              size="sm"
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+              asChild
+            >
+              <a href="https://wa.me/5591982370332?text=Olá! Gostaria de falar com um especialista.">
+                <Phone className="w-4 h-4 mr-2" />
+                Fale Conosco
+              </a>
             </Button>
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden">
+          <div className="lg:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-700 hover:text-blue-600"
+              className={isScrolled || !isHome ? "text-gray-700" : "text-white"}
             >
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -127,93 +131,46 @@ const Navigation = () => {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-2 sm:px-3 bg-white border-t">
-              <p className="px-3 py-2 text-sm font-semibold text-gray-500">Links Úteis</p>
-              <a
-                href="https://anydesk.com/pt/downloads/windows"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium flex items-center justify-between"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <span>AnyDesk</span>
-                <ExternalLink className="w-4 h-4" />
-              </a>
-              <a
-                href="https://rustdesk.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium flex items-center justify-between"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <span>RustDesk</span>
-                <ExternalLink className="w-4 h-4" />
-              </a>
-              <a
-                href="https://www.win-rar.com/download.html"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium flex items-center justify-between"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <span>WinRAR</span>
-                <ExternalLink className="w-4 h-4" />
-              </a>
-              <a
-                href="https://www.7-zip.org/download.html"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium flex items-center justify-between"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <span>7-Zip</span>
-                <ExternalLink className="w-4 h-4" />
-              </a>
+          <div className="lg:hidden bg-white border-t shadow-lg">
+            <div className="px-4 py-4 space-y-2">
+              {navLinks.map((link) => (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md font-medium"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {link.name}
+                </a>
+              ))}
 
               <div className="border-t pt-2 mt-2">
-                <p className="px-3 py-2 text-sm font-semibold text-gray-500">Páginas</p>
-                <a href="/solucoes" className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
-                  Soluções Empresariais
-                </a>
-                <a href="/juridico" className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
-                  Soluções Jurídicas
-                </a>
-                <a href="/desenvolvimento-web" className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
-                  Desenvolvimento Web
-                </a>
-                <a href="/infraestrutura-nuvem" className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
-                  Infraestrutura em Nuvem
-                </a>
-                <a href="/portfolio" className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
-                  Portfolio
-                </a>
-                <a href="/depoimentos" className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
-                  Depoimentos
-                </a>
-                <a href="/ferramentas" className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
-                  Ferramentas
-                </a>
-                <a href="/video-institucional" className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
-                  Vídeo Institucional
-                </a>
+                <p className="px-3 py-2 text-sm font-semibold text-gray-500">Soluções</p>
+                {solutionLinks.map((link) => (
+                  <Link
+                    key={link.name}
+                    to={link.href}
+                    className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {link.name}
+                  </Link>
+                ))}
               </div>
-              
-              <div className="border-t pt-2 mt-2">
-                <a
-                  href="https://www.app.delta7tecnologia.com.br/front/login.php"
-                  className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Portal de Chamados
-                </a>
-                <a
-                  href="#contact"
-                  className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Contato
-                </a>
+
+              <div className="border-t pt-4 mt-4 space-y-2">
+                <Button variant="outline" className="w-full" asChild>
+                  <a href="https://www.app.delta7tecnologia.com.br/front/login.php">
+                    <Headset className="w-4 h-4 mr-2" />
+                    Portal de Chamados
+                  </a>
+                </Button>
+                <Button className="w-full bg-blue-600 hover:bg-blue-700" asChild>
+                  <a href="https://wa.me/5591982370332">
+                    <Phone className="w-4 h-4 mr-2" />
+                    Fale Conosco
+                  </a>
+                </Button>
               </div>
             </div>
           </div>
