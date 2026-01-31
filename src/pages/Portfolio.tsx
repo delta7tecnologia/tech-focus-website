@@ -19,7 +19,7 @@ const Portfolio = () => {
               </Link>
               <div className="h-6 w-px bg-gray-300"></div>
               <img 
-                src="/uploads/960d4398-2d86-492b-8415-3fe19e4f9f38.png"
+                src="/lovable-uploads/960d4398-2d86-492b-8415-3fe19e4f9f38.png" 
                 alt="Delta7 Tecnologia"
                 className="h-12 w-auto"
               />
