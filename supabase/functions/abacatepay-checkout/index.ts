@@ -21,6 +21,7 @@ interface CheckoutRequest {
     taxId: string;
     cellphone: string;
   };
+  paymentMethod: 'PIX' | 'CREDIT_CARD' | 'BOLETO';
   returnUrl: string;
   completionUrl: string;
 }
@@ -38,7 +39,7 @@ serve(async (req) => {
       throw new Error('AbacatePay API Key não configurada');
     }
 
-    const { items, customer, returnUrl, completionUrl }: CheckoutRequest = await req.json();
+    const { items, customer, paymentMethod, returnUrl, completionUrl }: CheckoutRequest = await req.json();
 
     // Validate request
     if (!items || items.length === 0) {
@@ -58,6 +59,15 @@ serve(async (req) => {
       description: item.description || item.name,
     }));
 
+    // Map payment methods
+    const methodsMap: Record<string, string[]> = {
+      'PIX': ['PIX'],
+      'CREDIT_CARD': ['CREDIT_CARD'],
+      'BOLETO': ['BOLETO'],
+    };
+
+    const methods = methodsMap[paymentMethod] || ['PIX'];
+
     // Create billing via AbacatePay API
     const billingResponse = await fetch('https://api.abacatepay.com/v1/billing/create', {
       method: 'POST',
@@ -67,7 +77,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         frequency: 'ONE_TIME',
-        methods: ['PIX'],
+        methods: methods,
         products: products,
         returnUrl: returnUrl,
         completionUrl: completionUrl,
@@ -84,7 +94,7 @@ serve(async (req) => {
 
     if (!billingResponse.ok) {
       console.error('AbacatePay error:', billingData);
-      throw new Error(billingData.error || 'Erro ao criar cobrança');
+      throw new Error(billingData.error || billingData.message || 'Erro ao criar cobrança');
     }
 
     return new Response(JSON.stringify({

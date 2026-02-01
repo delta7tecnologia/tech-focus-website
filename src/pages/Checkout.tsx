@@ -6,16 +6,25 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 import { useCartContext } from '@/contexts/CartContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, ArrowLeft, CreditCard, ShoppingBag, Package } from 'lucide-react';
+import { 
+  Loader2, ArrowLeft, CreditCard, ShoppingBag, Package, 
+  Shield, Lock, QrCode, FileText, CheckCircle2, Minus, Plus, Trash2 
+} from 'lucide-react';
+
+type PaymentMethod = 'PIX' | 'CREDIT_CARD' | 'BOLETO';
 
 const Checkout = () => {
-  const { items, total, clearCart } = useCartContext();
+  const { items, total, clearCart, updateQuantity, removeItem } = useCartContext();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('PIX');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -38,6 +47,19 @@ const Checkout = () => {
       .replace(/(\d{2})(\d)/, '($1) $2')
       .replace(/(\d{5})(\d)/, '$1-$2')
       .slice(0, 15);
+  };
+
+  const paymentMethodLabels = {
+    PIX: { name: 'PIX', description: 'Aprovação instantânea', icon: QrCode, discount: '5% de desconto' },
+    CREDIT_CARD: { name: 'Cartão de Crédito', description: 'Até 12x sem juros', icon: CreditCard, discount: null },
+    BOLETO: { name: 'Boleto Bancário', description: 'Vencimento em 3 dias', icon: FileText, discount: null },
+  };
+
+  const getTotal = () => {
+    if (paymentMethod === 'PIX') {
+      return total * 0.95; // 5% discount
+    }
+    return total;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -70,6 +92,7 @@ const Checkout = () => {
             taxId: formData.taxId,
             cellphone: formData.cellphone,
           },
+          paymentMethod: paymentMethod,
           returnUrl: `${window.location.origin}/loja`,
           completionUrl: `${window.location.origin}/pagamento-sucesso`,
         },
@@ -100,17 +123,19 @@ const Checkout = () => {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-gray-50">
         <Navigation />
         <main className="pt-24 pb-16">
-          <div className="container mx-auto px-4 max-w-2xl text-center py-16">
-            <ShoppingBag className="w-20 h-20 text-muted-foreground mx-auto mb-6" />
-            <h1 className="text-2xl font-bold mb-4">Seu carrinho está vazio</h1>
-            <p className="text-muted-foreground mb-8">
+          <div className="container mx-auto px-4 max-w-2xl text-center py-20">
+            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <ShoppingBag className="w-12 h-12 text-gray-400" />
+            </div>
+            <h1 className="text-3xl font-bold mb-4">Seu carrinho está vazio</h1>
+            <p className="text-muted-foreground mb-8 text-lg">
               Adicione produtos ao carrinho para continuar com a compra
             </p>
-            <Button onClick={() => navigate('/loja')}>
-              Ver Produtos
+            <Button size="lg" onClick={() => navigate('/loja')} className="bg-blue-600 hover:bg-blue-700">
+              Explorar Produtos
             </Button>
           </div>
         </main>
@@ -120,143 +145,299 @@ const Checkout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       <Navigation />
       
       <main className="pt-24 pb-16">
-        <div className="container mx-auto px-4 max-w-4xl">
+        <div className="container mx-auto px-4 max-w-6xl">
           <Button 
             variant="ghost" 
-            className="mb-6 gap-2"
+            className="mb-6 gap-2 text-muted-foreground hover:text-foreground"
             onClick={() => navigate('/loja')}
           >
             <ArrowLeft className="w-4 h-4" />
             Voltar para a loja
           </Button>
 
-          <h1 className="text-3xl font-bold mb-8">Finalizar Compra</h1>
+          {/* Progress Steps */}
+          <div className="flex items-center justify-center mb-8 gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-medium">1</div>
+              <span className="text-sm font-medium hidden sm:inline">Carrinho</span>
+            </div>
+            <div className="w-12 h-0.5 bg-blue-600"></div>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-medium">2</div>
+              <span className="text-sm font-medium hidden sm:inline">Pagamento</span>
+            </div>
+            <div className="w-12 h-0.5 bg-gray-300"></div>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center text-sm font-medium">3</div>
+              <span className="text-sm text-muted-foreground hidden sm:inline">Confirmação</span>
+            </div>
+          </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Order Summary */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Package className="w-5 h-5" />
-                  Resumo do Pedido
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {items.map((item) => (
-                    <div key={item.id} className="flex justify-between items-center">
-                      <div className="flex items-center gap-3">
-                        {item.image_url && (
-                          <img 
-                            src={item.image_url} 
-                            alt={item.name}
-                            className="w-12 h-12 object-cover rounded"
-                          />
-                        )}
-                        <div>
-                          <p className="font-medium">{item.name}</p>
-                          <p className="text-sm text-muted-foreground">
-                            Qtd: {item.quantity}
+          <h1 className="text-3xl font-bold mb-8 text-center">Finalizar Compra</h1>
+
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Left Column - Cart Items & Payment */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Cart Items */}
+              <Card className="border-0 shadow-md">
+                <CardHeader className="border-b bg-gray-50/50">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Package className="w-5 h-5 text-blue-600" />
+                    Itens do Pedido ({items.length})
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  {items.map((item, index) => (
+                    <div key={item.id}>
+                      <div className="p-4 flex gap-4">
+                        <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                          {item.image_url ? (
+                            <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Package className="w-8 h-8 text-gray-400" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium truncate">{item.name}</h4>
+                          {item.description && (
+                            <p className="text-sm text-muted-foreground truncate">{item.description}</p>
+                          )}
+                          <p className="text-blue-600 font-semibold mt-1">
+                            R$ {item.price.toFixed(2)}
                           </p>
                         </div>
+                        <div className="flex flex-col items-end gap-2">
+                          <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+                            <button
+                              className="w-8 h-8 flex items-center justify-center hover:bg-white rounded transition-colors"
+                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            >
+                              <Minus className="w-4 h-4" />
+                            </button>
+                            <span className="w-8 text-center font-medium">{item.quantity}</span>
+                            <button
+                              className="w-8 h-8 flex items-center justify-center hover:bg-white rounded transition-colors"
+                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            >
+                              <Plus className="w-4 h-4" />
+                            </button>
+                          </div>
+                          <button
+                            className="text-sm text-red-500 hover:text-red-700 flex items-center gap-1"
+                            onClick={() => removeItem(item.id)}
+                          >
+                            <Trash2 className="w-3 h-3" />
+                            Remover
+                          </button>
+                        </div>
                       </div>
-                      <p className="font-semibold">
-                        R$ {(item.price * item.quantity).toFixed(2)}
-                      </p>
+                      {index < items.length - 1 && <Separator />}
                     </div>
                   ))}
-                  <div className="border-t pt-4 mt-4">
-                    <div className="flex justify-between text-lg font-bold">
-                      <span>Total</span>
-                      <span className="text-primary">R$ {total.toFixed(2)}</span>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
 
-            {/* Customer Form */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CreditCard className="w-5 h-5" />
-                  Dados para Pagamento
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <Label htmlFor="name">Nome Completo *</Label>
-                    <Input
-                      id="name"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      required
-                      placeholder="Seu nome completo"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="email">E-mail *</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      required
-                      placeholder="seu@email.com"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="taxId">CPF *</Label>
-                    <Input
-                      id="taxId"
-                      value={formData.taxId}
-                      onChange={(e) => setFormData({ ...formData, taxId: formatCPF(e.target.value) })}
-                      required
-                      placeholder="000.000.000-00"
-                      maxLength={14}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="cellphone">Telefone</Label>
-                    <Input
-                      id="cellphone"
-                      value={formData.cellphone}
-                      onChange={(e) => setFormData({ ...formData, cellphone: formatPhone(e.target.value) })}
-                      placeholder="(00) 00000-0000"
-                      maxLength={15}
-                    />
+              {/* Payment Methods */}
+              <Card className="border-0 shadow-md">
+                <CardHeader className="border-b bg-gray-50/50">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <CreditCard className="w-5 h-5 text-blue-600" />
+                    Forma de Pagamento
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <RadioGroup value={paymentMethod} onValueChange={(v) => setPaymentMethod(v as PaymentMethod)}>
+                    <div className="space-y-3">
+                      {(Object.keys(paymentMethodLabels) as PaymentMethod[]).map((method) => {
+                        const { name, description, icon: Icon, discount } = paymentMethodLabels[method];
+                        const isSelected = paymentMethod === method;
+                        return (
+                          <label
+                            key={method}
+                            className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                              isSelected 
+                                ? 'border-blue-600 bg-blue-50' 
+                                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                            }`}
+                          >
+                            <RadioGroupItem value={method} className="text-blue-600" />
+                            <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+                              isSelected ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600'
+                            }`}>
+                              <Icon className="w-6 h-6" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <span className="font-semibold">{name}</span>
+                                {discount && (
+                                  <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
+                                    {discount}
+                                  </Badge>
+                                )}
+                              </div>
+                              <p className="text-sm text-muted-foreground">{description}</p>
+                            </div>
+                            {isSelected && (
+                              <CheckCircle2 className="w-6 h-6 text-blue-600" />
+                            )}
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </RadioGroup>
+                </CardContent>
+              </Card>
+
+              {/* Customer Data */}
+              <Card className="border-0 shadow-md">
+                <CardHeader className="border-b bg-gray-50/50">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Shield className="w-5 h-5 text-blue-600" />
+                    Seus Dados
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <form id="checkout-form" onSubmit={handleSubmit} className="space-y-4">
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="name" className="text-sm font-medium">Nome Completo *</Label>
+                        <Input
+                          id="name"
+                          value={formData.name}
+                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                          required
+                          placeholder="Seu nome completo"
+                          className="mt-1.5 h-11"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="email" className="text-sm font-medium">E-mail *</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          required
+                          placeholder="seu@email.com"
+                          className="mt-1.5 h-11"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="taxId" className="text-sm font-medium">CPF *</Label>
+                        <Input
+                          id="taxId"
+                          value={formData.taxId}
+                          onChange={(e) => setFormData({ ...formData, taxId: formatCPF(e.target.value) })}
+                          required
+                          placeholder="000.000.000-00"
+                          maxLength={14}
+                          className="mt-1.5 h-11"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="cellphone" className="text-sm font-medium">Telefone</Label>
+                        <Input
+                          id="cellphone"
+                          value={formData.cellphone}
+                          onChange={(e) => setFormData({ ...formData, cellphone: formatPhone(e.target.value) })}
+                          placeholder="(00) 00000-0000"
+                          maxLength={15}
+                          className="mt-1.5 h-11"
+                        />
+                      </div>
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Right Column - Order Summary */}
+            <div className="lg:col-span-1">
+              <Card className="border-0 shadow-md sticky top-24">
+                <CardHeader className="border-b bg-gray-50/50">
+                  <CardTitle className="text-lg">Resumo do Pedido</CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Subtotal ({items.length} itens)</span>
+                      <span>R$ {total.toFixed(2)}</span>
+                    </div>
+                    
+                    {paymentMethod === 'PIX' && (
+                      <div className="flex justify-between text-sm text-green-600">
+                        <span>Desconto PIX (5%)</span>
+                        <span>- R$ {(total * 0.05).toFixed(2)}</span>
+                      </div>
+                    )}
+
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Frete</span>
+                      <span className="text-green-600">Grátis</span>
+                    </div>
+
+                    <Separator />
+
+                    <div className="flex justify-between text-xl font-bold">
+                      <span>Total</span>
+                      <span className="text-blue-600">R$ {getTotal().toFixed(2)}</span>
+                    </div>
+
+                    {paymentMethod === 'CREDIT_CARD' && (
+                      <p className="text-xs text-muted-foreground text-center">
+                        ou 12x de R$ {(getTotal() / 12).toFixed(2)} sem juros
+                      </p>
+                    )}
                   </div>
 
                   <Button 
-                    type="submit" 
-                    className="w-full mt-6" 
+                    type="submit"
+                    form="checkout-form"
+                    className="w-full mt-6 h-14 text-lg bg-green-600 hover:bg-green-700" 
                     size="lg"
                     disabled={isLoading}
                   >
                     {isLoading ? (
                       <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                         Processando...
                       </>
                     ) : (
                       <>
-                        <CreditCard className="w-4 h-4 mr-2" />
-                        Pagar com PIX - R$ {total.toFixed(2)}
+                        <Lock className="w-5 h-5 mr-2" />
+                        Pagar R$ {getTotal().toFixed(2)}
                       </>
                     )}
                   </Button>
 
-                  <p className="text-xs text-muted-foreground text-center">
-                    Pagamento processado com segurança via AbacatePay
+                  <div className="mt-6 space-y-3">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Shield className="w-4 h-4 text-green-500" />
+                      <span>Seus dados estão protegidos</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Lock className="w-4 h-4 text-green-500" />
+                      <span>Pagamento 100% seguro</span>
+                    </div>
+                  </div>
+
+                  <Separator className="my-4" />
+
+                  <p className="text-xs text-center text-muted-foreground">
+                    Pagamento processado com segurança via<br />
+                    <strong className="text-foreground">AbacatePay</strong>
                   </p>
-                </form>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </main>
