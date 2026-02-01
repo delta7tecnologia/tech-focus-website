@@ -1,9 +1,10 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { crypto } from "https://deno.land/std@0.168.0/crypto/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version, x-webhook-signature',
 };
 
 interface WebhookPayload {
@@ -20,6 +21,34 @@ interface WebhookPayload {
   };
 }
 
+async function verifySignature(payload: string, signature: string, secret: string): Promise<boolean> {
+  try {
+    const encoder = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+      "raw",
+      encoder.encode(secret),
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["sign"]
+    );
+    
+    const signatureBuffer = await crypto.subtle.sign(
+      "HMAC",
+      key,
+      encoder.encode(payload)
+    );
+    
+    const expectedSignature = Array.from(new Uint8Array(signatureBuffer))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+    
+    return signature === expectedSignature || signature === `sha256=${expectedSignature}`;
+  } catch (error) {
+    console.error('Signature verification error:', error);
+    return false;
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -28,10 +57,40 @@ serve(async (req) => {
   try {
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const WEBHOOK_SECRET = Deno.env.get('ABACATEPAY_WEBHOOK_SECRET');
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    const payload: WebhookPayload = await req.json();
+    // Get raw body for signature verification
+    const rawBody = await req.text();
+    
+    // Handle empty body (health checks, etc.)
+    if (!rawBody) {
+      return new Response(JSON.stringify({ success: true, message: 'OK' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Verify signature if secret is configured
+    if (WEBHOOK_SECRET) {
+      const signature = req.headers.get('x-webhook-signature') || 
+                        req.headers.get('x-signature') ||
+                        req.headers.get('x-abacatepay-signature') || '';
+      
+      if (signature) {
+        const isValid = await verifySignature(rawBody, signature, WEBHOOK_SECRET);
+        if (!isValid) {
+          console.error('Invalid webhook signature');
+          return new Response(JSON.stringify({ error: 'Invalid signature' }), {
+            status: 401,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+        console.log('Webhook signature verified successfully');
+      }
+    }
+
+    const payload: WebhookPayload = JSON.parse(rawBody);
     
     console.log('Webhook received:', JSON.stringify(payload, null, 2));
 
