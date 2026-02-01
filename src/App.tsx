@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CartProvider } from "@/contexts/CartContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 import CartDrawer from "@/components/CartDrawer";
 
 import Index from "./pages/Index";
@@ -30,48 +31,62 @@ import AdminClients from "./pages/admin/AdminClients";
 import AdminLinks from "./pages/admin/AdminLinks";
 import AdminFaq from "./pages/admin/AdminFaq";
 
+import ClientLogin from "./pages/client/ClientLogin";
+import ClientLayout from "./pages/client/ClientLayout";
+import ClientAccount from "./pages/client/ClientAccount";
+import ClientOrders from "./pages/client/ClientOrders";
+
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <CartProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <CartDrawer />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/solucoes" element={<Solucoes />} />
-            <Route path="/portfolio" element={<Portfolio />} />
-            <Route path="/depoimentos" element={<Depoimentos />} />
-            <Route path="/ferramentas" element={<Ferramentas />} />
-            <Route path="/video-institucional" element={<VideoInstitucional />} />
-            <Route path="/links-uteis" element={<LinksUteis />} />
-            <Route path="/loja" element={<Loja />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/pagamento-sucesso" element={<PagamentoSucesso />} />
-            
-            {/* Admin Routes */}
-            <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/admin/setup" element={<AdminSetup />} />
-            <Route path="/admin" element={<AdminLayout />}>
-              <Route index element={<AdminDashboard />} />
-              <Route path="pedidos" element={<AdminOrders />} />
-              <Route path="avaliacoes" element={<AdminTestimonials />} />
-              <Route path="produtos" element={<AdminProducts />} />
-              <Route path="servicos" element={<AdminServices />} />
-              <Route path="clientes" element={<AdminClients />} />
-              <Route path="links" element={<AdminLinks />} />
-              <Route path="faq" element={<AdminFaq />} />
-            </Route>
-            
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </CartProvider>
+    <AuthProvider>
+      <CartProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <CartDrawer />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/solucoes" element={<Solucoes />} />
+              <Route path="/portfolio" element={<Portfolio />} />
+              <Route path="/depoimentos" element={<Depoimentos />} />
+              <Route path="/ferramentas" element={<Ferramentas />} />
+              <Route path="/video-institucional" element={<VideoInstitucional />} />
+              <Route path="/links-uteis" element={<LinksUteis />} />
+              <Route path="/loja" element={<Loja />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/pagamento-sucesso" element={<PagamentoSucesso />} />
+              
+              {/* Client Routes */}
+              <Route path="/cliente/login" element={<ClientLogin />} />
+              <Route path="/cliente" element={<ClientLayout />}>
+                <Route index element={<ClientAccount />} />
+                <Route path="pedidos" element={<ClientOrders />} />
+              </Route>
+              
+              {/* Admin Routes */}
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin/setup" element={<AdminSetup />} />
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<AdminDashboard />} />
+                <Route path="pedidos" element={<AdminOrders />} />
+                <Route path="avaliacoes" element={<AdminTestimonials />} />
+                <Route path="produtos" element={<AdminProducts />} />
+                <Route path="servicos" element={<AdminServices />} />
+                <Route path="clientes" element={<AdminClients />} />
+                <Route path="links" element={<AdminLinks />} />
+                <Route path="faq" element={<AdminFaq />} />
+              </Route>
+              
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </CartProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

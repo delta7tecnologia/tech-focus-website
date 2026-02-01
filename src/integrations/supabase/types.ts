@@ -80,6 +80,60 @@ export type Database = {
         }
         Relationships: []
       }
+      licenses: {
+        Row: {
+          activated_at: string | null
+          activation_instructions: string | null
+          created_at: string
+          encrypted_serial: string
+          id: string
+          is_activated: boolean | null
+          license_key: string
+          order_id: string
+          product_id: string
+          updated_at: string
+        }
+        Insert: {
+          activated_at?: string | null
+          activation_instructions?: string | null
+          created_at?: string
+          encrypted_serial: string
+          id?: string
+          is_activated?: boolean | null
+          license_key: string
+          order_id: string
+          product_id: string
+          updated_at?: string
+        }
+        Update: {
+          activated_at?: string | null
+          activation_instructions?: string | null
+          created_at?: string
+          encrypted_serial?: string
+          id?: string
+          is_activated?: boolean | null
+          license_key?: string
+          order_id?: string
+          product_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "licenses_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "licenses_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           created_at: string
@@ -98,6 +152,7 @@ export type Database = {
           subtotal: number
           total: number
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -116,6 +171,7 @@ export type Database = {
           subtotal?: number
           total?: number
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -134,6 +190,7 @@ export type Database = {
           subtotal?: number
           total?: number
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
