@@ -11,7 +11,8 @@ import {
   Menu,
   X,
   ExternalLink,
-  Building2
+  Building2,
+  ShoppingBag
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { supabase } from '@/integrations/supabase/client';
@@ -74,6 +75,7 @@ const AdminLayout = () => {
 
   const menuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, path: '/admin' },
+    { name: 'Pedidos', icon: ShoppingBag, path: '/admin/pedidos' },
     { name: 'Avaliações', icon: Star, path: '/admin/avaliacoes' },
     { name: 'Produtos', icon: Package, path: '/admin/produtos' },
     { name: 'Serviços', icon: Settings, path: '/admin/servicos' },

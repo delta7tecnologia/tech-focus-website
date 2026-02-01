@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Star, Package, Settings, Link as LinkIcon, HelpCircle, Plus, ExternalLink, Building2 } from 'lucide-react';
+import { Star, Package, Settings, Link as LinkIcon, HelpCircle, Plus, ExternalLink, Building2, ShoppingBag, CreditCard } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -55,7 +55,25 @@ const AdminDashboard = () => {
     }
   });
 
+  const { data: orderCount } = useQuery({
+    queryKey: ['admin-orders-count'],
+    queryFn: async () => {
+      const { count } = await supabase.from('orders').select('*', { count: 'exact', head: true });
+      return count || 0;
+    }
+  });
+
+  const { data: pendingOrderCount } = useQuery({
+    queryKey: ['admin-pending-orders-count'],
+    queryFn: async () => {
+      const { count } = await supabase.from('orders').select('*', { count: 'exact', head: true }).eq('payment_status', 'pending');
+      return count || 0;
+    }
+  });
+
   const stats = [
+    { name: 'Pedidos', count: orderCount, icon: ShoppingBag, color: 'bg-emerald-500', path: '/admin/pedidos' },
+    { name: 'Pendentes', count: pendingOrderCount, icon: CreditCard, color: 'bg-amber-500', path: '/admin/pedidos' },
     { name: 'Avaliações', count: testimonialCount, icon: Star, color: 'bg-yellow-500', path: '/admin/avaliacoes' },
     { name: 'Produtos', count: productCount, icon: Package, color: 'bg-blue-500', path: '/admin/produtos' },
     { name: 'Serviços', count: serviceCount, icon: Settings, color: 'bg-green-500', path: '/admin/servicos' },
@@ -65,10 +83,10 @@ const AdminDashboard = () => {
   ];
 
   const quickActions = [
+    { name: 'Ver Pedidos', description: 'Acompanhe os pedidos da loja', icon: ShoppingBag, path: '/admin/pedidos' },
     { name: 'Adicionar Avaliação', description: 'Cadastre uma nova avaliação de cliente', icon: Star, path: '/admin/avaliacoes' },
     { name: 'Novo Produto', description: 'Adicione um novo produto ao catálogo', icon: Package, path: '/admin/produtos' },
     { name: 'Novo Serviço', description: 'Cadastre um novo serviço oferecido', icon: Settings, path: '/admin/servicos' },
-    { name: 'Adicionar Link', description: 'Adicione um link útil ao portal', icon: LinkIcon, path: '/admin/links' },
   ];
 
   return (
@@ -80,7 +98,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-4">
         {stats.map((stat) => (
           <Link key={stat.name} to={stat.path}>
             <Card className="hover:shadow-md transition-shadow cursor-pointer">
