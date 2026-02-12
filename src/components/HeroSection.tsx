@@ -16,18 +16,18 @@ const HeroSection = () => {
   }, []);
 
   return (
-    <section className="relative min-h-screen pt-20 overflow-hidden">
+    <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 pt-20 overflow-hidden">
       {/* Raining Letters Background */}
-      <RainingLetters
-        showTitle={false}
-        charCount={250}
-        className="!min-h-0 absolute inset-0"
-      >
-        <div className="w-full h-full" />
-      </RainingLetters>
+      <div className="absolute inset-0 z-0">
+        <RainingLetters
+          showTitle={false}
+          charCount={200}
+          className="!min-h-0 !absolute !inset-0 !bg-transparent"
+        />
+      </div>
 
       {/* Grid Pattern */}
-      <div className="absolute inset-0 opacity-5 z-10">
+      <div className="absolute inset-0 opacity-5 z-[1]">
         <div className="absolute inset-0" style={{
           backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
                            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
@@ -35,7 +35,7 @@ const HeroSection = () => {
         }} />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 py-16 lg:py-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-16 lg:py-24">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left Content */}
           <motion.div 
