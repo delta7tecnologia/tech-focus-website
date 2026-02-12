@@ -214,7 +214,7 @@ const RainingLetters: React.FC<RainingLettersProps> = ({
   }, [])
 
   return (
-    <div className={`relative min-h-screen w-full overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 ${className}`}>
+    <div className={`relative min-h-screen w-full overflow-hidden ${className.includes('!bg-transparent') ? '' : 'bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900'} ${className}`}>
       {/* Content overlay */}
       {showTitle && (
         <div className="absolute inset-0 flex flex-col items-center justify-center z-20 pointer-events-none">
