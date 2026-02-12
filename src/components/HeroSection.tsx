@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Shield, Server, Cloud, Headphones, CheckCircle, Play } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { RainingLetters } from '@/components/ui/modern-animated-hero-section';
 
 const HeroSection = () => {
   const words = ['inteligente', 'eficiente', 'confiável', 'segura'];
@@ -15,16 +16,18 @@ const HeroSection = () => {
   }, []);
 
   return (
-    <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 pt-20 overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute top-1/2 -left-40 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
-        <div className="absolute bottom-20 right-1/4 w-64 h-64 bg-blue-400/10 rounded-full blur-2xl animate-pulse delay-500" />
-      </div>
+    <section className="relative min-h-screen pt-20 overflow-hidden">
+      {/* Raining Letters Background */}
+      <RainingLetters
+        showTitle={false}
+        charCount={250}
+        className="!min-h-0 absolute inset-0"
+      >
+        <div className="w-full h-full" />
+      </RainingLetters>
 
       {/* Grid Pattern */}
-      <div className="absolute inset-0 opacity-5">
+      <div className="absolute inset-0 opacity-5 z-10">
         <div className="absolute inset-0" style={{
           backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
                            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
@@ -32,7 +35,7 @@ const HeroSection = () => {
         }} />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-16 lg:py-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 py-16 lg:py-24">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left Content */}
           <motion.div 
@@ -42,7 +45,6 @@ const HeroSection = () => {
             transition={{ duration: 0.8 }}
           >
             <div className="space-y-6">
-              {/* Badge */}
               <motion.div 
                 className="inline-flex items-center px-4 py-2 bg-blue-500/20 border border-blue-400/30 rounded-full text-blue-300 text-sm font-medium backdrop-blur-sm"
                 initial={{ opacity: 0, y: -20 }}
@@ -53,7 +55,6 @@ const HeroSection = () => {
                 + de 10 anos de experiência em TI
               </motion.div>
               
-              {/* Main Title */}
               <h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight">
                 Transforme seu negócio com uma TI{' '}
                 <span className="block mt-2">
@@ -79,7 +80,6 @@ const HeroSection = () => {
               </p>
             </div>
 
-            {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
               <Button 
                 size="lg" 
@@ -104,7 +104,6 @@ const HeroSection = () => {
               </Button>
             </div>
 
-            {/* Trust Badge */}
             <motion.div 
               className="flex items-center gap-4 text-sm text-gray-400"
               initial={{ opacity: 0 }}
@@ -122,7 +121,6 @@ const HeroSection = () => {
               </span>
             </motion.div>
 
-            {/* Stats */}
             <motion.div 
               className="flex flex-wrap gap-8 pt-8 border-t border-white/10"
               initial={{ opacity: 0, y: 20 }}
@@ -204,7 +202,7 @@ const HeroSection = () => {
       </div>
 
       {/* Wave Bottom */}
-      <div className="absolute bottom-0 left-0 right-0">
+      <div className="absolute bottom-0 left-0 right-0 z-20">
         <svg className="w-full h-20 text-white" viewBox="0 0 1440 54" fill="currentColor" preserveAspectRatio="none">
           <path d="M0 22L60 16.7C120 11 240 1.00001 360 0.700012C480 1.00001 600 11 720 16.7C840 22 960 22 1080 18.3C1200 15 1320 7.00001 1380 3.70001L1440 0.700012V54H1380C1320 54 1200 54 1080 54C960 54 840 54 720 54C600 54 480 54 360 54C240 54 120 54 60 54H0V22Z" />
         </svg>
