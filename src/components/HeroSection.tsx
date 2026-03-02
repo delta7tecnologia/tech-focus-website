@@ -84,7 +84,7 @@ const HeroSection = () => {
               
               <motion.h1 variants={itemVariants} className="text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-white">
                 Transforme seu negócio com uma TI{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-cyan-400 inline-block relative">
+                <span className="inline-block relative">
                   <AnimatePresence mode="wait">
                     <motion.span
                       key={currentWordIndex}
@@ -92,7 +92,7 @@ const HeroSection = () => {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
-                      className="inline-block"
+                      className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-cyan-400"
                     >
                       {words[currentWordIndex]}
                     </motion.span>
