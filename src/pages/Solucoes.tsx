@@ -469,6 +469,7 @@ const Solucoes = () => {
 
       <Footer />
     </div>
+  </PageTransition>
   );
 };
 
