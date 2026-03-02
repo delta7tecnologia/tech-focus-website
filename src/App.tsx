@@ -17,6 +17,7 @@ import ResetPassword from "./pages/ResetPassword";
 
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminSetup from "./pages/admin/AdminSetup";
+import AdminSettings from "./pages/admin/AdminSettings";
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminTestimonials from "./pages/admin/AdminTestimonials";
