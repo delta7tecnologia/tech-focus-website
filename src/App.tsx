@@ -13,6 +13,7 @@ import Ferramentas from "./pages/Ferramentas";
 import VideoInstitucional from "./pages/VideoInstitucional";
 import LinksUteis from "./pages/LinksUteis";
 import NotFound from "./pages/NotFound";
+import ResetPassword from "./pages/ResetPassword";
 
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminSetup from "./pages/admin/AdminSetup";
