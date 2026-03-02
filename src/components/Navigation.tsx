@@ -78,7 +78,7 @@ const Navigation = () => {
 
           {/* Desktop CTA Buttons */}
           <div className="hidden lg:flex items-center space-x-4">
-            <CartButton />
+            
             <Button 
               variant={isScrolled || !isHome ? "outline" : "ghost"}
               size="sm" 
