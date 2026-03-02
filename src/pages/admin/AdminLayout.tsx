@@ -82,6 +82,7 @@ const AdminLayout = () => {
     { name: 'Clientes', icon: Building2, path: '/admin/clientes' },
     { name: 'Links Úteis', icon: LinkIcon, path: '/admin/links' },
     { name: 'FAQ', icon: HelpCircle, path: '/admin/faq' },
+    { name: 'Configurações', icon: Settings, path: '/admin/configuracoes' },
   ];
 
   if (loading) {

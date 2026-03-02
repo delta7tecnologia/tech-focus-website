@@ -136,7 +136,32 @@ const AdminLogin = () => {
             </Button>
           </form>
 
-          <div className="mt-6 text-center">
+          <div className="mt-4 text-center">
+            <button
+              type="button"
+              onClick={async () => {
+                if (!email) {
+                  setError('Digite seu e-mail para recuperar a senha.');
+                  return;
+                }
+                setLoading(true);
+                const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                  redirectTo: `${window.location.origin}/reset-password`,
+                });
+                setLoading(false);
+                if (error) {
+                  setError(error.message);
+                } else {
+                  toast({ title: "E-mail enviado!", description: "Verifique sua caixa de entrada para redefinir a senha." });
+                }
+              }}
+              className="text-sm text-blue-600 hover:underline"
+            >
+              Esqueci minha senha
+            </button>
+          </div>
+
+          <div className="mt-2 text-center">
             <a href="/" className="text-sm text-gray-500 hover:text-blue-600">
               ← Voltar ao site
             </a>
