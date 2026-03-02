@@ -119,6 +119,7 @@ const Solucoes = () => {
   ];
 
   return (
+    <PageTransition>
     <div className="min-h-screen bg-white">
       <Navigation />
 
