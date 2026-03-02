@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Menu, X, Phone, Headset } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
-import CartButton from './CartButton';
+
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -22,7 +22,7 @@ const Navigation = () => {
     { name: 'Início', href: '/' },
     { name: 'Serviços', href: '/#services' },
     { name: 'Soluções', href: '/solucoes' },
-    { name: 'Loja', href: '/loja' },
+    
     { name: 'Links Úteis', href: '/links-uteis' },
     { name: 'Quem Somos', href: '/#about' },
     { name: 'Contato', href: '/#contact' }
@@ -78,7 +78,7 @@ const Navigation = () => {
 
           {/* Desktop CTA Buttons */}
           <div className="hidden lg:flex items-center space-x-4">
-            <CartButton />
+            
             <Button 
               variant={isScrolled || !isHome ? "outline" : "ghost"}
               size="sm" 

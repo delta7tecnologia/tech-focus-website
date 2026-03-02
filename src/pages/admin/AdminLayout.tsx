@@ -75,9 +75,9 @@ const AdminLayout = () => {
 
   const menuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, path: '/admin' },
-    { name: 'Pedidos', icon: ShoppingBag, path: '/admin/pedidos' },
+    
     { name: 'Avaliações', icon: Star, path: '/admin/avaliacoes' },
-    { name: 'Produtos', icon: Package, path: '/admin/produtos' },
+    
     { name: 'Serviços', icon: Settings, path: '/admin/servicos' },
     { name: 'Clientes', icon: Building2, path: '/admin/clientes' },
     { name: 'Links Úteis', icon: LinkIcon, path: '/admin/links' },
