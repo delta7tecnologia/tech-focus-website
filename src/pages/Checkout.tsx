@@ -17,7 +17,7 @@ import {
   Shield, Lock, QrCode, FileText, CheckCircle2, Minus, Plus, Trash2 
 } from 'lucide-react';
 
-type PaymentMethod = 'PIX' | 'CREDIT_CARD' | 'BOLETO';
+type PaymentMethod = 'PIX' | 'BOLETO';
 
 const Checkout = () => {
   const { items, total, clearCart, updateQuantity, removeItem } = useCartContext();
@@ -51,7 +51,6 @@ const Checkout = () => {
 
   const paymentMethodLabels = {
     PIX: { name: 'PIX', description: 'Aprovação instantânea', icon: QrCode, discount: '5% de desconto' },
-    CREDIT_CARD: { name: 'Cartão de Crédito', description: 'Até 12x sem juros', icon: CreditCard, discount: null },
     BOLETO: { name: 'Boleto Bancário', description: 'Vencimento em 3 dias', icon: FileText, discount: null },
   };
 
@@ -391,11 +390,6 @@ const Checkout = () => {
                       <span className="text-blue-600">R$ {getTotal().toFixed(2)}</span>
                     </div>
 
-                    {paymentMethod === 'CREDIT_CARD' && (
-                      <p className="text-xs text-muted-foreground text-center">
-                        ou 12x de R$ {(getTotal() / 12).toFixed(2)} sem juros
-                      </p>
-                    )}
                   </div>
 
                   <Button 
