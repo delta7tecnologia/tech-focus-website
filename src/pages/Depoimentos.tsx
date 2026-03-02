@@ -3,46 +3,22 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Star, Quote } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 const Depoimentos = () => {
-  const testimonials = [
-    {
-      name: "Liliam Seguins",
-      company: "Cemetra",
-      rating: 5,
-      text: "Super recomendo, o Thiago é comunicativo, explica com excelência o que vai executar, prestativo, pontual, honesto... dentre várias  qualidades que atribuirmos ao seu trabalho, a atenção nos dada para suprir toda a nossa necessidade, nos encantou. Parabéns equipe Delta7."
-    },
-    {
-      name: "Luiz Eduardo Pozzer",
-      company: "Dinâmica Center",
-      rating: 5,
-      text: "Thiago sempre eficiente, tanto em chamados simples e os mais complexos envolvendo minha rede e o meu servidor! És um profissional experiente quando se fala em redes e servidores em geral...."
-    },
-    {
-      name: "Vinícius Rodrigues Rios",
-      company: "JMC FERROS",
-      rating: 5,
-      text: "Presta serviço de qualidade, é eficiente no atendimento, não demora pra fazer visitas técnica. Super recomendo!"
-    },
-    {
-      name: "DANIELA REIS",
-      company: "Evolução Contabilidade",
-      rating: 5,
-      text: "Atendimento rápido, eficiente, com segurança. Acima de tudo, muito profissional."
-    },
-    {
-      name: "Luiz Claudio",
-      company: "CF Contabilidade",
-      rating: 5,
-      text: "Empresa comprometida em dar a melhor solução ao cliente. Todos os serviços que fizemos com a delta foram resolvidos com 100% de satisfação."
-    },
-    {
-      name: "Izaias Rossi",
-      company: "Tamadil Auto Peças e Serviços",
-      rating: 5,
-      text: "Bom atendimento, sempre prestativo, bom relacionamento com clientes."
+  const { data: testimonials = [], isLoading } = useQuery({
+    queryKey: ['testimonials-page'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('testimonials')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data;
     }
-  ];
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -51,7 +27,7 @@ const Depoimentos = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4">
-              <Link to="/juridico">
+              <Link to="/">
                 <Button variant="ghost" size="sm">
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Voltar
@@ -86,27 +62,33 @@ const Depoimentos = () => {
       {/* Testimonials Section */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-shadow">
-                <CardContent className="p-8">
-                  <div className="flex items-center mb-4">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-                    ))}
-                  </div>
-                  <div className="mb-6">
-                    <Quote className="h-8 w-8 text-blue-600 mb-4" />
-                    <p className="text-gray-600 italic leading-relaxed">{testimonial.text}</p>
-                  </div>
-                  <div className="border-t pt-4">
-                    <p className="font-semibold text-gray-900">{testimonial.name}</p>
-                    <p className="text-gray-500 text-sm">{testimonial.company}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {isLoading ? (
+            <div className="text-center py-12 text-gray-500">Carregando avaliações...</div>
+          ) : testimonials.length === 0 ? (
+            <div className="text-center py-12 text-gray-500">Nenhuma avaliação disponível no momento.</div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+              {testimonials.map((testimonial) => (
+                <Card key={testimonial.id} className="border-0 shadow-lg hover:shadow-xl transition-shadow">
+                  <CardContent className="p-8">
+                    <div className="flex items-center mb-4">
+                      {[...Array(testimonial.rating || 5)].map((_, i) => (
+                        <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                      ))}
+                    </div>
+                    <div className="mb-6">
+                      <Quote className="h-8 w-8 text-blue-600 mb-4" />
+                      <p className="text-gray-600 italic leading-relaxed">{testimonial.content}</p>
+                    </div>
+                    <div className="border-t pt-4">
+                      <p className="font-semibold text-gray-900">{testimonial.client_name}</p>
+                      {testimonial.company && <p className="text-gray-500 text-sm">{testimonial.company}</p>}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
 
           {/* Google Reviews Section */}
           <div className="bg-gradient-to-r from-blue-600 to-red-500 rounded-2xl p-12 text-white text-center">
