@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import logoDark from '@/assets/logo.png';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -63,7 +64,7 @@ const ResetPassword = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-2xl">
         <CardHeader className="text-center">
-          <img src="/logo.png" alt="Delta7" className="h-12 mx-auto mb-4" />
+          <img src={logoDark} alt="Delta7" className="h-12 mx-auto mb-4" />
           <CardTitle className="text-2xl">Redefinir Senha</CardTitle>
           <CardDescription>Digite sua nova senha</CardDescription>
         </CardHeader>

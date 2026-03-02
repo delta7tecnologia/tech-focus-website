@@ -15,25 +15,25 @@ const HeroSection = () => {
   }, []);
 
   const containerVariants = {
-    hidden: { opacity: 0 },
+    hidden: { opacity: 1 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.15, delayChildren: 0.3 }
+      transition: { staggerChildren: 0.1, delayChildren: 0 }
     }
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as const } }
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" as const } }
   };
 
   const cardVariants = {
-    hidden: { opacity: 0, scale: 0.9, y: 20 },
+    hidden: { opacity: 0, scale: 0.95, y: 15 },
     visible: (i: number) => ({
       opacity: 1,
       scale: 1,
       y: 0,
-      transition: { duration: 0.5, delay: 0.5 + i * 0.15, ease: "easeOut" as const }
+      transition: { duration: 0.4, delay: 0.3 + i * 0.1, ease: "easeOut" as const }
     })
   };
 
@@ -50,7 +50,7 @@ const HeroSection = () => {
 
       {/* Floating particles - pure CSS */}
       <div className="absolute inset-0 overflow-hidden">
-        {Array.from({ length: 20 }).map((_, i) => (
+        {Array.from({ length: 8 }).map((_, i) => (
           <div
             key={i}
             className="absolute w-1 h-1 bg-blue-400/30 rounded-full animate-pulse"

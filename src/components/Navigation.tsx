@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Menu, X, Phone, Headset } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import logoDark from '@/assets/logo.png';
+import logoWhite from '@/assets/logo-branco.png';
 
 
 const Navigation = () => {
@@ -39,7 +41,7 @@ const Navigation = () => {
           {/* Logo */}
           <Link to="/" className="flex-shrink-0">
             <img 
-              src={isScrolled || !isHome ? "/logo.png" : "/logo-branco.png"}
+              src={isScrolled || !isHome ? logoDark : logoWhite}
               alt="Delta7 Tecnologia" 
               className="h-10 w-auto"
             />
