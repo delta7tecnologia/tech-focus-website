@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Shield, Server, Cloud, Headphones, CheckCircle, Play } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const HeroSection = () => {
   const words = ['inteligente', 'eficiente', 'confiável', 'segura'];
@@ -12,6 +13,29 @@ const HeroSection = () => {
     }, 2500);
     return () => clearInterval(interval);
   }, []);
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.15, delayChildren: 0.3 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] } }
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, scale: 0.9, y: 20 },
+    visible: (i: number) => ({
+      opacity: 1,
+      scale: 1,
+      y: 0,
+      transition: { duration: 0.5, delay: 0.5 + i * 0.15, ease: [0.25, 0.46, 0.45, 0.94] }
+    })
+  };
 
   return (
     <section className="relative min-h-screen pt-20 overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
@@ -43,28 +67,47 @@ const HeroSection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-16 lg:py-24">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left Content */}
-          <div className="text-white space-y-8">
+          <motion.div
+            className="text-white space-y-8"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
             <div className="space-y-6">
-              <div className="inline-flex items-center px-4 py-2 bg-blue-500/20 border border-blue-400/30 rounded-full text-blue-300 text-sm font-medium backdrop-blur-sm">
+              <motion.div
+                variants={itemVariants}
+                className="inline-flex items-center px-4 py-2 bg-blue-500/20 border border-blue-400/30 rounded-full text-blue-300 text-sm font-medium backdrop-blur-sm"
+              >
                 <CheckCircle className="w-4 h-4 mr-2" />
                 + de 10 anos de experiência em TI
-              </div>
+              </motion.div>
               
-              <h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-white">
+              <motion.h1 variants={itemVariants} className="text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-white">
                 Transforme seu negócio com uma TI{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-cyan-400">
-                  {words[currentWordIndex]}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-cyan-400 inline-block">
+                  <AnimatePresence mode="wait">
+                    <motion.span
+                      key={currentWordIndex}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.4, ease: "easeInOut" }}
+                      className="inline-block"
+                    >
+                      {words[currentWordIndex]}
+                    </motion.span>
+                  </AnimatePresence>
                 </span>
-              </h1>
+              </motion.h1>
               
-              <p className="text-xl text-gray-200 leading-relaxed max-w-xl">
+              <motion.p variants={itemVariants} className="text-xl text-gray-200 leading-relaxed max-w-xl">
                 Líder em Gestão de TI B2B para Pequenas e Médias Empresas. 
                 Infraestrutura, segurança, monitoramento e suporte especializado 
                 para acelerar o crescimento do seu negócio.
-              </p>
+              </motion.p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4">
+            <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4">
               <Button 
                 size="lg" 
                 className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white px-8 py-6 text-lg shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all"
@@ -85,9 +128,9 @@ const HeroSection = () => {
                   Conheça Nossos Serviços
                 </a>
               </Button>
-            </div>
+            </motion.div>
 
-            <div className="flex items-center gap-4 text-sm text-gray-300">
+            <motion.div variants={itemVariants} className="flex items-center gap-4 text-sm text-gray-300">
               <span className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-green-400" />
                 +90% de avaliação positiva
@@ -97,9 +140,9 @@ const HeroSection = () => {
                 <CheckCircle className="w-4 h-4 text-green-400" />
                 Suporte 24/7
               </span>
-            </div>
+            </motion.div>
 
-            <div className="flex flex-wrap gap-8 pt-8 border-t border-white/10">
+            <motion.div variants={itemVariants} className="flex flex-wrap gap-8 pt-8 border-t border-white/10">
               {[
                 { value: '200+', label: 'Clientes Atendidos' },
                 { value: '24/7', label: 'Suporte Disponível' },
@@ -111,42 +154,57 @@ const HeroSection = () => {
                   <div className="text-sm text-gray-400 mt-1">{stat.label}</div>
                 </div>
               ))}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           {/* Right Content - Feature Cards */}
           <div className="hidden lg:grid grid-cols-2 gap-4">
             <div className="space-y-4">
-              <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:bg-white/10 hover:border-blue-400/30 transition-all duration-300 group">
-                <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <Shield className="h-6 w-6 text-blue-400" />
-                </div>
-                <h3 className="font-semibold text-white mb-2">Segurança Avançada</h3>
-                <p className="text-sm text-gray-400">Firewall, VPN, SIEM e proteção completa contra ameaças</p>
-              </div>
-              <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:bg-white/10 hover:border-green-400/30 transition-all duration-300 group">
-                <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <Server className="h-6 w-6 text-green-400" />
-                </div>
-                <h3 className="font-semibold text-white mb-2">Servidores & Virtualização</h3>
-                <p className="text-sm text-gray-400">Proxmox, VMware e alta disponibilidade</p>
-              </div>
+              {[
+                { icon: <Shield className="h-6 w-6 text-blue-400" />, bg: "bg-blue-500/20", title: "Segurança Avançada", desc: "Firewall, VPN, SIEM e proteção completa contra ameaças", hoverBorder: "hover:border-blue-400/30" },
+                { icon: <Server className="h-6 w-6 text-green-400" />, bg: "bg-green-500/20", title: "Servidores & Virtualização", desc: "Proxmox, VMware e alta disponibilidade", hoverBorder: "hover:border-green-400/30" },
+              ].map((card, i) => (
+                <motion.div
+                  key={card.title}
+                  className={`bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:bg-white/10 ${card.hoverBorder} transition-all duration-300 group`}
+                  custom={i}
+                  variants={cardVariants}
+                  initial="hidden"
+                  animate="visible"
+                  whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                >
+                  <div className={`w-12 h-12 ${card.bg} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                    {card.icon}
+                  </div>
+                  <h3 className="font-semibold text-white mb-2">{card.title}</h3>
+                  <p className="text-sm text-gray-400">{card.desc}</p>
+                </motion.div>
+              ))}
             </div>
             <div className="space-y-4 mt-8">
-              <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:bg-white/10 hover:border-cyan-400/30 transition-all duration-300 group">
-                <div className="w-12 h-12 bg-cyan-500/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <Cloud className="h-6 w-6 text-cyan-400" />
-                </div>
-                <h3 className="font-semibold text-white mb-2">Cloud & Backup</h3>
-                <p className="text-sm text-gray-400">Infraestrutura em nuvem e disaster recovery</p>
-              </div>
-              <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-6 border border-blue-500/30 shadow-xl shadow-blue-500/20 group">
-                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <Headphones className="h-6 w-6 text-white" />
-                </div>
-                <h3 className="font-semibold text-white mb-2">Suporte 24/7</h3>
-                <p className="text-sm text-blue-100">Atendimento especializado sempre disponível</p>
-              </div>
+              {[
+                { icon: <Cloud className="h-6 w-6 text-cyan-400" />, bg: "bg-cyan-500/20", title: "Cloud & Backup", desc: "Infraestrutura em nuvem e disaster recovery", hoverBorder: "hover:border-cyan-400/30", special: false },
+                { icon: <Headphones className="h-6 w-6 text-white" />, bg: "bg-white/20", title: "Suporte 24/7", desc: "Atendimento especializado sempre disponível", hoverBorder: "", special: true },
+              ].map((card, i) => (
+                <motion.div
+                  key={card.title}
+                  className={card.special 
+                    ? "bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-6 border border-blue-500/30 shadow-xl shadow-blue-500/20 group"
+                    : `bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:bg-white/10 ${card.hoverBorder} transition-all duration-300 group`
+                  }
+                  custom={i + 2}
+                  variants={cardVariants}
+                  initial="hidden"
+                  animate="visible"
+                  whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                >
+                  <div className={`w-12 h-12 ${card.bg} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                    {card.icon}
+                  </div>
+                  <h3 className="font-semibold text-white mb-2">{card.title}</h3>
+                  <p className={`text-sm ${card.special ? 'text-blue-100' : 'text-gray-400'}`}>{card.desc}</p>
+                </motion.div>
+              ))}
             </div>
           </div>
         </div>
