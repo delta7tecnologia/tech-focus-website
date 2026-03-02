@@ -390,11 +390,6 @@ const Checkout = () => {
                       <span className="text-blue-600">R$ {getTotal().toFixed(2)}</span>
                     </div>
 
-                    {paymentMethod === 'CREDIT_CARD' && (
-                      <p className="text-xs text-muted-foreground text-center">
-                        ou 12x de R$ {(getTotal() / 12).toFixed(2)} sem juros
-                      </p>
-                    )}
                   </div>
 
                   <Button 
