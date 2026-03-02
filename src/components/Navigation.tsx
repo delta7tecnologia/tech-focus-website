@@ -22,7 +22,7 @@ const Navigation = () => {
     { name: 'Início', href: '/' },
     { name: 'Serviços', href: '/#services' },
     { name: 'Soluções', href: '/solucoes' },
-    { name: 'Loja', href: '/loja' },
+    
     { name: 'Links Úteis', href: '/links-uteis' },
     { name: 'Quem Somos', href: '/#about' },
     { name: 'Contato', href: '/#contact' }
