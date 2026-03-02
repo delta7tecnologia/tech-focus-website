@@ -13,9 +13,11 @@ import Ferramentas from "./pages/Ferramentas";
 import VideoInstitucional from "./pages/VideoInstitucional";
 import LinksUteis from "./pages/LinksUteis";
 import NotFound from "./pages/NotFound";
+import ResetPassword from "./pages/ResetPassword";
 
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminSetup from "./pages/admin/AdminSetup";
+import AdminSettings from "./pages/admin/AdminSettings";
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminTestimonials from "./pages/admin/AdminTestimonials";
@@ -41,6 +43,7 @@ const App = () => (
             <Route path="/ferramentas" element={<Ferramentas />} />
             <Route path="/video-institucional" element={<VideoInstitucional />} />
             <Route path="/links-uteis" element={<LinksUteis />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
@@ -52,6 +55,7 @@ const App = () => (
               <Route path="clientes" element={<AdminClients />} />
               <Route path="links" element={<AdminLinks />} />
               <Route path="faq" element={<AdminFaq />} />
+              <Route path="configuracoes" element={<AdminSettings />} />
             </Route>
             
             <Route path="*" element={<NotFound />} />
