@@ -16,15 +16,13 @@ const HeroSection = () => {
   }, []);
 
   return (
-    <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 pt-20 overflow-hidden">
-      {/* Raining Letters Background */}
-      <div className="absolute inset-0 z-0">
-        <RainingLetters
-          showTitle={false}
-          charCount={200}
-          className="!min-h-0 !absolute !inset-0 !bg-transparent"
-        />
-      </div>
+    <section className="relative min-h-screen pt-20 overflow-hidden">
+      {/* Raining Letters as full background - CSS-only animations */}
+      <RainingLetters
+        showTitle={false}
+        charCount={120}
+        className="!min-h-0 absolute inset-0 z-0"
+      />
 
       {/* Grid Pattern */}
       <div className="absolute inset-0 opacity-5 z-[1]">
@@ -202,7 +200,7 @@ const HeroSection = () => {
       </div>
 
       {/* Wave Bottom */}
-      <div className="absolute bottom-0 left-0 right-0 z-20">
+      <div className="absolute bottom-0 left-0 right-0 z-[5]">
         <svg className="w-full h-20 text-white" viewBox="0 0 1440 54" fill="currentColor" preserveAspectRatio="none">
           <path d="M0 22L60 16.7C120 11 240 1.00001 360 0.700012C480 1.00001 600 11 720 16.7C840 22 960 22 1080 18.3C1200 15 1320 7.00001 1380 3.70001L1440 0.700012V54H1380C1320 54 1200 54 1080 54C960 54 840 54 720 54C600 54 480 54 360 54C240 54 120 54 60 54H0V22Z" />
         </svg>

@@ -1,11 +1,11 @@
 import type React from "react"
-import { useState, useEffect, useCallback, useRef } from "react"
+import { useState, useEffect, useCallback, useRef, useMemo } from "react"
 
 interface Character {
   char: string
   x: number
-  y: number
-  speed: number
+  delay: number
+  duration: number
 }
 
 class TextScramble {
@@ -147,74 +147,58 @@ interface RainingLettersProps {
 const RainingLetters: React.FC<RainingLettersProps> = ({
   title = "DELTA7",
   phrases,
-  charCount = 200,
+  charCount = 150,
   showTitle = true,
   className = '',
   children
 }) => {
-  const [characters, setCharacters] = useState<Character[]>([])
-  const [activeIndices, setActiveIndices] = useState<Set<number>>(new Set())
-
-  const createCharacters = useCallback(() => {
-    const allChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:,.<>?"
-    const newCharacters: Character[] = []
-
+  const allChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+  
+  // Generate characters once, use CSS animations for falling
+  const characters = useMemo(() => {
+    const chars: Character[] = []
     for (let i = 0; i < charCount; i++) {
-      newCharacters.push({
+      chars.push({
         char: allChars[Math.floor(Math.random() * allChars.length)],
         x: Math.random() * 100,
-        y: Math.random() * 100,
-        speed: 0.1 + Math.random() * 0.3,
+        delay: Math.random() * 15, // stagger start
+        duration: 8 + Math.random() * 12, // varying fall speeds
       })
     }
-
-    return newCharacters
+    return chars
   }, [charCount])
 
-  useEffect(() => {
-    setCharacters(createCharacters())
-  }, [createCharacters])
-
-  useEffect(() => {
-    const updateActiveIndices = () => {
-      const newActiveIndices = new Set<number>()
-      const numActive = Math.floor(Math.random() * 3) + 3
-      for (let i = 0; i < numActive; i++) {
-        newActiveIndices.add(Math.floor(Math.random() * characters.length))
-      }
-      setActiveIndices(newActiveIndices)
-    }
-
-    const flickerInterval = setInterval(updateActiveIndices, 50)
-    return () => clearInterval(flickerInterval)
-  }, [characters.length])
-
-  useEffect(() => {
-    let animationFrameId: number
-
-    const updatePositions = () => {
-      setCharacters(prevChars => 
-        prevChars.map(char => ({
-          ...char,
-          y: char.y + char.speed,
-          ...(char.y >= 100 && {
-            y: -5,
-            x: Math.random() * 100,
-            char: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:,.<>?"[
-              Math.floor(Math.random() * "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:,.<>?".length)
-            ],
-          }),
-        }))
-      )
-      animationFrameId = requestAnimationFrame(updatePositions)
-    }
-
-    animationFrameId = requestAnimationFrame(updatePositions)
-    return () => cancelAnimationFrame(animationFrameId)
-  }, [])
+  const isTransparent = className.includes('bg-transparent')
 
   return (
-    <div className={`relative min-h-screen w-full overflow-hidden ${className.includes('!bg-transparent') ? '' : 'bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900'} ${className}`}>
+    <div className={`relative min-h-screen w-full overflow-hidden ${isTransparent ? '' : 'bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900'} ${className}`}>
+      <style>{`
+        @keyframes rain-fall {
+          0% { transform: translateY(-5vh); opacity: 0; }
+          5% { opacity: 1; }
+          95% { opacity: 1; }
+          100% { transform: translateY(105vh); opacity: 0; }
+        }
+        @keyframes rain-glow {
+          0%, 100% { color: rgba(59, 130, 246, 0.3); text-shadow: none; }
+          50% { color: rgba(34, 211, 238, 0.9); text-shadow: 0 0 10px rgba(34, 211, 238, 0.8); }
+        }
+        .rain-char {
+          animation: rain-fall var(--duration) linear var(--delay) infinite;
+          position: absolute;
+          left: var(--x);
+          top: -20px;
+          font-family: monospace;
+          font-size: 14px;
+          color: rgba(59, 130, 246, 0.3);
+          user-select: none;
+          pointer-events: none;
+        }
+        .rain-char:nth-child(5n) {
+          animation: rain-fall var(--duration) linear var(--delay) infinite, rain-glow 3s ease-in-out var(--delay) infinite;
+        }
+      `}</style>
+
       {/* Content overlay */}
       {showTitle && (
         <div className="absolute inset-0 flex flex-col items-center justify-center z-20 pointer-events-none">
@@ -234,27 +218,20 @@ const RainingLetters: React.FC<RainingLettersProps> = ({
         </div>
       )}
 
-      {/* Raining Characters */}
+      {/* Raining Characters - Pure CSS animation, no React re-renders */}
       {characters.map((char, index) => (
         <span
           key={index}
-          className={`absolute font-mono text-sm transition-colors duration-100 select-none ${
-            activeIndices.has(index) 
-              ? 'text-cyan-400 text-shadow-glow' 
-              : 'text-blue-500/30'
-          }`}
+          className="rain-char"
           style={{
-            left: `${char.x}%`,
-            top: `${char.y}%`,
-            textShadow: activeIndices.has(index) ? '0 0 10px rgba(34, 211, 238, 0.8)' : 'none',
-          }}
+            '--x': `${char.x}%`,
+            '--delay': `${char.delay}s`,
+            '--duration': `${char.duration}s`,
+          } as React.CSSProperties}
         >
           {char.char}
         </span>
       ))}
-
-      {/* Gradient overlay at bottom */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-slate-900 to-transparent z-10" />
     </div>
   )
 }
