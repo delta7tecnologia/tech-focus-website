@@ -100,7 +100,7 @@ const AdminLayout = () => {
       <aside className={`${sidebarOpen ? 'w-64' : 'w-16'} bg-white shadow-lg transition-all duration-300 flex flex-col fixed h-full z-40`}>
         {/* Logo */}
         <div className="p-4 border-b flex items-center justify-between">
-          {sidebarOpen && <img src="/logo.png" alt="Delta7" className="h-8" />}
+          {sidebarOpen && <img src={logoDark} alt="Delta7" className="h-8" />}
           <button 
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="p-2 hover:bg-gray-100 rounded-lg"
