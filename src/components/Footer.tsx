@@ -10,6 +10,7 @@ import {
   ArrowUp,
   Settings
 } from 'lucide-react';
+import logoWhite from '@/assets/logo-branco.png';
 
 const Footer = () => {
   const scrollToTop = () => {
