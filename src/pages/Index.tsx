@@ -12,24 +12,27 @@ import UsefulLinksSection from '@/components/UsefulLinksSection';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 import WhatsAppButton from '@/components/WhatsAppButton';
+import PageTransition from '@/components/PageTransition';
 
 const Index = () => {
   return (
-    <div className="min-h-screen">
-      <Navigation />
-      <HeroSection />
-      <ClientsSection />
-      <ServicesSection />
-      
-      <About />
-      <Differentials />
-      <Testimonials />
-      <FAQSection />
-      <UsefulLinksSection />
-      <Contact />
-      <Footer />
-      <WhatsAppButton />
-    </div>
+    <PageTransition>
+      <div className="min-h-screen">
+        <Navigation />
+        <HeroSection />
+        <ClientsSection />
+        <ServicesSection />
+        
+        <About />
+        <Differentials />
+        <Testimonials />
+        <FAQSection />
+        <UsefulLinksSection />
+        <Contact />
+        <Footer />
+        <WhatsAppButton />
+      </div>
+    </PageTransition>
   );
 };
 
