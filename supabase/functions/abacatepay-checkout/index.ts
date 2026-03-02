@@ -69,13 +69,13 @@ serve(async (req) => {
       description: item.description || item.name,
     }));
 
-    // Map payment methods
+    // Map payment methods - AbacatePay only supports PIX and BOLETO
     const methodsMap: Record<string, string[]> = {
       'PIX': ['PIX'],
-      'CREDIT_CARD': ['CREDIT_CARD'],
       'BOLETO': ['BOLETO'],
     };
 
+    // Default to PIX if unsupported method
     const methods = methodsMap[paymentMethod] || ['PIX'];
 
     // Create billing via AbacatePay API

@@ -51,7 +51,6 @@ const Checkout = () => {
 
   const paymentMethodLabels = {
     PIX: { name: 'PIX', description: 'Aprovação instantânea', icon: QrCode, discount: '5% de desconto' },
-    CREDIT_CARD: { name: 'Cartão de Crédito', description: 'Até 12x sem juros', icon: CreditCard, discount: null },
     BOLETO: { name: 'Boleto Bancário', description: 'Vencimento em 3 dias', icon: FileText, discount: null },
   };
 
