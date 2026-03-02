@@ -123,6 +123,10 @@ const Solucoes = () => {
   return (
     <PageTransition>
     <div className="min-h-screen bg-white">
+      <SEOHead 
+        title="Soluções de TI para Empresas | Delta7 Tecnologia"
+        description="Conheça todas as soluções de TI da Delta7: infraestrutura, segurança, cloud, backup, desenvolvimento web e automação com IA para sua empresa."
+      />
       <Navigation />
 
       {/* Hero Section */}
