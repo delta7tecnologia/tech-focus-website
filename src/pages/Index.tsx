@@ -3,7 +3,7 @@ import Navigation from '@/components/Navigation';
 import HeroSection from '@/components/HeroSection';
 import ClientsSection from '@/components/ClientsSection';
 import ServicesSection from '@/components/ServicesSection';
-import FeaturedProducts from '@/components/FeaturedProducts';
+
 import About from '@/components/About';
 import Differentials from '@/components/Differentials';
 import Testimonials from '@/components/Testimonials';
