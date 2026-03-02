@@ -28,12 +28,12 @@ const HeroSection = () => {
   };
 
   const cardVariants = {
-    hidden: { opacity: 0, scale: 0.9, y: 20 },
+    hidden: { opacity: 0, scale: 0.95, y: 15 },
     visible: (i: number) => ({
       opacity: 1,
       scale: 1,
       y: 0,
-      transition: { duration: 0.5, delay: 0.5 + i * 0.15, ease: "easeOut" as const }
+      transition: { duration: 0.4, delay: 0.3 + i * 0.1, ease: "easeOut" as const }
     })
   };
 
