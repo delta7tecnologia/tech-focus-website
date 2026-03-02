@@ -16,12 +16,12 @@ const HeroSection = () => {
   }, []);
 
   return (
-    <section className="relative min-h-screen pt-20 overflow-hidden">
+    <section className="relative min-h-screen pt-20 overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
       {/* Raining Letters as full background - CSS-only animations */}
       <RainingLetters
         showTitle={false}
         charCount={120}
-        className="!min-h-0 absolute inset-0 z-0"
+        className="!min-h-0 absolute inset-0 z-0 !bg-transparent"
       />
 
       {/* Grid Pattern */}
