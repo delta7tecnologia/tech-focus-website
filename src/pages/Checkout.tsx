@@ -17,7 +17,7 @@ import {
   Shield, Lock, QrCode, FileText, CheckCircle2, Minus, Plus, Trash2 
 } from 'lucide-react';
 
-type PaymentMethod = 'PIX' | 'CREDIT_CARD' | 'BOLETO';
+type PaymentMethod = 'PIX' | 'BOLETO';
 
 const Checkout = () => {
   const { items, total, clearCart, updateQuantity, removeItem } = useCartContext();
