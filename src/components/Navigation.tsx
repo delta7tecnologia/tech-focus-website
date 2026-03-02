@@ -29,7 +29,7 @@ const Navigation = () => {
   ];
 
   return (
-    <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+    <nav aria-label="Navegação principal" className={`fixed top-0 w-full z-50 transition-all duration-300 ${
       isScrolled || !isHome
         ? 'bg-white shadow-md' 
         : 'bg-transparent'

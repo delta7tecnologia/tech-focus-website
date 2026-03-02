@@ -5,14 +5,19 @@ import UsefulLinksSection from '@/components/UsefulLinksSection';
 import WhatsAppButton from '@/components/WhatsAppButton';
 import { motion } from 'framer-motion';
 import PageTransition from '@/components/PageTransition';
+import SEOHead from '@/components/SEOHead';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 const LinksUteis = () => {
   return (
     <PageTransition>
       <div className="min-h-screen">
+        <SEOHead
+          title="Links Úteis e Ferramentas de Suporte | Delta7 Tecnologia"
+          description="Acesse rapidamente os sistemas e ferramentas de suporte da Delta7 Tecnologia. Portal de chamados, acesso remoto e mais."
+        />
         <Navigation />
         
-        {/* Hero */}
         <section className="pt-24 pb-12 bg-gradient-to-br from-blue-600 to-blue-800">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div 
@@ -27,6 +32,8 @@ const LinksUteis = () => {
             </motion.div>
           </div>
         </section>
+
+        <Breadcrumbs items={[{ label: 'Links Úteis' }]} />
 
         <UsefulLinksSection />
         

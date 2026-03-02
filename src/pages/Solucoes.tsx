@@ -12,6 +12,8 @@ import {
 import { Link } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import SEOHead from '@/components/SEOHead';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 const Solucoes = () => {
   const infraServices = [
@@ -121,6 +123,10 @@ const Solucoes = () => {
   return (
     <PageTransition>
     <div className="min-h-screen bg-white">
+      <SEOHead 
+        title="Soluções de TI para Empresas | Delta7 Tecnologia"
+        description="Conheça todas as soluções de TI da Delta7: infraestrutura, segurança, cloud, backup, desenvolvimento web e automação com IA para sua empresa."
+      />
       <Navigation />
 
       {/* Hero Section */}
@@ -166,6 +172,8 @@ const Solucoes = () => {
           </motion.div>
         </div>
       </section>
+
+      <Breadcrumbs items={[{ label: 'Soluções' }]} />
 
       {/* Infraestrutura de TI */}
       <section id="infra" className="py-20 bg-gray-50">
