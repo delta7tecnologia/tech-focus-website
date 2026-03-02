@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Menu, X, Phone, Headset } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import logoDark from '@/assets/logo.png';
+import logoWhite from '@/assets/logo-branco.png';
 
 
 const Navigation = () => {
