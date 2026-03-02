@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { motion } from 'framer-motion';
+import PageTransition from '@/components/PageTransition';
 import { 
   ArrowLeft, ArrowRight, Shield, Monitor, Cloud, BarChart3, Server, Database,
   Code2, Mail, Globe, Smartphone, Zap, Users, HardDrive, Wrench, CheckCircle,
