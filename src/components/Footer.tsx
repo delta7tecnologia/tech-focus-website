@@ -41,7 +41,7 @@ const Footer = () => {
           {/* Company Info */}
           <div className="space-y-6">
             <img 
-              src="/logo-branco.png" 
+              src={logoWhite} 
               alt="Delta7 Tecnologia" 
               className="h-10 w-auto"
             />

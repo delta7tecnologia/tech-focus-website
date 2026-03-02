@@ -41,7 +41,7 @@ const Navigation = () => {
           {/* Logo */}
           <Link to="/" className="flex-shrink-0">
             <img 
-              src={isScrolled || !isHome ? "/logo.png" : "/logo-branco.png"}
+              src={isScrolled || !isHome ? logoDark : logoWhite}
               alt="Delta7 Tecnologia" 
               className="h-10 w-auto"
             />
