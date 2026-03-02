@@ -50,7 +50,7 @@ const HeroSection = () => {
 
       {/* Floating particles - pure CSS */}
       <div className="absolute inset-0 overflow-hidden">
-        {Array.from({ length: 20 }).map((_, i) => (
+        {Array.from({ length: 8 }).map((_, i) => (
           <div
             key={i}
             className="absolute w-1 h-1 bg-blue-400/30 rounded-full animate-pulse"
