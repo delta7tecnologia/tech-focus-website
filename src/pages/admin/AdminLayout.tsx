@@ -86,6 +86,7 @@ const AdminLayout = () => {
     { name: 'Links Úteis', icon: LinkIcon, path: '/admin/links' },
     { name: 'Técnicos', icon: Users, path: '/admin/tecnicos' },
     { name: 'Patrimônios', icon: Monitor, path: '/admin/patrimonios' },
+    { name: 'Arquivos Técnicos', icon: Package, path: '/admin/arquivos' },
     { name: 'FAQ', icon: HelpCircle, path: '/admin/faq' },
     { name: 'Configurações', icon: Settings, path: '/admin/configuracoes' },
   ];
