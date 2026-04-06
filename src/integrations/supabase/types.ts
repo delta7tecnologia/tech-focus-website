@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      assets: {
+        Row: {
+          company_name: string
+          created_at: string
+          created_by: string
+          id: string
+          machine_name: string
+          notes: string | null
+          office_activation_date: string | null
+          office_license: string | null
+          screenshot_url: string | null
+          updated_at: string
+          windows_activation_date: string | null
+          windows_license: string | null
+        }
+        Insert: {
+          company_name: string
+          created_at?: string
+          created_by: string
+          id?: string
+          machine_name: string
+          notes?: string | null
+          office_activation_date?: string | null
+          office_license?: string | null
+          screenshot_url?: string | null
+          updated_at?: string
+          windows_activation_date?: string | null
+          windows_license?: string | null
+        }
+        Update: {
+          company_name?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          machine_name?: string
+          notes?: string | null
+          office_activation_date?: string | null
+          office_license?: string | null
+          screenshot_url?: string | null
+          updated_at?: string
+          windows_activation_date?: string | null
+          windows_license?: string | null
+        }
+        Relationships: []
+      }
       clients: {
         Row: {
           created_at: string

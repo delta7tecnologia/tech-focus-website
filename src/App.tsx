@@ -27,6 +27,7 @@ import AdminClients from "./pages/admin/AdminClients";
 import AdminLinks from "./pages/admin/AdminLinks";
 import AdminTechnicians from "./pages/admin/AdminTechnicians";
 import AdminFaq from "./pages/admin/AdminFaq";
+import AdminAssets from "./pages/admin/AdminAssets";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,7 @@ const App = () => (
               <Route path="links" element={<AdminLinks />} />
               <Route path="tecnicos" element={<AdminTechnicians />} />
               <Route path="faq" element={<AdminFaq />} />
+              <Route path="patrimonios" element={<AdminAssets />} />
               <Route path="configuracoes" element={<AdminSettings />} />
             </Route>
             
