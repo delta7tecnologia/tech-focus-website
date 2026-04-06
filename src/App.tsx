@@ -27,6 +27,7 @@ import AdminClients from "./pages/admin/AdminClients";
 import AdminLinks from "./pages/admin/AdminLinks";
 import AdminTechnicians from "./pages/admin/AdminTechnicians";
 import AdminFaq from "./pages/admin/AdminFaq";
+import AdminAssets from "./pages/admin/AdminAssets";
 
 const queryClient = new QueryClient();
 
