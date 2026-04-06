@@ -15,7 +15,17 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { UserCheck, UserX, Users, Pencil, KeyRound, Eye, EyeOff } from 'lucide-react';
+import { UserCheck, UserX, Users, Pencil, KeyRound, Eye, EyeOff, Trash2 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface Profile {
   id: string;
