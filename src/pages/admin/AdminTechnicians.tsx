@@ -51,6 +51,25 @@ const AdminTechnicians = () => {
   const [deleting, setDeleting] = useState(false);
   const [resettingPassword, setResettingPassword] = useState(false);
 
+  const handleDeleteUser = async () => {
+    if (!deleteProfile) return;
+    setDeleting(true);
+    try {
+      const res = await supabase.functions.invoke('admin-delete-user', {
+        body: { user_id: deleteProfile.user_id },
+      });
+      if (res.error) throw new Error(res.error.message);
+      if (res.data?.error) throw new Error(res.data.error);
+      queryClient.invalidateQueries({ queryKey: ['admin-technicians'] });
+      toast({ title: 'Técnico excluído com sucesso!' });
+      setDeleteProfile(null);
+    } catch (err: any) {
+      toast({ title: 'Erro', description: err.message, variant: 'destructive' });
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const { data: profiles, isLoading } = useQuery({
     queryKey: ['admin-technicians'],
     queryFn: async () => {
