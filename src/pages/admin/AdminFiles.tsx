@@ -7,18 +7,25 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Upload, Download, Trash2, FileText, Search } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
+import { Upload, Download, Trash2, FileText, Search, Pencil } from 'lucide-react';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+
+interface TechFile {
+  id: string;
+  title: string;
+  description: string | null;
+  file_path: string;
+  file_name: string;
+  file_size: number | null;
+  mime_type: string | null;
+  category: string | null;
+  uploaded_by: string;
+  created_at: string;
+}
 
 const AdminFiles = () => {
   const { toast } = useToast();
@@ -30,6 +37,11 @@ const AdminFiles = () => {
   const [file, setFile] = useState<File | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [deleteFile, setDeleteFile] = useState<{ id: string; filePath: string; title: string } | null>(null);
+
+  const [editFile, setEditFile] = useState<TechFile | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editCategory, setEditCategory] = useState('');
 
   const { data: currentUser } = useQuery({
     queryKey: ['current-user'],
@@ -47,7 +59,7 @@ const AdminFiles = () => {
         .select('*')
         .order('created_at', { ascending: false });
       if (error) throw error;
-      return data;
+      return data as TechFile[];
     },
   });
 
@@ -87,6 +99,25 @@ const AdminFiles = () => {
     },
     onError: (error: any) => {
       toast({ title: 'Erro ao enviar', description: error.message, variant: 'destructive' });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, title, description, category }: { id: string; title: string; description: string; category: string }) => {
+      const { error } = await supabase.from('technical_files').update({
+        title: title.trim(),
+        description: description.trim() || null,
+        category: category.trim() || 'Geral',
+      }).eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-technical-files'] });
+      toast({ title: 'Arquivo atualizado!' });
+      setEditFile(null);
+    },
+    onError: (error: any) => {
+      toast({ title: 'Erro ao atualizar', description: error.message, variant: 'destructive' });
     },
   });
 
@@ -133,6 +164,13 @@ const AdminFiles = () => {
       f.file_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (f.category || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const openEdit = (f: TechFile) => {
+    setEditTitle(f.title);
+    setEditDescription(f.description || '');
+    setEditCategory(f.category || 'Geral');
+    setEditFile(f);
+  };
 
   return (
     <div className="space-y-6">
@@ -221,7 +259,10 @@ const AdminFiles = () => {
                     </div>
                   </div>
                   <div className="flex gap-1 flex-shrink-0">
-                    <Button size="icon" variant="ghost" onClick={() => handleDownload(f.file_path, f.file_name)}>
+                    <Button size="icon" variant="ghost" onClick={() => openEdit(f)} title="Editar">
+                      <Pencil className="w-4 h-4" />
+                    </Button>
+                    <Button size="icon" variant="ghost" onClick={() => handleDownload(f.file_path, f.file_name)} title="Baixar">
                       <Download className="w-4 h-4" />
                     </Button>
                     <Button
@@ -229,6 +270,7 @@ const AdminFiles = () => {
                       variant="ghost"
                       className="text-red-600"
                       onClick={() => setDeleteFile({ id: f.id, filePath: f.file_path, title: f.title })}
+                      title="Excluir"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -240,6 +282,39 @@ const AdminFiles = () => {
         </div>
       )}
 
+      {/* Edit Dialog */}
+      <Dialog open={!!editFile} onOpenChange={(open) => !open && setEditFile(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar Arquivo</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label>Título</Label>
+              <Input value={editTitle} onChange={(e) => setEditTitle(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label>Descrição</Label>
+              <Input value={editDescription} onChange={(e) => setEditDescription(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label>Categoria</Label>
+              <Input value={editCategory} onChange={(e) => setEditCategory(e.target.value)} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditFile(null)}>Cancelar</Button>
+            <Button
+              onClick={() => editFile && updateMutation.mutate({ id: editFile.id, title: editTitle, description: editDescription, category: editCategory })}
+              disabled={updateMutation.isPending}
+            >
+              {updateMutation.isPending ? 'Salvando...' : 'Salvar'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation */}
       <AlertDialog open={!!deleteFile} onOpenChange={(open) => !open && setDeleteFile(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
