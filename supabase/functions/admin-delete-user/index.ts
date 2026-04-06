@@ -34,10 +34,14 @@ Deno.serve(async (req) => {
     }
 
     const adminClient = createClient(supabaseUrl, supabaseServiceKey);
-    const { data: isAdmin } = await adminClient.rpc("has_role", {
+    const { data: isAdmin, error: isAdminError } = await adminClient.rpc("has_role", {
       _user_id: caller.id,
       _role: "admin",
     });
+
+    if (isAdminError) {
+      throw isAdminError;
+    }
 
     if (!isAdmin) {
       return new Response(JSON.stringify({ error: "Forbidden" }), {
@@ -56,7 +60,23 @@ Deno.serve(async (req) => {
 
     // Prevent admin from deleting themselves
     if (user_id === caller.id) {
-      return new Response(JSON.stringify({ error: "Cannot delete yourself" }), {
+      return new Response(JSON.stringify({ error: "Você não pode excluir o próprio usuário." }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const { data: targetIsAdmin, error: targetRoleError } = await adminClient.rpc("has_role", {
+      _user_id: user_id,
+      _role: "admin",
+    });
+
+    if (targetRoleError) {
+      throw targetRoleError;
+    }
+
+    if (targetIsAdmin) {
+      return new Response(JSON.stringify({ error: "Administradores não podem ser excluídos por esta tela." }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
