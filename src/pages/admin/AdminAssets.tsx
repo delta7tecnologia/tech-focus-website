@@ -225,8 +225,8 @@ const AdminAssets = () => {
               <TableRow>
                 <TableHead>Máquina</TableHead>
                 <TableHead>Empresa</TableHead>
-                <TableHead>Ativação Windows</TableHead>
-                <TableHead>Ativação Office</TableHead>
+                <TableHead>Windows</TableHead>
+                <TableHead>Office</TableHead>
                 <TableHead>Evidência</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
@@ -236,8 +236,26 @@ const AdminAssets = () => {
                 <TableRow key={asset.id}>
                   <TableCell className="font-medium">{asset.machine_name}</TableCell>
                   <TableCell>{asset.company_name}</TableCell>
-                  <TableCell>{formatDate(asset.windows_activation_date)}</TableCell>
-                  <TableCell>{formatDate(asset.office_activation_date)}</TableCell>
+                  <TableCell>
+                    <div className="space-y-1">
+                      <p className="text-xs text-gray-500">Ativação: {formatDate(asset.windows_activation_date)}</p>
+                      {asset.windows_license ? (
+                        <code className="text-xs bg-gray-100 px-1.5 py-0.5 rounded font-mono break-all">{asset.windows_license}</code>
+                      ) : (
+                        <span className="text-xs text-gray-400">Sem licença</span>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="space-y-1">
+                      <p className="text-xs text-gray-500">Ativação: {formatDate(asset.office_activation_date)}</p>
+                      {asset.office_license ? (
+                        <code className="text-xs bg-gray-100 px-1.5 py-0.5 rounded font-mono break-all">{asset.office_license}</code>
+                      ) : (
+                        <span className="text-xs text-gray-400">Sem licença</span>
+                      )}
+                    </div>
+                  </TableCell>
                   <TableCell>
                     {asset.screenshot_url ? (
                       <button
