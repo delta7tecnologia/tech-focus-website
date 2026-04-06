@@ -15,7 +15,17 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { UserCheck, UserX, Users, Pencil, KeyRound, Eye, EyeOff } from 'lucide-react';
+import { UserCheck, UserX, Users, Pencil, KeyRound, Eye, EyeOff, Trash2 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface Profile {
   id: string;
@@ -37,7 +47,28 @@ const AdminTechnicians = () => {
   const [resetProfile, setResetProfile] = useState<Profile | null>(null);
   const [newPassword, setNewPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [deleteProfile, setDeleteProfile] = useState<Profile | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [resettingPassword, setResettingPassword] = useState(false);
+
+  const handleDeleteUser = async () => {
+    if (!deleteProfile) return;
+    setDeleting(true);
+    try {
+      const res = await supabase.functions.invoke('admin-delete-user', {
+        body: { user_id: deleteProfile.user_id },
+      });
+      if (res.error) throw new Error(res.error.message);
+      if (res.data?.error) throw new Error(res.data.error);
+      queryClient.invalidateQueries({ queryKey: ['admin-technicians'] });
+      toast({ title: 'Técnico excluído com sucesso!' });
+      setDeleteProfile(null);
+    } catch (err: any) {
+      toast({ title: 'Erro', description: err.message, variant: 'destructive' });
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const { data: profiles, isLoading } = useQuery({
     queryKey: ['admin-technicians'],
@@ -188,6 +219,14 @@ const AdminTechnicians = () => {
                         <UserCheck className="w-4 h-4 mr-1" /> Aprovar
                       </Button>
                     )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-destructive"
+                      onClick={() => setDeleteProfile(p)}
+                    >
+                      <Trash2 className="w-4 h-4 mr-1" /> Excluir
+                    </Button>
                   </div>
                 </div>
               </CardContent>
@@ -260,6 +299,28 @@ const AdminTechnicians = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={!!deleteProfile} onOpenChange={(open) => !open && setDeleteProfile(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir técnico?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação é irreversível. O técnico <strong>{deleteProfile?.full_name || deleteProfile?.email}</strong> será removido permanentemente do sistema.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteUser}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? 'Excluindo...' : 'Excluir'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
