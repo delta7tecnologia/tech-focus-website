@@ -12,6 +12,7 @@ import Depoimentos from "./pages/Depoimentos";
 import Ferramentas from "./pages/Ferramentas";
 import VideoInstitucional from "./pages/VideoInstitucional";
 import LinksUteis from "./pages/LinksUteis";
+import AreaTecnica from "./pages/AreaTecnica";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
 
