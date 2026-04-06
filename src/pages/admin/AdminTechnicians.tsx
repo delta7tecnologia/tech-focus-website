@@ -47,6 +47,8 @@ const AdminTechnicians = () => {
   const [resetProfile, setResetProfile] = useState<Profile | null>(null);
   const [newPassword, setNewPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [deleteProfile, setDeleteProfile] = useState<Profile | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [resettingPassword, setResettingPassword] = useState(false);
 
   const { data: profiles, isLoading } = useQuery({
