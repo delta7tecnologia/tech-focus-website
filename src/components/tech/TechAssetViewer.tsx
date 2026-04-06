@@ -31,10 +31,14 @@ const TechAssetViewer = () => {
     },
   });
 
-  const filtered = assets.filter(a =>
-    a.machine_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    a.company_name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const companies = [...new Set(assets.map(a => a.company_name))].sort();
+
+  const filtered = assets.filter(a => {
+    const matchesSearch = a.machine_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      a.company_name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCompany = !companyFilter || a.company_name === companyFilter;
+    return matchesSearch && matchesCompany;
+  });
 
   const formatDate = (d: string | null) => {
     if (!d) return '—';
