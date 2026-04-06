@@ -76,10 +76,14 @@ const [searchTerm, setSearchTerm] = useState('');
     },
   });
 
-  const filteredAssets = assets.filter(a =>
-    a.machine_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    a.company_name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const companies = [...new Set(assets.map(a => a.company_name))].sort();
+
+  const filteredAssets = assets.filter(a => {
+    const matchesSearch = a.machine_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      a.company_name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCompany = !companyFilter || a.company_name === companyFilter;
+    return matchesSearch && matchesCompany;
+  });
 
   const openNew = () => {
     setEditingId(null);
