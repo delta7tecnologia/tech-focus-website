@@ -11,7 +11,13 @@ import { useToast } from '@/hooks/use-toast';
 const TechAssetViewer = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  const [companyFilter, setCompanyFilter] = useState('');
   const [viewImage, setViewImage] = useState<string | null>(null);
+  const [visibleLicenses, setVisibleLicenses] = useState<Record<string, boolean>>({});
+
+  const toggleLicense = (key: string) => {
+    setVisibleLicenses(prev => ({ ...prev, [key]: !prev[key] }));
+  };
 
   const { data: assets = [], isLoading } = useQuery({
     queryKey: ['tech-assets'],
