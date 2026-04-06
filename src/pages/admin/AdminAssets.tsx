@@ -56,7 +56,13 @@ const AdminAssets = () => {
   const [viewImage, setViewImage] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+const [searchTerm, setSearchTerm] = useState('');
+  const [companyFilter, setCompanyFilter] = useState('');
+  const [hiddenLicenses, setHiddenLicenses] = useState<Record<string, boolean>>({});
+
+  const toggleLicense = (key: string) => {
+    setHiddenLicenses(prev => ({ ...prev, [key]: !prev[key] }));
+  };
 
   const { data: assets = [], isLoading } = useQuery({
     queryKey: ['admin-assets'],
