@@ -119,106 +119,126 @@ const TechFileManager = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Arquivos Técnicos</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Área Técnica</h2>
           <p className="text-gray-500">Olá, {user?.user_metadata?.full_name || user?.email}</p>
         </div>
         <div className="flex gap-2">
-          <Dialog open={isUploadOpen} onOpenChange={setIsUploadOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Upload className="w-4 h-4 mr-2" /> Enviar Arquivo
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Enviar Arquivo</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={(e) => { e.preventDefault(); uploadMutation.mutate(); }} className="space-y-4">
-                <div>
-                  <Label>Título *</Label>
-                  <Input value={title} onChange={(e) => setTitle(e.target.value)} required />
-                </div>
-                <div>
-                  <Label>Descrição</Label>
-                  <Input value={description} onChange={(e) => setDescription(e.target.value)} />
-                </div>
-                <div>
-                  <Label>Categoria</Label>
-                  <Input value={category} onChange={(e) => setCategory(e.target.value)} placeholder="Geral" />
-                </div>
-                <div>
-                  <Label>Arquivo *</Label>
-                  <Input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} required />
-                </div>
-                <div className="flex gap-2 justify-end">
-                  <Button type="button" variant="outline" onClick={() => setIsUploadOpen(false)}>Cancelar</Button>
-                  <Button type="submit" disabled={uploadMutation.isPending}>
-                    {uploadMutation.isPending ? 'Enviando...' : 'Enviar'}
-                  </Button>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
           <Button variant="outline" onClick={signOut}>
             <LogOut className="w-4 h-4 mr-2" /> Sair
           </Button>
         </div>
       </div>
 
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-        <Input
-          className="pl-10"
-          placeholder="Buscar arquivos..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
+      <Tabs defaultValue="files" className="w-full">
+        <TabsList>
+          <TabsTrigger value="files" className="gap-2">
+            <FileText className="w-4 h-4" /> Arquivos
+          </TabsTrigger>
+          <TabsTrigger value="assets" className="gap-2">
+            <Monitor className="w-4 h-4" /> Patrimônios
+          </TabsTrigger>
+        </TabsList>
 
-      {isLoading ? (
-        <div className="text-center py-12 text-gray-500">Carregando...</div>
-      ) : !filtered?.length ? (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500">Nenhum arquivo encontrado</p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid gap-4">
-          {filtered.map((f) => (
-            <Card key={f.id}>
-              <CardContent className="p-4 sm:p-6">
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-4 min-w-0">
-                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <FileText className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="font-semibold text-gray-900 truncate">{f.title}</p>
-                      <p className="text-xs text-gray-500 truncate">{f.file_name} · {formatSize(f.file_size)}</p>
-                      {f.description && <p className="text-sm text-gray-500 mt-1">{f.description}</p>}
-                      <span className="inline-block text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded mt-1">
-                        {f.category}
-                      </span>
-                    </div>
+        <TabsContent value="files" className="space-y-4 mt-4">
+          <div className="flex gap-2">
+            <Dialog open={isUploadOpen} onOpenChange={setIsUploadOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Upload className="w-4 h-4 mr-2" /> Enviar Arquivo
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Enviar Arquivo</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={(e) => { e.preventDefault(); uploadMutation.mutate(); }} className="space-y-4">
+                  <div>
+                    <Label>Título *</Label>
+                    <Input value={title} onChange={(e) => setTitle(e.target.value)} required />
                   </div>
-                  <div className="flex gap-1 flex-shrink-0">
-                    <Button size="icon" variant="ghost" onClick={() => handleDownload(f.file_path, f.file_name)}>
-                      <Download className="w-4 h-4" />
+                  <div>
+                    <Label>Descrição</Label>
+                    <Input value={description} onChange={(e) => setDescription(e.target.value)} />
+                  </div>
+                  <div>
+                    <Label>Categoria</Label>
+                    <Input value={category} onChange={(e) => setCategory(e.target.value)} placeholder="Geral" />
+                  </div>
+                  <div>
+                    <Label>Arquivo *</Label>
+                    <Input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} required />
+                  </div>
+                  <div className="flex gap-2 justify-end">
+                    <Button type="button" variant="outline" onClick={() => setIsUploadOpen(false)}>Cancelar</Button>
+                    <Button type="submit" disabled={uploadMutation.isPending}>
+                      {uploadMutation.isPending ? 'Enviando...' : 'Enviar'}
                     </Button>
-                    {f.uploaded_by === user?.id && (
-                      <Button size="icon" variant="ghost" className="text-red-600" onClick={() => deleteMutation.mutate({ id: f.id, filePath: f.file_path })}>
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    )}
                   </div>
-                </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Input
+              className="pl-10"
+              placeholder="Buscar arquivos..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
+          {isLoading ? (
+            <div className="text-center py-12 text-gray-500">Carregando...</div>
+          ) : !filtered?.length ? (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                <p className="text-gray-500">Nenhum arquivo encontrado</p>
               </CardContent>
             </Card>
-          ))}
-        </div>
-      )}
+          ) : (
+            <div className="grid gap-4">
+              {filtered.map((f) => (
+                <Card key={f.id}>
+                  <CardContent className="p-4 sm:p-6">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-4 min-w-0">
+                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <FileText className="w-5 h-5 text-blue-600" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-semibold text-gray-900 truncate">{f.title}</p>
+                          <p className="text-xs text-gray-500 truncate">{f.file_name} · {formatSize(f.file_size)}</p>
+                          {f.description && <p className="text-sm text-gray-500 mt-1">{f.description}</p>}
+                          <span className="inline-block text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded mt-1">
+                            {f.category}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex gap-1 flex-shrink-0">
+                        <Button size="icon" variant="ghost" onClick={() => handleDownload(f.file_path, f.file_name)}>
+                          <Download className="w-4 h-4" />
+                        </Button>
+                        {f.uploaded_by === user?.id && (
+                          <Button size="icon" variant="ghost" className="text-red-600" onClick={() => deleteMutation.mutate({ id: f.id, filePath: f.file_path })}>
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="assets" className="mt-4">
+          <TechAssetViewer />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
