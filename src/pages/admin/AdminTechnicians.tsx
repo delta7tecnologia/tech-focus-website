@@ -219,6 +219,14 @@ const AdminTechnicians = () => {
                         <UserCheck className="w-4 h-4 mr-1" /> Aprovar
                       </Button>
                     )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-destructive"
+                      onClick={() => setDeleteProfile(p)}
+                    >
+                      <Trash2 className="w-4 h-4 mr-1" /> Excluir
+                    </Button>
                   </div>
                 </div>
               </CardContent>
