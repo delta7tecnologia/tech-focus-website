@@ -62,6 +62,7 @@ const App = () => (
               <Route path="tecnicos" element={<AdminTechnicians />} />
               <Route path="faq" element={<AdminFaq />} />
               <Route path="patrimonios" element={<AdminAssets />} />
+              <Route path="arquivos" element={<AdminFiles />} />
               <Route path="configuracoes" element={<AdminSettings />} />
             </Route>
             
