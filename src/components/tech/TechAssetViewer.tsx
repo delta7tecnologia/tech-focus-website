@@ -11,7 +11,13 @@ import { useToast } from '@/hooks/use-toast';
 const TechAssetViewer = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  const [companyFilter, setCompanyFilter] = useState('');
   const [viewImage, setViewImage] = useState<string | null>(null);
+  const [visibleLicenses, setVisibleLicenses] = useState<Record<string, boolean>>({});
+
+  const toggleLicense = (key: string) => {
+    setVisibleLicenses(prev => ({ ...prev, [key]: !prev[key] }));
+  };
 
   const { data: assets = [], isLoading } = useQuery({
     queryKey: ['tech-assets'],
@@ -25,10 +31,14 @@ const TechAssetViewer = () => {
     },
   });
 
-  const filtered = assets.filter(a =>
-    a.machine_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    a.company_name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const companies = [...new Set(assets.map(a => a.company_name))].sort();
+
+  const filtered = assets.filter(a => {
+    const matchesSearch = a.machine_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      a.company_name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCompany = !companyFilter || a.company_name === companyFilter;
+    return matchesSearch && matchesCompany;
+  });
 
   const formatDate = (d: string | null) => {
     if (!d) return '—';
@@ -42,14 +52,26 @@ const TechAssetViewer = () => {
 
   return (
     <div className="space-y-4">
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-        <Input
-          className="pl-10"
-          placeholder="Buscar por máquina ou empresa..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+      <div className="flex flex-wrap gap-3">
+        <div className="relative max-w-sm flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Input
+            className="pl-10"
+            placeholder="Buscar por máquina ou empresa..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <select
+          value={companyFilter}
+          onChange={(e) => setCompanyFilter(e.target.value)}
+          className="border rounded-md px-3 py-2 text-sm bg-white"
+        >
+          <option value="">Todas as empresas</option>
+          {companies.map(c => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
       </div>
 
       {isLoading ? (
@@ -83,13 +105,19 @@ const TechAssetViewer = () => {
                     <p className="text-xs font-medium text-gray-500 mb-1">Windows</p>
                     <p className="text-xs text-gray-400">Ativação: {formatDate(asset.windows_activation_date)}</p>
                     {asset.windows_license ? (
-                      <button
-                        onClick={() => copyToClipboard(asset.windows_license!)}
-                        className="flex items-center gap-1 mt-1 text-xs font-mono bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 transition-colors break-all text-left"
-                      >
-                        <Copy className="w-3 h-3 flex-shrink-0" />
-                        {asset.windows_license}
-                      </button>
+                      <div className="flex items-center gap-1 mt-1">
+                        <button
+                          onClick={() => toggleLicense(`win-${asset.id}`)}
+                          className="text-xs font-mono bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 transition-colors break-all text-left"
+                        >
+                          {visibleLicenses[`win-${asset.id}`] ? asset.windows_license : '••••••••••••••'}
+                        </button>
+                        {visibleLicenses[`win-${asset.id}`] && (
+                          <button onClick={() => copyToClipboard(asset.windows_license!)} className="text-gray-400 hover:text-gray-600">
+                            <Copy className="w-3 h-3" />
+                          </button>
+                        )}
+                      </div>
                     ) : (
                       <span className="text-xs text-gray-400">Sem licença</span>
                     )}
@@ -98,13 +126,19 @@ const TechAssetViewer = () => {
                     <p className="text-xs font-medium text-gray-500 mb-1">Office</p>
                     <p className="text-xs text-gray-400">Ativação: {formatDate(asset.office_activation_date)}</p>
                     {asset.office_license ? (
-                      <button
-                        onClick={() => copyToClipboard(asset.office_license!)}
-                        className="flex items-center gap-1 mt-1 text-xs font-mono bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 transition-colors break-all text-left"
-                      >
-                        <Copy className="w-3 h-3 flex-shrink-0" />
-                        {asset.office_license}
-                      </button>
+                      <div className="flex items-center gap-1 mt-1">
+                        <button
+                          onClick={() => toggleLicense(`off-${asset.id}`)}
+                          className="text-xs font-mono bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 transition-colors break-all text-left"
+                        >
+                          {visibleLicenses[`off-${asset.id}`] ? asset.office_license : '••••••••••••••'}
+                        </button>
+                        {visibleLicenses[`off-${asset.id}`] && (
+                          <button onClick={() => copyToClipboard(asset.office_license!)} className="text-gray-400 hover:text-gray-600">
+                            <Copy className="w-3 h-3" />
+                          </button>
+                        )}
+                      </div>
                     ) : (
                       <span className="text-xs text-gray-400">Sem licença</span>
                     )}

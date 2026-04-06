@@ -56,7 +56,13 @@ const AdminAssets = () => {
   const [viewImage, setViewImage] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+const [searchTerm, setSearchTerm] = useState('');
+  const [companyFilter, setCompanyFilter] = useState('');
+  const [hiddenLicenses, setHiddenLicenses] = useState<Record<string, boolean>>({});
+
+  const toggleLicense = (key: string) => {
+    setHiddenLicenses(prev => ({ ...prev, [key]: !prev[key] }));
+  };
 
   const { data: assets = [], isLoading } = useQuery({
     queryKey: ['admin-assets'],
@@ -70,10 +76,14 @@ const AdminAssets = () => {
     },
   });
 
-  const filteredAssets = assets.filter(a =>
-    a.machine_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    a.company_name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const companies = [...new Set(assets.map(a => a.company_name))].sort();
+
+  const filteredAssets = assets.filter(a => {
+    const matchesSearch = a.machine_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      a.company_name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCompany = !companyFilter || a.company_name === companyFilter;
+    return matchesSearch && matchesCompany;
+  });
 
   const openNew = () => {
     setEditingId(null);
@@ -199,14 +209,26 @@ const AdminAssets = () => {
         </Button>
       </div>
 
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-        <Input
-          placeholder="Buscar por máquina ou empresa..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10"
-        />
+      <div className="flex flex-wrap gap-3">
+        <div className="relative max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Input
+            placeholder="Buscar por máquina ou empresa..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        <select
+          value={companyFilter}
+          onChange={(e) => setCompanyFilter(e.target.value)}
+          className="border rounded-md px-3 py-2 text-sm bg-white"
+        >
+          <option value="">Todas as empresas</option>
+          {companies.map(c => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
       </div>
 
       {isLoading ? (
@@ -240,7 +262,12 @@ const AdminAssets = () => {
                     <div className="space-y-1">
                       <p className="text-xs text-gray-500">Ativação: {formatDate(asset.windows_activation_date)}</p>
                       {asset.windows_license ? (
-                        <code className="text-xs bg-gray-100 px-1.5 py-0.5 rounded font-mono break-all">{asset.windows_license}</code>
+                        <button
+                          onClick={() => toggleLicense(`win-${asset.id}`)}
+                          className="text-xs bg-gray-100 px-1.5 py-0.5 rounded font-mono break-all cursor-pointer hover:bg-gray-200 transition-colors"
+                        >
+                          {hiddenLicenses[`win-${asset.id}`] ? asset.windows_license : '••••••••••••••••••••'}
+                        </button>
                       ) : (
                         <span className="text-xs text-gray-400">Sem licença</span>
                       )}
@@ -250,7 +277,12 @@ const AdminAssets = () => {
                     <div className="space-y-1">
                       <p className="text-xs text-gray-500">Ativação: {formatDate(asset.office_activation_date)}</p>
                       {asset.office_license ? (
-                        <code className="text-xs bg-gray-100 px-1.5 py-0.5 rounded font-mono break-all">{asset.office_license}</code>
+                        <button
+                          onClick={() => toggleLicense(`off-${asset.id}`)}
+                          className="text-xs bg-gray-100 px-1.5 py-0.5 rounded font-mono break-all cursor-pointer hover:bg-gray-200 transition-colors"
+                        >
+                          {hiddenLicenses[`off-${asset.id}`] ? asset.office_license : '••••••••••••••••••••'}
+                        </button>
                       ) : (
                         <span className="text-xs text-gray-400">Sem licença</span>
                       )}
