@@ -12,6 +12,7 @@ import Depoimentos from "./pages/Depoimentos";
 import Ferramentas from "./pages/Ferramentas";
 import VideoInstitucional from "./pages/VideoInstitucional";
 import LinksUteis from "./pages/LinksUteis";
+import AreaTecnica from "./pages/AreaTecnica";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
 
@@ -24,6 +25,7 @@ import AdminTestimonials from "./pages/admin/AdminTestimonials";
 import AdminServices from "./pages/admin/AdminServices";
 import AdminClients from "./pages/admin/AdminClients";
 import AdminLinks from "./pages/admin/AdminLinks";
+import AdminTechnicians from "./pages/admin/AdminTechnicians";
 import AdminFaq from "./pages/admin/AdminFaq";
 
 const queryClient = new QueryClient();
@@ -43,6 +45,7 @@ const App = () => (
             <Route path="/ferramentas" element={<Ferramentas />} />
             <Route path="/video-institucional" element={<VideoInstitucional />} />
             <Route path="/links-uteis" element={<LinksUteis />} />
+            <Route path="/area-tecnica" element={<AreaTecnica />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             
             {/* Admin Routes */}
@@ -54,6 +57,7 @@ const App = () => (
               <Route path="servicos" element={<AdminServices />} />
               <Route path="clientes" element={<AdminClients />} />
               <Route path="links" element={<AdminLinks />} />
+              <Route path="tecnicos" element={<AdminTechnicians />} />
               <Route path="faq" element={<AdminFaq />} />
               <Route path="configuracoes" element={<AdminSettings />} />
             </Route>

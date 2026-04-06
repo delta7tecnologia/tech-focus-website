@@ -26,6 +26,7 @@ const Navigation = () => {
     { name: 'Soluções', href: '/solucoes' },
     
     { name: 'Links Úteis', href: '/links-uteis' },
+    { name: 'Área Técnica', href: '/area-tecnica' },
     { name: 'Quem Somos', href: '/#about' },
     { name: 'Contato', href: '/#contact' }
   ];
