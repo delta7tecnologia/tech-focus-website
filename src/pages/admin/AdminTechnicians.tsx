@@ -36,6 +36,34 @@ interface Profile {
   created_at: string;
 }
 
+interface TechnicianProfile extends Profile {
+  roles: Array<'admin' | 'user'>;
+  isCurrentUser: boolean;
+}
+
+const getFunctionErrorMessage = async (error: unknown, fallback: string) => {
+  if (error && typeof error === 'object' && 'context' in error) {
+    const response = (error as { context?: Response }).context;
+
+    if (response instanceof Response) {
+      try {
+        const payload = await response.json();
+        if (typeof payload?.error === 'string' && payload.error) {
+          return payload.error;
+        }
+      } catch {
+        // Keep fallback below when the response body is not JSON.
+      }
+    }
+  }
+
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  return fallback;
+};
+
 const AdminTechnicians = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -53,13 +81,25 @@ const AdminTechnicians = () => {
 
   const handleDeleteUser = async () => {
     if (!deleteProfile) return;
+
+    if ((deleteProfile as TechnicianProfile).isCurrentUser) {
+      toast({ title: 'Erro', description: 'Você não pode excluir o próprio usuário.', variant: 'destructive' });
+      setDeleteProfile(null);
+      return;
+    }
+
     setDeleting(true);
     try {
-      const res = await supabase.functions.invoke('admin-delete-user', {
+      const { data, error } = await supabase.functions.invoke('admin-delete-user', {
         body: { user_id: deleteProfile.user_id },
       });
-      if (res.error) throw new Error(res.error.message);
-      if (res.data?.error) throw new Error(res.data.error);
+
+      if (error) {
+        throw new Error(await getFunctionErrorMessage(error, 'Erro ao excluir técnico'));
+      }
+
+      if (data?.error) throw new Error(data.error);
+
       queryClient.invalidateQueries({ queryKey: ['admin-technicians'] });
       toast({ title: 'Técnico excluído com sucesso!' });
       setDeleteProfile(null);
@@ -73,12 +113,43 @@ const AdminTechnicians = () => {
   const { data: profiles, isLoading } = useQuery({
     queryKey: ['admin-technicians'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      return data as Profile[];
+      const [
+        { data: profilesData, error: profilesError },
+        { data: rolesData, error: rolesError },
+        { data: { session } },
+      ] = await Promise.all([
+        supabase
+          .from('profiles')
+          .select('*')
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('user_roles')
+          .select('user_id, role'),
+        supabase.auth.getSession(),
+      ]);
+
+      if (profilesError) throw profilesError;
+      if (rolesError) throw rolesError;
+
+      const rolesByUser = new Map<string, Array<'admin' | 'user'>>();
+
+      rolesData?.forEach(({ user_id, role }) => {
+        const userRoles = rolesByUser.get(user_id) ?? [];
+        userRoles.push(role);
+        rolesByUser.set(user_id, userRoles);
+      });
+
+      return (profilesData as Profile[])
+        .map((profile) => {
+          const roles = rolesByUser.get(profile.user_id) ?? [];
+
+          return {
+            ...profile,
+            roles,
+            isCurrentUser: profile.user_id === session?.user.id,
+          };
+        })
+        .filter((profile): profile is TechnicianProfile => !profile.roles.includes('admin'));
     },
   });
 
