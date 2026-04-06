@@ -262,7 +262,12 @@ const [searchTerm, setSearchTerm] = useState('');
                     <div className="space-y-1">
                       <p className="text-xs text-gray-500">Ativação: {formatDate(asset.windows_activation_date)}</p>
                       {asset.windows_license ? (
-                        <code className="text-xs bg-gray-100 px-1.5 py-0.5 rounded font-mono break-all">{asset.windows_license}</code>
+                        <button
+                          onClick={() => toggleLicense(`win-${asset.id}`)}
+                          className="text-xs bg-gray-100 px-1.5 py-0.5 rounded font-mono break-all cursor-pointer hover:bg-gray-200 transition-colors"
+                        >
+                          {hiddenLicenses[`win-${asset.id}`] ? asset.windows_license : '••••••••••••••••••••'}
+                        </button>
                       ) : (
                         <span className="text-xs text-gray-400">Sem licença</span>
                       )}
@@ -272,7 +277,12 @@ const [searchTerm, setSearchTerm] = useState('');
                     <div className="space-y-1">
                       <p className="text-xs text-gray-500">Ativação: {formatDate(asset.office_activation_date)}</p>
                       {asset.office_license ? (
-                        <code className="text-xs bg-gray-100 px-1.5 py-0.5 rounded font-mono break-all">{asset.office_license}</code>
+                        <button
+                          onClick={() => toggleLicense(`off-${asset.id}`)}
+                          className="text-xs bg-gray-100 px-1.5 py-0.5 rounded font-mono break-all cursor-pointer hover:bg-gray-200 transition-colors"
+                        >
+                          {hiddenLicenses[`off-${asset.id}`] ? asset.office_license : '••••••••••••••••••••'}
+                        </button>
                       ) : (
                         <span className="text-xs text-gray-400">Sem licença</span>
                       )}

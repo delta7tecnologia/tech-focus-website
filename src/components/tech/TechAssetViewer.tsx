@@ -105,13 +105,19 @@ const TechAssetViewer = () => {
                     <p className="text-xs font-medium text-gray-500 mb-1">Windows</p>
                     <p className="text-xs text-gray-400">Ativação: {formatDate(asset.windows_activation_date)}</p>
                     {asset.windows_license ? (
-                      <button
-                        onClick={() => copyToClipboard(asset.windows_license!)}
-                        className="flex items-center gap-1 mt-1 text-xs font-mono bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 transition-colors break-all text-left"
-                      >
-                        <Copy className="w-3 h-3 flex-shrink-0" />
-                        {asset.windows_license}
-                      </button>
+                      <div className="flex items-center gap-1 mt-1">
+                        <button
+                          onClick={() => toggleLicense(`win-${asset.id}`)}
+                          className="text-xs font-mono bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 transition-colors break-all text-left"
+                        >
+                          {visibleLicenses[`win-${asset.id}`] ? asset.windows_license : '••••••••••••••'}
+                        </button>
+                        {visibleLicenses[`win-${asset.id}`] && (
+                          <button onClick={() => copyToClipboard(asset.windows_license!)} className="text-gray-400 hover:text-gray-600">
+                            <Copy className="w-3 h-3" />
+                          </button>
+                        )}
+                      </div>
                     ) : (
                       <span className="text-xs text-gray-400">Sem licença</span>
                     )}
@@ -120,13 +126,19 @@ const TechAssetViewer = () => {
                     <p className="text-xs font-medium text-gray-500 mb-1">Office</p>
                     <p className="text-xs text-gray-400">Ativação: {formatDate(asset.office_activation_date)}</p>
                     {asset.office_license ? (
-                      <button
-                        onClick={() => copyToClipboard(asset.office_license!)}
-                        className="flex items-center gap-1 mt-1 text-xs font-mono bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 transition-colors break-all text-left"
-                      >
-                        <Copy className="w-3 h-3 flex-shrink-0" />
-                        {asset.office_license}
-                      </button>
+                      <div className="flex items-center gap-1 mt-1">
+                        <button
+                          onClick={() => toggleLicense(`off-${asset.id}`)}
+                          className="text-xs font-mono bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 transition-colors break-all text-left"
+                        >
+                          {visibleLicenses[`off-${asset.id}`] ? asset.office_license : '••••••••••••••'}
+                        </button>
+                        {visibleLicenses[`off-${asset.id}`] && (
+                          <button onClick={() => copyToClipboard(asset.office_license!)} className="text-gray-400 hover:text-gray-600">
+                            <Copy className="w-3 h-3" />
+                          </button>
+                        )}
+                      </div>
                     ) : (
                       <span className="text-xs text-gray-400">Sem licença</span>
                     )}
