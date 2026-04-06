@@ -13,7 +13,8 @@ import {
   X,
   ExternalLink,
   Building2,
-  ShoppingBag
+  ShoppingBag,
+  Users
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { supabase } from '@/integrations/supabase/client';
