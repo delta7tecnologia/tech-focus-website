@@ -1,19 +1,43 @@
-import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState, useRef } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Search, Monitor, Eye, Copy } from 'lucide-react';
+import { Search, Monitor, Eye, Copy, Plus, Pencil, Upload, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { printAssetReport } from '@/utils/printAssetReport';
+
+const emptyForm = {
+  machine_name: '',
+  company_name: '',
+  windows_activation_date: '',
+  office_activation_date: '',
+  windows_license: '',
+  office_license: '',
+  notes: '',
+};
 
 const TechAssetViewer = () => {
+  const { user } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [companyFilter, setCompanyFilter] = useState('');
   const [viewImage, setViewImage] = useState<string | null>(null);
   const [visibleLicenses, setVisibleLicenses] = useState<Record<string, boolean>>({});
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState(emptyForm);
+  const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
+  const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   const toggleLicense = (key: string) => {
     setVisibleLicenses(prev => ({ ...prev, [key]: !prev[key] }));
@@ -50,9 +74,94 @@ const TechAssetViewer = () => {
     toast({ title: 'Licença copiada!' });
   };
 
+  const openNew = () => {
+    setEditingId(null);
+    setForm(emptyForm);
+    setScreenshotFile(null);
+    setScreenshotPreview(null);
+    setDialogOpen(true);
+  };
+
+  const openEdit = (asset: any) => {
+    setEditingId(asset.id);
+    setForm({
+      machine_name: asset.machine_name,
+      company_name: asset.company_name,
+      windows_activation_date: asset.windows_activation_date || '',
+      office_activation_date: asset.office_activation_date || '',
+      windows_license: asset.windows_license || '',
+      office_license: asset.office_license || '',
+      notes: asset.notes || '',
+    });
+    setScreenshotFile(null);
+    setScreenshotPreview(asset.screenshot_url || null);
+    setDialogOpen(true);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setScreenshotFile(file);
+    setScreenshotPreview(URL.createObjectURL(file));
+  };
+
+  const uploadScreenshot = async (file: File): Promise<string> => {
+    const ext = file.name.split('.').pop();
+    const path = `${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage.from('asset-screenshots').upload(path, file);
+    if (error) throw error;
+    const { data } = supabase.storage.from('asset-screenshots').getPublicUrl(path);
+    return data.publicUrl;
+  };
+
+  const handleSave = async () => {
+    if (!form.machine_name.trim() || !form.company_name.trim()) {
+      toast({ title: 'Erro', description: 'Nome da máquina e empresa são obrigatórios.', variant: 'destructive' });
+      return;
+    }
+    setSaving(true);
+    try {
+      let screenshot_url = editingId
+        ? assets.find(a => a.id === editingId)?.screenshot_url || null
+        : null;
+
+      if (screenshotFile) {
+        screenshot_url = await uploadScreenshot(screenshotFile);
+      }
+
+      const payload = {
+        machine_name: form.machine_name.trim(),
+        company_name: form.company_name.trim(),
+        windows_activation_date: form.windows_activation_date || null,
+        office_activation_date: form.office_activation_date || null,
+        windows_license: form.windows_license.trim() || null,
+        office_license: form.office_license.trim() || null,
+        notes: form.notes.trim() || null,
+        screenshot_url,
+      };
+
+      if (editingId) {
+        const { error } = await supabase.from('assets').update(payload).eq('id', editingId);
+        if (error) throw error;
+        toast({ title: 'Patrimônio atualizado!' });
+      } else {
+        const { error } = await supabase.from('assets').insert({ ...payload, created_by: user!.id });
+        if (error) throw error;
+        toast({ title: 'Patrimônio cadastrado!' });
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['tech-assets'] });
+      setDialogOpen(false);
+    } catch (err: any) {
+      toast({ title: 'Erro', description: err.message, variant: 'destructive' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-3 items-center">
         <div className="relative max-w-sm flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <Input
@@ -72,6 +181,20 @@ const TechAssetViewer = () => {
             <option key={c} value={c}>{c}</option>
           ))}
         </select>
+        <Button
+          variant="outline"
+          className="gap-2"
+          disabled={filtered.length === 0}
+          onClick={() => {
+            const company = companyFilter || 'Todas as empresas';
+            printAssetReport(filtered, company);
+          }}
+        >
+          <Printer className="w-4 h-4" /> Imprimir
+        </Button>
+        <Button onClick={openNew} className="gap-2">
+          <Plus className="w-4 h-4" /> Novo
+        </Button>
       </div>
 
       {isLoading ? (
@@ -93,11 +216,16 @@ const TechAssetViewer = () => {
                     <p className="font-semibold text-gray-900">{asset.machine_name}</p>
                     <p className="text-sm text-gray-500">{asset.company_name}</p>
                   </div>
-                  {asset.screenshot_url && (
-                    <Button size="icon" variant="ghost" onClick={() => setViewImage(asset.screenshot_url)}>
-                      <Eye className="w-4 h-4" />
+                  <div className="flex gap-1">
+                    <Button size="icon" variant="ghost" onClick={() => openEdit(asset)}>
+                      <Pencil className="w-4 h-4" />
                     </Button>
-                  )}
+                    {asset.screenshot_url && (
+                      <Button size="icon" variant="ghost" onClick={() => setViewImage(asset.screenshot_url)}>
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 text-sm">
@@ -154,6 +282,66 @@ const TechAssetViewer = () => {
         </div>
       )}
 
+      {/* Form Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{editingId ? 'Editar Patrimônio' : 'Novo Patrimônio'}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium">Nome da Máquina *</label>
+              <Input value={form.machine_name} onChange={e => setForm(f => ({ ...f, machine_name: e.target.value }))} placeholder="Ex: PC-001" />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Empresa *</label>
+              <Input value={form.company_name} onChange={e => setForm(f => ({ ...f, company_name: e.target.value }))} placeholder="Nome da empresa" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium">Ativação Windows</label>
+                <Input type="date" value={form.windows_activation_date} onChange={e => setForm(f => ({ ...f, windows_activation_date: e.target.value }))} />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Ativação Office</label>
+                <Input type="date" value={form.office_activation_date} onChange={e => setForm(f => ({ ...f, office_activation_date: e.target.value }))} />
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium">Licença Windows</label>
+              <Input value={form.windows_license} onChange={e => setForm(f => ({ ...f, windows_license: e.target.value }))} placeholder="XXXXX-XXXXX-XXXXX-XXXXX-XXXXX" />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Licença Office</label>
+              <Input value={form.office_license} onChange={e => setForm(f => ({ ...f, office_license: e.target.value }))} placeholder="XXXXX-XXXXX-XXXXX-XXXXX-XXXXX" />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Evidência (Print Screen)</label>
+              <div className="mt-1">
+                <input type="file" ref={fileInputRef} accept="image/*" onChange={handleFileChange} className="hidden" />
+                <Button type="button" variant="outline" className="gap-2" onClick={() => fileInputRef.current?.click()}>
+                  <Upload className="w-4 h-4" /> Selecionar imagem
+                </Button>
+              </div>
+              {screenshotPreview && (
+                <img src={screenshotPreview} alt="Preview" className="mt-2 rounded-lg border max-h-48 object-contain w-full" />
+              )}
+            </div>
+            <div>
+              <label className="text-sm font-medium">Observações</label>
+              <Textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} placeholder="Anotações adicionais..." rows={3} />
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
+              <Button onClick={handleSave} disabled={saving}>
+                {saving ? 'Salvando...' : editingId ? 'Salvar' : 'Cadastrar'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Image Viewer */}
       <Dialog open={!!viewImage} onOpenChange={() => setViewImage(null)}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>

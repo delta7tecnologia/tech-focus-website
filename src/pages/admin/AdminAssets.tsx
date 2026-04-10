@@ -15,7 +15,8 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Plus, Pencil, Trash2, Monitor, Upload, Eye, Search } from 'lucide-react';
+import { Plus, Pencil, Trash2, Monitor, Upload, Eye, Search, Printer } from 'lucide-react';
+import { printAssetReport } from '@/utils/printAssetReport';
 
 interface Asset {
   id: string;
@@ -204,9 +205,22 @@ const [searchTerm, setSearchTerm] = useState('');
           <h2 className="text-2xl font-bold text-gray-900">Patrimônios</h2>
           <p className="text-gray-500">Gerencie os patrimônios e licenças das máquinas</p>
         </div>
-        <Button onClick={openNew} className="gap-2">
-          <Plus className="w-4 h-4" /> Novo Patrimônio
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            className="gap-2"
+            disabled={filteredAssets.length === 0}
+            onClick={() => {
+              const company = companyFilter || 'Todas as empresas';
+              printAssetReport(filteredAssets, company);
+            }}
+          >
+            <Printer className="w-4 h-4" /> Imprimir Relatório
+          </Button>
+          <Button onClick={openNew} className="gap-2">
+            <Plus className="w-4 h-4" /> Novo Patrimônio
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-3">
