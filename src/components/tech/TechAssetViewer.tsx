@@ -241,6 +241,9 @@ const TechAssetViewer = () => {
                     <Button size="icon" variant="ghost" onClick={() => openEdit(asset)}>
                       <Pencil className="w-4 h-4" />
                     </Button>
+                    <Button size="icon" variant="ghost" onClick={() => setDeleteId(asset.id)} className="text-destructive hover:text-destructive">
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                     {asset.screenshot_url && (
                       <Button size="icon" variant="ghost" onClick={() => setViewImage(asset.screenshot_url)}>
                         <Eye className="w-4 h-4" />
