@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Search, Monitor, Eye, Copy, Plus, Pencil, Upload, Printer } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Search, Monitor, Eye, Copy, Plus, Pencil, Upload, Printer, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { printAssetReport } from '@/utils/printAssetReport';
@@ -38,6 +39,8 @@ const TechAssetViewer = () => {
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [showCompanyDropdown, setShowCompanyDropdown] = useState(false);
 
   const toggleLicense = (key: string) => {
     setVisibleLicenses(prev => ({ ...prev, [key]: !prev[key] }));
@@ -159,6 +162,24 @@ const TechAssetViewer = () => {
     }
   };
 
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    try {
+      const { error } = await supabase.from('assets').delete().eq('id', deleteId);
+      if (error) throw error;
+      toast({ title: 'Patrimônio excluído!' });
+      queryClient.invalidateQueries({ queryKey: ['tech-assets'] });
+    } catch (err: any) {
+      toast({ title: 'Erro', description: err.message, variant: 'destructive' });
+    } finally {
+      setDeleteId(null);
+    }
+  };
+
+  const filteredCompanies = companies.filter(c =>
+    c.toLowerCase().includes(form.company_name.toLowerCase())
+  );
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap gap-3 items-center">
@@ -219,6 +240,9 @@ const TechAssetViewer = () => {
                   <div className="flex gap-1">
                     <Button size="icon" variant="ghost" onClick={() => openEdit(asset)}>
                       <Pencil className="w-4 h-4" />
+                    </Button>
+                    <Button size="icon" variant="ghost" onClick={() => setDeleteId(asset.id)} className="text-destructive hover:text-destructive">
+                      <Trash2 className="w-4 h-4" />
                     </Button>
                     {asset.screenshot_url && (
                       <Button size="icon" variant="ghost" onClick={() => setViewImage(asset.screenshot_url)}>
@@ -293,9 +317,35 @@ const TechAssetViewer = () => {
               <label className="text-sm font-medium">Nome da Máquina *</label>
               <Input value={form.machine_name} onChange={e => setForm(f => ({ ...f, machine_name: e.target.value }))} placeholder="Ex: PC-001" />
             </div>
-            <div>
+            <div className="relative">
               <label className="text-sm font-medium">Empresa *</label>
-              <Input value={form.company_name} onChange={e => setForm(f => ({ ...f, company_name: e.target.value }))} placeholder="Nome da empresa" />
+              <Input
+                value={form.company_name}
+                onChange={e => {
+                  setForm(f => ({ ...f, company_name: e.target.value }));
+                  setShowCompanyDropdown(true);
+                }}
+                onFocus={() => setShowCompanyDropdown(true)}
+                onBlur={() => setTimeout(() => setShowCompanyDropdown(false), 200)}
+                placeholder="Digite ou selecione a empresa"
+              />
+              {showCompanyDropdown && filteredCompanies.length > 0 && (
+                <div className="absolute z-50 w-full mt-1 bg-popover border rounded-md shadow-md max-h-40 overflow-y-auto">
+                  {filteredCompanies.map(c => (
+                    <button
+                      key={c}
+                      type="button"
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
+                      onMouseDown={() => {
+                        setForm(f => ({ ...f, company_name: c }));
+                        setShowCompanyDropdown(false);
+                      }}
+                    >
+                      {c}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -350,6 +400,23 @@ const TechAssetViewer = () => {
           {viewImage && <img src={viewImage} alt="Evidência" className="w-full rounded-lg" />}
         </DialogContent>
       </Dialog>
+      {/* Delete Confirmation */}
+      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir patrimônio?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não pode ser desfeita. O patrimônio será removido permanentemente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
