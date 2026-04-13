@@ -39,6 +39,8 @@ const TechAssetViewer = () => {
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [showCompanyDropdown, setShowCompanyDropdown] = useState(false);
 
   const toggleLicense = (key: string) => {
     setVisibleLicenses(prev => ({ ...prev, [key]: !prev[key] }));
