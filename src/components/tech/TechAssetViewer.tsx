@@ -317,9 +317,35 @@ const TechAssetViewer = () => {
               <label className="text-sm font-medium">Nome da Máquina *</label>
               <Input value={form.machine_name} onChange={e => setForm(f => ({ ...f, machine_name: e.target.value }))} placeholder="Ex: PC-001" />
             </div>
-            <div>
+            <div className="relative">
               <label className="text-sm font-medium">Empresa *</label>
-              <Input value={form.company_name} onChange={e => setForm(f => ({ ...f, company_name: e.target.value }))} placeholder="Nome da empresa" />
+              <Input
+                value={form.company_name}
+                onChange={e => {
+                  setForm(f => ({ ...f, company_name: e.target.value }));
+                  setShowCompanyDropdown(true);
+                }}
+                onFocus={() => setShowCompanyDropdown(true)}
+                onBlur={() => setTimeout(() => setShowCompanyDropdown(false), 200)}
+                placeholder="Digite ou selecione a empresa"
+              />
+              {showCompanyDropdown && filteredCompanies.length > 0 && (
+                <div className="absolute z-50 w-full mt-1 bg-popover border rounded-md shadow-md max-h-40 overflow-y-auto">
+                  {filteredCompanies.map(c => (
+                    <button
+                      key={c}
+                      type="button"
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
+                      onMouseDown={() => {
+                        setForm(f => ({ ...f, company_name: c }));
+                        setShowCompanyDropdown(false);
+                      }}
+                    >
+                      {c}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
