@@ -162,6 +162,24 @@ const TechAssetViewer = () => {
     }
   };
 
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    try {
+      const { error } = await supabase.from('assets').delete().eq('id', deleteId);
+      if (error) throw error;
+      toast({ title: 'Patrimônio excluído!' });
+      queryClient.invalidateQueries({ queryKey: ['tech-assets'] });
+    } catch (err: any) {
+      toast({ title: 'Erro', description: err.message, variant: 'destructive' });
+    } finally {
+      setDeleteId(null);
+    }
+  };
+
+  const filteredCompanies = companies.filter(c =>
+    c.toLowerCase().includes(form.company_name.toLowerCase())
+  );
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap gap-3 items-center">
