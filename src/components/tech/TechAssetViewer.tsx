@@ -85,7 +85,7 @@ const TechAssetViewer = () => {
     setDialogOpen(true);
   };
 
-  const openEdit = (asset: any) => {
+  const openEdit = async (asset: any) => {
     setEditingId(asset.id);
     setForm({
       machine_name: asset.machine_name,
@@ -97,7 +97,8 @@ const TechAssetViewer = () => {
       notes: asset.notes || '',
     });
     setScreenshotFile(null);
-    setScreenshotPreview(asset.screenshot_url || null);
+    const preview = asset.screenshot_url ? await getSignedUrl(asset.screenshot_url) : null;
+    setScreenshotPreview(preview);
     setDialogOpen(true);
   };
 
@@ -267,7 +268,7 @@ const TechAssetViewer = () => {
                       <Trash2 className="w-4 h-4" />
                     </Button>
                     {asset.screenshot_url && (
-                      <Button size="icon" variant="ghost" onClick={() => setViewImage(asset.screenshot_url)}>
+                      <Button size="icon" variant="ghost" onClick={() => handleViewImage(asset.screenshot_url)}>
                         <Eye className="w-4 h-4" />
                       </Button>
                     )}
