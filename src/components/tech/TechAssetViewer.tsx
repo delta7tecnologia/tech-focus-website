@@ -85,7 +85,7 @@ const TechAssetViewer = () => {
     setDialogOpen(true);
   };
 
-  const openEdit = (asset: any) => {
+  const openEdit = async (asset: any) => {
     setEditingId(asset.id);
     setForm({
       machine_name: asset.machine_name,
@@ -97,7 +97,8 @@ const TechAssetViewer = () => {
       notes: asset.notes || '',
     });
     setScreenshotFile(null);
-    setScreenshotPreview(asset.screenshot_url || null);
+    const preview = asset.screenshot_url ? await getSignedUrl(asset.screenshot_url) : null;
+    setScreenshotPreview(preview);
     setDialogOpen(true);
   };
 
@@ -113,8 +114,30 @@ const TechAssetViewer = () => {
     const path = `${crypto.randomUUID()}.${ext}`;
     const { error } = await supabase.storage.from('asset-screenshots').upload(path, file);
     if (error) throw error;
-    const { data } = supabase.storage.from('asset-screenshots').getPublicUrl(path);
-    return data.publicUrl;
+    // Store the storage path; we'll generate signed URLs on demand
+    return path;
+  };
+
+  const getSignedUrl = async (pathOrUrl: string): Promise<string | null> => {
+    if (!pathOrUrl) return null;
+    // Backward compatibility: if it's a full URL (legacy public bucket), extract path
+    let path = pathOrUrl;
+    const marker = '/asset-screenshots/';
+    const idx = pathOrUrl.indexOf(marker);
+    if (idx !== -1) {
+      path = pathOrUrl.substring(idx + marker.length);
+    }
+    const { data, error } = await supabase.storage
+      .from('asset-screenshots')
+      .createSignedUrl(path, 3600);
+    if (error) return null;
+    return data.signedUrl;
+  };
+
+  const handleViewImage = async (pathOrUrl: string) => {
+    const url = await getSignedUrl(pathOrUrl);
+    if (url) setViewImage(url);
+    else toast({ title: 'Erro', description: 'Não foi possível carregar a imagem.', variant: 'destructive' });
   };
 
   const handleSave = async () => {
@@ -245,7 +268,7 @@ const TechAssetViewer = () => {
                       <Trash2 className="w-4 h-4" />
                     </Button>
                     {asset.screenshot_url && (
-                      <Button size="icon" variant="ghost" onClick={() => setViewImage(asset.screenshot_url)}>
+                      <Button size="icon" variant="ghost" onClick={() => handleViewImage(asset.screenshot_url)}>
                         <Eye className="w-4 h-4" />
                       </Button>
                     )}
