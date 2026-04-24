@@ -317,7 +317,7 @@ const [searchTerm, setSearchTerm] = useState('');
                   <TableCell>
                     {asset.screenshot_url ? (
                       <button
-                        onClick={() => setViewImage(asset.screenshot_url)}
+                        onClick={() => openScreenshot(asset.screenshot_url!)}
                         className="text-blue-600 hover:underline flex items-center gap-1 text-sm"
                       >
                         <Eye className="w-4 h-4" /> Ver
