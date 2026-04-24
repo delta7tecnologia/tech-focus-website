@@ -124,10 +124,22 @@ const [searchTerm, setSearchTerm] = useState('');
       .from('asset-screenshots')
       .upload(path, file);
     if (error) throw error;
-    const { data } = supabase.storage
+    return path;
+  };
+
+  const openScreenshot = async (pathOrUrl: string) => {
+    let path = pathOrUrl;
+    const marker = '/asset-screenshots/';
+    const idx = pathOrUrl.indexOf(marker);
+    if (idx !== -1) path = pathOrUrl.substring(idx + marker.length);
+    const { data, error } = await supabase.storage
       .from('asset-screenshots')
-      .getPublicUrl(path);
-    return data.publicUrl;
+      .createSignedUrl(path, 3600);
+    if (error || !data?.signedUrl) {
+      toast({ title: 'Erro', description: 'Não foi possível carregar a imagem.', variant: 'destructive' });
+      return;
+    }
+    setViewImage(data.signedUrl);
   };
 
   const handleSave = async () => {
@@ -305,7 +317,7 @@ const [searchTerm, setSearchTerm] = useState('');
                   <TableCell>
                     {asset.screenshot_url ? (
                       <button
-                        onClick={() => setViewImage(asset.screenshot_url)}
+                        onClick={() => openScreenshot(asset.screenshot_url!)}
                         className="text-blue-600 hover:underline flex items-center gap-1 text-sm"
                       >
                         <Eye className="w-4 h-4" /> Ver
