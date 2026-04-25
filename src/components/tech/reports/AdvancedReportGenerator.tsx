@@ -502,9 +502,14 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       {/* Cabeçalho timbrado */}
       <Card className="border-blue-900 border-t-4">
         <CardContent className="p-6 flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3">
-          <div>
-            <h3 className="text-xl font-bold text-blue-900">DELTA7 SOLUÇÕES EM TECNOLOGIA</h3>
-            <p className="text-sm text-gray-500">Laudo Técnico de Equipamento — Computador / Estação de Trabalho</p>
+          <div className="flex items-center gap-3">
+            <img src={delta7Logo} alt="Delta7" className="h-12 w-auto" />
+            <div>
+              <h3 className="text-xl font-bold text-blue-900">DELTA7 SOLUÇÕES EM TECNOLOGIA</h3>
+              <p className="text-sm text-gray-500">
+                {draftId ? `Editando rascunho ${reportNumber}` : 'Laudo Técnico de Equipamento — Computador / Estação de Trabalho'}
+              </p>
+            </div>
           </div>
           <div className="text-sm text-gray-500"><span className="font-medium">Data/Hora:</span> {now}</div>
         </CardContent>
@@ -904,19 +909,34 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       </Card>
 
       <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
-        <Button type="button" variant="outline" onClick={reset} disabled={generateMutation.isPending}>
+        <Button type="button" variant="outline" onClick={reset} disabled={generateMutation.isPending || saveDraftMutation.isPending}>
           <RotateCcw className="w-4 h-4 mr-2" /> Limpar
         </Button>
+        <Button type="button" variant="outline"
+          onClick={() => saveDraftMutation.mutate()}
+          disabled={saveDraftMutation.isPending || generateMutation.isPending}>
+          {saveDraftMutation.isPending
+            ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Salvando...</>
+            : <><Save className="w-4 h-4 mr-2" /> Salvar rascunho</>}
+        </Button>
         <Button type="button" className="bg-blue-900 hover:bg-blue-800"
-          onClick={() => generateMutation.mutate()} disabled={generateMutation.isPending}>
+          onClick={handleGenerate} disabled={generateMutation.isPending || saveDraftMutation.isPending}>
           {generateMutation.isPending
             ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Gerando...</>
-            : <><FileCheck2 className="w-4 h-4 mr-2" /> Gerar Laudo Final (PDF)</>}
+            : <><Eye className="w-4 h-4 mr-2" /> Pré-visualizar e gerar PDF</>}
         </Button>
       </div>
       <p className="text-xs text-gray-400 text-center flex items-center justify-center gap-1">
         <FileSignature className="w-3 h-3" /> Hash SHA-256 único combinando técnico + Nº de série + diagnóstico.
       </p>
+
+      <PdfPreviewDialog
+        open={previewOpen}
+        onOpenChange={handlePreviewClose}
+        pdf={previewPdf}
+        fileName={`${reportNumber || 'Laudo'}.pdf`}
+        isLoading={previewLoading}
+      />
     </div>
   );
 };
