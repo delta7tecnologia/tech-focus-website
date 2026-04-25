@@ -10,18 +10,22 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileSignature, Camera, X, Loader2, FileCheck2, RotateCcw, Save, Eye } from 'lucide-react';
+import { FileSignature, Camera, X, Loader2, FileCheck2, RotateCcw, Save, Eye, Link2 } from 'lucide-react';
 import { generateReportHash, generateReportNumber } from '@/utils/reportHash';
 import { generateReportPdf, type ReportPhoto } from '@/utils/reportPdf';
 import type jsPDF from 'jspdf';
 import PdfPreviewDialog from './PdfPreviewDialog';
 import delta7Logo from '@/assets/delta7-logo.png';
+import { detectExternalProvider } from '../UploadOrLinkInput';
 
 interface PhotoState extends ReportPhoto {
   id: string;
   file?: File;
   storagePath?: string;
   uploaded?: boolean;
+  external?: boolean;
+  externalUrl?: string;
+  externalProvider?: string;
 }
 
 const fileToDataUrl = (file: File) =>
