@@ -9,8 +9,9 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Upload, Download, Trash2, FileText, LogOut, Search, Monitor } from 'lucide-react';
+import { Upload, Download, Trash2, FileText, LogOut, Search, Monitor, FileSignature } from 'lucide-react';
 import TechAssetViewer from './TechAssetViewer';
+import TechReports from './reports/TechReports';
 
 const TechFileManager = () => {
   const { user, signOut } = useAuth();
@@ -137,6 +138,9 @@ const TechFileManager = () => {
           <TabsTrigger value="assets" className="gap-2">
             <Monitor className="w-4 h-4" /> Patrimônios
           </TabsTrigger>
+          <TabsTrigger value="reports" className="gap-2">
+            <FileSignature className="w-4 h-4" /> Laudos
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="files" className="space-y-4 mt-4">
@@ -237,6 +241,10 @@ const TechFileManager = () => {
 
         <TabsContent value="assets" className="mt-4">
           <TechAssetViewer />
+        </TabsContent>
+
+        <TabsContent value="reports" className="mt-4">
+          <TechReports />
         </TabsContent>
       </Tabs>
     </div>
