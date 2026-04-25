@@ -453,7 +453,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
         problemas: s.problemas, estado: s.estado,
         parecer: s.parecer, parecerTexto: s.parecerTexto,
         recomendacoes: s.recomendacoes,
-        photos: photos.map((p) => ({ dataUrl: p.dataUrl, caption: p.caption })),
+        photos: photos.map((p) => ({ dataUrl: p.dataUrl, caption: p.caption, external: p.external, externalUrl: p.externalUrl, externalProvider: p.externalProvider })),
         observacoesFinais: s.observacoesFinais,
         assinaturaTecnico: s.assinaturaTecnico,
         assinaturaGestor: s.assinaturaGestor,

@@ -339,7 +339,7 @@ const ReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
         triagem,
         diagnostico,
         conclusao,
-        photos: photos.map((p) => ({ dataUrl: p.dataUrl, caption: p.caption })),
+        photos: photos.map((p) => ({ dataUrl: p.dataUrl, caption: p.caption, external: p.external, externalUrl: p.externalUrl, externalProvider: p.externalProvider })),
         integrityHash,
       });
       return { pdf, rNum };
