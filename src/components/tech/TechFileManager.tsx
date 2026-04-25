@@ -136,11 +136,6 @@ const TechFileManager = () => {
       toast({ title: 'Arquivo removido!' });
     },
   });
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['technical-files'] });
-      toast({ title: 'Arquivo removido!' });
-    },
-  });
 
   const formatSize = (bytes: number | null) => {
     if (!bytes) return '-';
@@ -152,7 +147,8 @@ const TechFileManager = () => {
   const filtered = files?.filter(
     (f) =>
       f.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      f.file_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (f.file_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (f.external_url || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       (f.category || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
