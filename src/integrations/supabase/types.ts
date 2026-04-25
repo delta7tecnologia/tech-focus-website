@@ -402,6 +402,7 @@ export type Database = {
           integrity_hash: string
           photos: Json
           report_number: string
+          report_type: string
           status_final: string
           technician_name: string
           triagem: Json
@@ -419,6 +420,7 @@ export type Database = {
           integrity_hash: string
           photos?: Json
           report_number: string
+          report_type?: string
           status_final?: string
           technician_name: string
           triagem?: Json
@@ -436,6 +438,7 @@ export type Database = {
           integrity_hash?: string
           photos?: Json
           report_number?: string
+          report_type?: string
           status_final?: string
           technician_name?: string
           triagem?: Json
