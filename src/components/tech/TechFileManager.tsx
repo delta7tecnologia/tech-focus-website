@@ -41,8 +41,31 @@ const TechFileManager = () => {
 
   const uploadMutation = useMutation({
     mutationFn: async () => {
-      if (!file || !title.trim()) throw new Error('Preencha título e selecione um arquivo.');
+      if (!title.trim()) throw new Error('Preencha o título.');
 
+      if (sourceMode === 'external') {
+        const url = externalUrl.trim();
+        if (!url) throw new Error('Informe a URL do arquivo externo.');
+        if (!/^https?:\/\//i.test(url)) throw new Error('A URL deve começar com http:// ou https://');
+
+        const { error: dbError } = await supabase.from('technical_files').insert({
+          title: title.trim(),
+          description: description.trim() || null,
+          category: category.trim() || 'Geral',
+          uploaded_by: user!.id,
+          is_external: true,
+          external_url: url,
+          external_provider: detectExternalProvider(url),
+          file_path: null,
+          file_name: null,
+          file_size: null,
+          mime_type: null,
+        });
+        if (dbError) throw dbError;
+        return;
+      }
+
+      if (!file) throw new Error('Selecione um arquivo.');
       const fileExt = file.name.split('.').pop();
       const filePath = `${crypto.randomUUID()}.${fileExt}`;
 
@@ -60,20 +83,23 @@ const TechFileManager = () => {
         mime_type: file.type,
         category: category.trim() || 'Geral',
         uploaded_by: user!.id,
+        is_external: false,
       });
       if (dbError) throw dbError;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['technical-files'] });
-      toast({ title: 'Arquivo enviado com sucesso!' });
+      toast({ title: 'Arquivo registrado com sucesso!' });
       setIsUploadOpen(false);
       setTitle('');
       setDescription('');
       setCategory('Geral');
       setFile(null);
+      setExternalUrl('');
+      setSourceMode('upload');
     },
     onError: (error: any) => {
-      toast({ title: 'Erro ao enviar', description: error.message, variant: 'destructive' });
+      toast({ title: 'Erro ao registrar', description: error.message, variant: 'destructive' });
     },
   });
 
