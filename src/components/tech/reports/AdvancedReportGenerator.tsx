@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -11,19 +11,24 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Camera, X, Loader2, FileCheck2, RotateCcw, Plus, FileSignature, Trash2 } from 'lucide-react';
+import { Camera, X, Loader2, FileCheck2, RotateCcw, Plus, FileSignature, Trash2, Save, Eye } from 'lucide-react';
 import { generateReportHash, generateReportNumber } from '@/utils/reportHash';
 import {
-  downloadAdvancedReportPdf,
+  generateAdvancedReportPdf,
   type AdvancedReportData,
   type AdvancedPhoto,
 } from '@/utils/reportPdfAdvanced';
 import type { SituacaoHW } from '@/utils/reportNarrativeAdvanced';
 import SignaturePad from './SignaturePad';
+import PdfPreviewDialog from './PdfPreviewDialog';
+import type jsPDF from 'jspdf';
+import delta7Logo from '@/assets/delta7-logo.png';
 
 interface PhotoState extends AdvancedPhoto {
   id: string;
-  file: File;
+  file?: File;
+  storagePath?: string;
+  uploaded?: boolean;
 }
 
 const fileToDataUrl = (file: File) =>
@@ -60,8 +65,21 @@ const ESTADO_OPCOES = ['Ótimo', 'Bom', 'Regular', 'Ruim', 'Péssimo'];
 const SEGURANCA_OPCOES = ['Adequada', 'Com ressalvas', 'Vulnerável', 'Comprometida'];
 const REDE_OPCOES = ['Funcional', 'Instável', 'Sem acesso à rede', 'N/A'];
 
+interface DraftReport {
+  id: string;
+  report_number: string;
+  technician_name: string;
+  company_name: string;
+  triagem: any;
+  diagnostico: any;
+  conclusao: any;
+  photos: any;
+  form_data: any;
+}
+
 interface Props {
   onSaved?: () => void;
+  draft?: DraftReport | null;
 }
 
 const initialState = () => ({
@@ -115,7 +133,7 @@ const initialState = () => ({
   usuarioMatricula: '',
 });
 
-const AdvancedReportGenerator: React.FC<Props> = ({ onSaved }) => {
+const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -124,6 +142,72 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved }) => {
   const [s, setS] = useState(initialState);
   const [photos, setPhotos] = useState<PhotoState[]>([]);
   const [showCompanyDropdown, setShowCompanyDropdown] = useState(false);
+  const [draftId, setDraftId] = useState<string | null>(null);
+  const [reportNumber, setReportNumber] = useState<string>('');
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewPdf, setPreviewPdf] = useState<jsPDF | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+
+  useEffect(() => {
+    const load = async () => {
+      if (!draft) return;
+      const fd = (draft.form_data || {}) as any;
+      const ident = draft.triagem?.identificacao || {};
+      const conc = draft.conclusao || {};
+      const ass = conc.assinaturas || {};
+      setS({
+        patrimonio: fd.patrimonio ?? ident.patrimonio ?? '',
+        marca: fd.marca ?? ident.marca ?? '',
+        modelo: fd.modelo ?? ident.modelo ?? '',
+        tipo: fd.tipo ?? ident.tipo ?? '',
+        setor: fd.setor ?? ident.setor ?? '',
+        unidade: fd.unidade ?? ident.unidade ?? '',
+        usuario: fd.usuario ?? ident.usuario ?? '',
+        contato: fd.contato ?? ident.contato ?? '',
+        dataAquisicao: fd.dataAquisicao ?? ident.dataAquisicao ?? '',
+        garantia: fd.garantia ?? ident.garantia ?? '',
+        finalidades: fd.finalidades ?? ident.finalidades ?? [],
+        finalidadeOutro: fd.finalidadeOutro ?? ident.finalidadeOutro ?? '',
+        companyName: draft.company_name || '',
+        technicianName: draft.technician_name || '',
+        hardware: fd.hardware ?? draft.triagem?.hardware ?? initialState().hardware,
+        software: fd.software ?? draft.triagem?.software ?? initialState().software,
+        problemas: fd.problemas ?? draft.diagnostico?.problemas ?? [{ area: '', descricao: '', criticidade: '', acao: '' }],
+        estado: fd.estado ?? draft.diagnostico?.estado ?? { conservacao: '', desempenho: '', seguranca: '', conectividade: '' },
+        parecer: fd.parecer ?? conc.parecer ?? '',
+        parecerTexto: fd.parecerTexto ?? conc.parecerTexto ?? '',
+        recomendacoes: fd.recomendacoes ?? conc.recomendacoes ?? [{ texto: '', responsavel: '', prazo: '' }],
+        observacoesFinais: fd.observacoesFinais ?? conc.observacoesFinais ?? '',
+        assinaturaTecnico: fd.assinaturaTecnico ?? '',
+        assinaturaGestor: fd.assinaturaGestor ?? '',
+        assinaturaUsuario: fd.assinaturaUsuario ?? '',
+        gestorNome: fd.gestorNome ?? ass.gestorNome ?? '',
+        gestorCargo: fd.gestorCargo ?? ass.gestorCargo ?? '',
+        usuarioNome: fd.usuarioNome ?? ass.usuarioNome ?? '',
+        usuarioMatricula: fd.usuarioMatricula ?? ass.usuarioMatricula ?? '',
+      });
+      setDraftId(draft.id);
+      setReportNumber(draft.report_number);
+      const loaded: PhotoState[] = [];
+      for (const p of (draft.photos || []) as Array<{ path: string; caption: string }>) {
+        try {
+          const { data } = await supabase.storage.from('report-photos').download(p.path);
+          if (data) {
+            const dataUrl = await new Promise<string>((res, rej) => {
+              const r = new FileReader();
+              r.onload = () => res(r.result as string);
+              r.onerror = rej;
+              r.readAsDataURL(data);
+            });
+            loaded.push({ id: crypto.randomUUID(), dataUrl, caption: p.caption || '', storagePath: p.path, uploaded: true });
+          }
+        } catch {}
+      }
+      setPhotos(loaded);
+    };
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draft]);
 
   useQuery({
     queryKey: ['adv-report-profile', user?.id],
@@ -214,7 +298,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved }) => {
         continue;
       }
       const dataUrl = await fileToDataUrl(file);
-      arr.push({ id: crypto.randomUUID(), file, dataUrl, caption: '' });
+      arr.push({ id: crypto.randomUUID(), file, dataUrl, caption: '', uploaded: false });
     }
     setPhotos((prev) => [...prev, ...arr]);
     if (fileInputRef.current) fileInputRef.current.value = '';
@@ -226,7 +310,104 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved }) => {
   const reset = () => {
     setS({ ...initialState(), technicianName: s.technicianName });
     setPhotos([]);
+    setDraftId(null);
+    setReportNumber('');
   };
+
+  const ensureUploadedPhotos = async (rNum: string) => {
+    const out: { path: string; caption: string }[] = [];
+    for (const p of photos) {
+      if (p.uploaded && p.storagePath) {
+        out.push({ path: p.storagePath, caption: p.caption });
+      } else if (p.file) {
+        const ext = p.file.name.split('.').pop() || 'jpg';
+        const path = `${user!.id}/${rNum}/${crypto.randomUUID()}.${ext}`;
+        const { error } = await supabase.storage.from('report-photos').upload(path, p.file);
+        if (error) throw error;
+        out.push({ path, caption: p.caption });
+        p.uploaded = true;
+        p.storagePath = path;
+      }
+    }
+    return out;
+  };
+
+  const buildPersistPayload = (rNum: string, generatedAt: string, integrityHash: string, uploadedPhotos: any[], isDraft: boolean) => {
+    const equipmentLabel = [s.marca, s.modelo, s.patrimonio ? `SN: ${s.patrimonio}` : '']
+      .filter(Boolean).join(' ') || 'Equipamento sem identificação';
+    const triagem = {
+      identificacao: {
+        patrimonio: s.patrimonio, marca: s.marca, modelo: s.modelo, tipo: s.tipo,
+        setor: s.setor, unidade: s.unidade, usuario: s.usuario, contato: s.contato,
+        dataAquisicao: s.dataAquisicao, garantia: s.garantia,
+        finalidades: s.finalidades, finalidadeOutro: s.finalidadeOutro,
+      },
+      hardware: s.hardware,
+      software: s.software,
+    };
+    const diagnostico = { problemas: s.problemas, estado: s.estado };
+    const conclusao = {
+      parecer: s.parecer,
+      parecerTexto: s.parecerTexto,
+      recomendacoes: s.recomendacoes,
+      observacoesFinais: s.observacoesFinais,
+      assinaturas: {
+        tecnico: !!s.assinaturaTecnico,
+        gestor: !!s.assinaturaGestor,
+        usuario: !!s.assinaturaUsuario,
+        gestorNome: s.gestorNome, gestorCargo: s.gestorCargo,
+        usuarioNome: s.usuarioNome, usuarioMatricula: s.usuarioMatricula,
+      },
+    };
+    return {
+      report_number: rNum,
+      report_type: 'equipamento',
+      created_by: user!.id,
+      technician_name: s.technicianName || 'Não informado',
+      company_name: s.companyName || 'Rascunho',
+      equipment: equipmentLabel,
+      triagem,
+      diagnostico,
+      conclusao,
+      photos: uploadedPhotos,
+      integrity_hash: integrityHash,
+      status_final: s.parecer || 'Pendente',
+      generated_at: generatedAt,
+      is_draft: isDraft,
+      form_data: s,
+    };
+  };
+
+  const saveDraftMutation = useMutation({
+    mutationFn: async () => {
+      const rNum = reportNumber || generateReportNumber();
+      const generatedAt = new Date().toISOString();
+      const uploadedPhotos = await ensureUploadedPhotos(rNum);
+      const integrityHash = await generateReportHash(
+        { rNum, draft: true, s },
+        s.technicianName || 'rascunho',
+        generatedAt,
+      );
+      const payload = buildPersistPayload(rNum, generatedAt, integrityHash, uploadedPhotos, true);
+      if (draftId) {
+        const { error } = await supabase.from('technical_reports').update(payload).eq('id', draftId);
+        if (error) throw error;
+      } else {
+        const { data, error } = await supabase.from('technical_reports').insert(payload).select('id').single();
+        if (error) throw error;
+        setDraftId(data.id);
+      }
+      setReportNumber(rNum);
+      return rNum;
+    },
+    onSuccess: (num) => {
+      toast({ title: 'Rascunho salvo', description: `Você pode continuar editando ${num} a qualquer momento.` });
+      queryClient.invalidateQueries({ queryKey: ['technical-reports'] });
+    },
+    onError: (e: any) => {
+      toast({ title: 'Erro ao salvar rascunho', description: e.message, variant: 'destructive' });
+    },
+  });
 
   const generateMutation = useMutation({
     mutationFn: async () => {
@@ -235,83 +416,35 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved }) => {
       if (!s.technicianName.trim()) throw new Error('Informe o técnico responsável.');
       if (!s.parecer) throw new Error('Selecione o parecer conclusivo.');
 
-      const reportNumber = generateReportNumber();
+      const rNum = reportNumber || generateReportNumber();
       const generatedAt = new Date().toISOString();
 
-      // Hash de legitimidade combinando técnico + Nº de série + diagnóstico
       const integrityHash = await generateReportHash(
         {
-          reportNumber,
-          patrimonio: s.patrimonio,
-          marca: s.marca,
-          modelo: s.modelo,
-          hardware: s.hardware,
-          software: s.software,
-          problemas: s.problemas,
-          parecer: s.parecer,
+          reportNumber: rNum,
+          patrimonio: s.patrimonio, marca: s.marca, modelo: s.modelo,
+          hardware: s.hardware, software: s.software,
+          problemas: s.problemas, parecer: s.parecer,
         },
         s.technicianName,
         generatedAt,
       );
 
-      // Upload das fotos
-      const uploadedPhotos: { path: string; caption: string }[] = [];
-      for (const p of photos) {
-        const ext = p.file.name.split('.').pop() || 'jpg';
-        const path = `${user!.id}/${reportNumber}/${crypto.randomUUID()}.${ext}`;
-        const { error: upErr } = await supabase.storage.from('report-photos').upload(path, p.file);
-        if (upErr) throw upErr;
-        uploadedPhotos.push({ path, caption: p.caption });
+      const uploadedPhotos = await ensureUploadedPhotos(rNum);
+      const payload = buildPersistPayload(rNum, generatedAt, integrityHash, uploadedPhotos, false);
+
+      if (draftId) {
+        const { error } = await supabase.from('technical_reports').update(payload).eq('id', draftId);
+        if (error) throw error;
+      } else {
+        const { data, error } = await supabase.from('technical_reports').insert(payload).select('id').single();
+        if (error) throw error;
+        setDraftId(data.id);
       }
-
-      const equipmentLabel = [s.marca, s.modelo, s.patrimonio ? `SN: ${s.patrimonio}` : '']
-        .filter(Boolean).join(' ');
-
-      // Dados consolidados gravados nos jsonb existentes
-      const triagem = {
-        identificacao: {
-          patrimonio: s.patrimonio, marca: s.marca, modelo: s.modelo, tipo: s.tipo,
-          setor: s.setor, unidade: s.unidade, usuario: s.usuario, contato: s.contato,
-          dataAquisicao: s.dataAquisicao, garantia: s.garantia,
-          finalidades: s.finalidades, finalidadeOutro: s.finalidadeOutro,
-        },
-        hardware: s.hardware,
-        software: s.software,
-      };
-      const diagnostico = { problemas: s.problemas, estado: s.estado };
-      const conclusao = {
-        parecer: s.parecer,
-        parecerTexto: s.parecerTexto,
-        recomendacoes: s.recomendacoes,
-        observacoesFinais: s.observacoesFinais,
-        assinaturas: {
-          tecnico: !!s.assinaturaTecnico,
-          gestor: !!s.assinaturaGestor,
-          usuario: !!s.assinaturaUsuario,
-          gestorNome: s.gestorNome, gestorCargo: s.gestorCargo,
-          usuarioNome: s.usuarioNome, usuarioMatricula: s.usuarioMatricula,
-        },
-      };
-
-      const { error: dbErr } = await supabase.from('technical_reports').insert({
-        report_number: reportNumber,
-        report_type: 'equipamento',
-        created_by: user!.id,
-        technician_name: s.technicianName,
-        company_name: s.companyName,
-        equipment: equipmentLabel || 'Equipamento sem identificação',
-        triagem,
-        diagnostico,
-        conclusao,
-        photos: uploadedPhotos,
-        integrity_hash: integrityHash,
-        status_final: s.parecer,
-        generated_at: generatedAt,
-      });
-      if (dbErr) throw dbErr;
+      setReportNumber(rNum);
 
       const data: AdvancedReportData = {
-        reportNumber, generatedAt, technicianName: s.technicianName,
+        reportNumber: rNum, generatedAt, technicianName: s.technicianName,
         patrimonio: s.patrimonio, marca: s.marca, modelo: s.modelo, tipo: s.tipo,
         setor: s.setor, unidade: s.unidade, usuario: s.usuario, contato: s.contato,
         dataAquisicao: s.dataAquisicao, garantia: s.garantia,
@@ -329,19 +462,38 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved }) => {
         usuarioNome: s.usuarioNome, usuarioMatricula: s.usuarioMatricula,
         integrityHash,
       };
-      await downloadAdvancedReportPdf(data);
-      return reportNumber;
+      const pdf = await generateAdvancedReportPdf(data);
+      return { pdf, rNum };
     },
-    onSuccess: (num) => {
-      toast({ title: 'Laudo gerado!', description: `Documento ${num} salvo e baixado.` });
+    onSuccess: ({ pdf, rNum }) => {
+      setPreviewPdf(pdf);
+      setPreviewLoading(false);
+      setPreviewOpen(true);
+      toast({ title: 'Laudo finalizado', description: `Documento ${rNum} pronto para revisão.` });
       queryClient.invalidateQueries({ queryKey: ['technical-reports'] });
-      reset();
-      onSaved?.();
     },
     onError: (e: any) => {
+      setPreviewLoading(false);
+      setPreviewOpen(false);
       toast({ title: 'Erro ao gerar laudo', description: e.message, variant: 'destructive' });
     },
   });
+
+  const handleGenerate = () => {
+    setPreviewLoading(true);
+    setPreviewPdf(null);
+    setPreviewOpen(true);
+    generateMutation.mutate();
+  };
+
+  const handlePreviewClose = (open: boolean) => {
+    setPreviewOpen(open);
+    if (!open && previewPdf) {
+      reset();
+      onSaved?.();
+    }
+  };
+
 
   const now = new Date().toLocaleString('pt-BR');
 
@@ -350,9 +502,14 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved }) => {
       {/* Cabeçalho timbrado */}
       <Card className="border-blue-900 border-t-4">
         <CardContent className="p-6 flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3">
-          <div>
-            <h3 className="text-xl font-bold text-blue-900">DELTA7 SOLUÇÕES EM TECNOLOGIA</h3>
-            <p className="text-sm text-gray-500">Laudo Técnico de Equipamento — Computador / Estação de Trabalho</p>
+          <div className="flex items-center gap-3">
+            <img src={delta7Logo} alt="Delta7" className="h-12 w-auto" />
+            <div>
+              <h3 className="text-xl font-bold text-blue-900">DELTA7 SOLUÇÕES EM TECNOLOGIA</h3>
+              <p className="text-sm text-gray-500">
+                {draftId ? `Editando rascunho ${reportNumber}` : 'Laudo Técnico de Equipamento — Computador / Estação de Trabalho'}
+              </p>
+            </div>
           </div>
           <div className="text-sm text-gray-500"><span className="font-medium">Data/Hora:</span> {now}</div>
         </CardContent>
@@ -752,19 +909,34 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved }) => {
       </Card>
 
       <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
-        <Button type="button" variant="outline" onClick={reset} disabled={generateMutation.isPending}>
+        <Button type="button" variant="outline" onClick={reset} disabled={generateMutation.isPending || saveDraftMutation.isPending}>
           <RotateCcw className="w-4 h-4 mr-2" /> Limpar
         </Button>
+        <Button type="button" variant="outline"
+          onClick={() => saveDraftMutation.mutate()}
+          disabled={saveDraftMutation.isPending || generateMutation.isPending}>
+          {saveDraftMutation.isPending
+            ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Salvando...</>
+            : <><Save className="w-4 h-4 mr-2" /> Salvar rascunho</>}
+        </Button>
         <Button type="button" className="bg-blue-900 hover:bg-blue-800"
-          onClick={() => generateMutation.mutate()} disabled={generateMutation.isPending}>
+          onClick={handleGenerate} disabled={generateMutation.isPending || saveDraftMutation.isPending}>
           {generateMutation.isPending
             ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Gerando...</>
-            : <><FileCheck2 className="w-4 h-4 mr-2" /> Gerar Laudo Final (PDF)</>}
+            : <><Eye className="w-4 h-4 mr-2" /> Pré-visualizar e gerar PDF</>}
         </Button>
       </div>
       <p className="text-xs text-gray-400 text-center flex items-center justify-center gap-1">
         <FileSignature className="w-3 h-3" /> Hash SHA-256 único combinando técnico + Nº de série + diagnóstico.
       </p>
+
+      <PdfPreviewDialog
+        open={previewOpen}
+        onOpenChange={handlePreviewClose}
+        pdf={previewPdf}
+        fileName={`${reportNumber || 'Laudo'}.pdf`}
+        isLoading={previewLoading}
+      />
     </div>
   );
 };

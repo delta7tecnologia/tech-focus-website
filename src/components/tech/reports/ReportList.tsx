@@ -10,7 +10,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Search, FileText, Trash2, Download, Loader2, Monitor } from 'lucide-react';
+import { Search, FileText, Trash2, Download, Loader2, Monitor, Pencil } from 'lucide-react';
 import { downloadReportPdf, type ReportPhoto } from '@/utils/reportPdf';
 import { downloadAdvancedReportPdf } from '@/utils/reportPdfAdvanced';
 
@@ -19,7 +19,11 @@ const statusColor = (s: string) =>
   : s === 'Condenado' ? 'bg-red-100 text-red-700'
   : 'bg-amber-100 text-amber-700';
 
-const ReportList: React.FC = () => {
+interface Props {
+  onEditDraft?: (draft: any) => void;
+}
+
+const ReportList: React.FC<Props> = ({ onEditDraft }) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -188,9 +192,13 @@ const ReportList: React.FC = () => {
                         ? <><Monitor className="w-3 h-3" /> Equipamento</>
                         : <><FileText className="w-3 h-3" /> Atendimento</>}
                     </span>
-                    <span className={`text-xs px-2 py-0.5 rounded ${statusColor(r.status_final)}`}>
-                      {r.status_final}
-                    </span>
+                    {r.is_draft ? (
+                      <span className="text-xs px-2 py-0.5 rounded bg-yellow-100 text-yellow-800 font-semibold">RASCUNHO</span>
+                    ) : (
+                      <span className={`text-xs px-2 py-0.5 rounded ${statusColor(r.status_final)}`}>
+                        {r.status_final}
+                      </span>
+                    )}
                   </div>
                   <p className="font-semibold text-gray-900 truncate mt-1">{r.company_name}</p>
                   <p className="text-sm text-gray-500 truncate">{r.equipment}</p>
@@ -199,16 +207,23 @@ const ReportList: React.FC = () => {
                   </p>
                 </div>
                 <div className="flex gap-1 flex-shrink-0">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleDownload(r)}
-                    disabled={downloadingId === r.id}
-                  >
-                    {downloadingId === r.id
-                      ? <Loader2 className="w-4 h-4 animate-spin" />
-                      : <Download className="w-4 h-4" />}
-                  </Button>
+                  {r.is_draft && r.created_by === user?.id && onEditDraft && (
+                    <Button size="sm" variant="outline" className="text-blue-900" onClick={() => onEditDraft(r)}>
+                      <Pencil className="w-4 h-4 mr-1" /> Continuar
+                    </Button>
+                  )}
+                  {!r.is_draft && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleDownload(r)}
+                      disabled={downloadingId === r.id}
+                    >
+                      {downloadingId === r.id
+                        ? <Loader2 className="w-4 h-4 animate-spin" />
+                        : <Download className="w-4 h-4" />}
+                    </Button>
+                  )}
                   {r.created_by === user?.id && (
                     <Button
                       size="sm"
