@@ -339,7 +339,7 @@ const ReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
         <CardContent className="p-6">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3">
             <div className="flex items-center gap-3">
-              <img src="/src/assets/delta7-logo.png" alt="Delta7" className="h-10 w-auto" onError={(e) => ((e.target as HTMLImageElement).style.display = 'none')} />
+              <img src={delta7Logo} alt="Delta7" className="h-10 w-auto" />
               <div>
                 <h3 className="text-xl font-bold text-blue-900">DELTA7 SOLUÇÕES EM TECNOLOGIA</h3>
                 <p className="text-sm text-gray-500">
