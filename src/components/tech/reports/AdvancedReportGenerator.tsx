@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -11,19 +11,24 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Camera, X, Loader2, FileCheck2, RotateCcw, Plus, FileSignature, Trash2 } from 'lucide-react';
+import { Camera, X, Loader2, FileCheck2, RotateCcw, Plus, FileSignature, Trash2, Save, Eye } from 'lucide-react';
 import { generateReportHash, generateReportNumber } from '@/utils/reportHash';
 import {
-  downloadAdvancedReportPdf,
+  generateAdvancedReportPdf,
   type AdvancedReportData,
   type AdvancedPhoto,
 } from '@/utils/reportPdfAdvanced';
 import type { SituacaoHW } from '@/utils/reportNarrativeAdvanced';
 import SignaturePad from './SignaturePad';
+import PdfPreviewDialog from './PdfPreviewDialog';
+import type jsPDF from 'jspdf';
+import delta7Logo from '@/assets/delta7-logo.png';
 
 interface PhotoState extends AdvancedPhoto {
   id: string;
-  file: File;
+  file?: File;
+  storagePath?: string;
+  uploaded?: boolean;
 }
 
 const fileToDataUrl = (file: File) =>
@@ -60,8 +65,21 @@ const ESTADO_OPCOES = ['Ótimo', 'Bom', 'Regular', 'Ruim', 'Péssimo'];
 const SEGURANCA_OPCOES = ['Adequada', 'Com ressalvas', 'Vulnerável', 'Comprometida'];
 const REDE_OPCOES = ['Funcional', 'Instável', 'Sem acesso à rede', 'N/A'];
 
+interface DraftReport {
+  id: string;
+  report_number: string;
+  technician_name: string;
+  company_name: string;
+  triagem: any;
+  diagnostico: any;
+  conclusao: any;
+  photos: any;
+  form_data: any;
+}
+
 interface Props {
   onSaved?: () => void;
+  draft?: DraftReport | null;
 }
 
 const initialState = () => ({
