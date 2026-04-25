@@ -882,22 +882,37 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       {/* 8. Fotos */}
       <Card>
         <CardContent className="p-6 space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
             <h4 className="font-semibold text-blue-900 border-l-4 border-blue-900 pl-3">8. Evidências fotográficas</h4>
-            <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
-              <Camera className="w-4 h-4 mr-2" /> Adicionar fotos
-            </Button>
-            <input ref={fileInputRef} type="file" accept="image/*" capture="environment" multiple
-              className="hidden" onChange={(e) => handleAddPhotos(e.target.files)} />
+            <div className="flex gap-2">
+              <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
+                <Camera className="w-4 h-4 mr-2" /> Adicionar fotos
+              </Button>
+              <Button type="button" variant="outline" size="sm" onClick={addExternalPhoto} title="Cole o link de uma foto na nuvem (OneDrive, Drive, etc.)">
+                <Link2 className="w-4 h-4 mr-2" /> Adicionar link
+              </Button>
+              <input ref={fileInputRef} type="file" accept="image/*" capture="environment" multiple
+                className="hidden" onChange={(e) => handleAddPhotos(e.target.files)} />
+            </div>
           </div>
           {photos.length === 0 ? (
-            <p className="text-sm text-gray-500 text-center py-4">Nenhuma foto adicionada.</p>
+            <p className="text-sm text-gray-500 text-center py-4">Nenhuma evidência adicionada.</p>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {photos.map((p) => (
                 <div key={p.id} className="space-y-2">
                   <div className="relative">
-                    <img src={p.dataUrl} alt="Evidência" className="w-full h-32 object-cover rounded border" />
+                    {p.external ? (
+                      <div className="w-full h-32 rounded border border-dashed bg-purple-50 flex flex-col items-center justify-center p-2 text-center">
+                        <Link2 className="w-5 h-5 text-purple-700 mb-1" />
+                        <span className="text-[10px] font-semibold text-purple-700 uppercase">{p.externalProvider}</span>
+                        <a href={p.externalUrl} target="_blank" rel="noopener noreferrer" className="text-[10px] text-blue-700 underline truncate w-full mt-1">
+                          {p.externalUrl}
+                        </a>
+                      </div>
+                    ) : (
+                      <img src={p.dataUrl} alt="Evidência" className="w-full h-32 object-cover rounded border" />
+                    )}
                     <button type="button"
                       className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 hover:bg-red-700"
                       onClick={() => removePhoto(p.id)}>
