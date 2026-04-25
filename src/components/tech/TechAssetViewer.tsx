@@ -296,8 +296,8 @@ const TechAssetViewer = () => {
                       <Trash2 className="w-4 h-4" />
                     </Button>
                     {asset.screenshot_url && (
-                      <Button size="icon" variant="ghost" onClick={() => handleViewImage(asset.screenshot_url)}>
-                        <Eye className="w-4 h-4" />
+                      <Button size="icon" variant="ghost" onClick={() => handleViewImage(asset)} title={asset.is_external_screenshot ? 'Abrir link externo' : 'Ver evidência'}>
+                        {asset.is_external_screenshot ? <ExternalLink className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </Button>
                     )}
                   </div>
