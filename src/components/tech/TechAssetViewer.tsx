@@ -147,8 +147,12 @@ const TechAssetViewer = () => {
     return data.signedUrl;
   };
 
-  const handleViewImage = async (pathOrUrl: string) => {
-    const url = await getSignedUrl(pathOrUrl);
+  const handleViewImage = async (asset: any) => {
+    if (asset.is_external_screenshot) {
+      window.open(asset.screenshot_url, '_blank', 'noopener,noreferrer');
+      return;
+    }
+    const url = await getSignedUrl(asset.screenshot_url);
     if (url) setViewImage(url);
     else toast({ title: 'Erro', description: 'Não foi possível carregar a imagem.', variant: 'destructive' });
   };
@@ -160,12 +164,22 @@ const TechAssetViewer = () => {
     }
     setSaving(true);
     try {
-      let screenshot_url = editingId
-        ? assets.find(a => a.id === editingId)?.screenshot_url || null
-        : null;
+      const existing = editingId ? assets.find(a => a.id === editingId) : null;
+      let screenshot_url: string | null = existing?.screenshot_url || null;
+      let is_external_screenshot = existing?.is_external_screenshot || false;
 
-      if (screenshotFile) {
+      if (screenshotMode === 'external') {
+        const url = externalScreenshotUrl.trim();
+        if (url) {
+          if (!/^https?:\/\//i.test(url)) {
+            throw new Error('A URL da evidência deve começar com http:// ou https://');
+          }
+          screenshot_url = url;
+          is_external_screenshot = true;
+        }
+      } else if (screenshotFile) {
         screenshot_url = await uploadScreenshot(screenshotFile);
+        is_external_screenshot = false;
       }
 
       const payload = {
@@ -177,6 +191,7 @@ const TechAssetViewer = () => {
         office_license: form.office_license.trim() || null,
         notes: form.notes.trim() || null,
         screenshot_url,
+        is_external_screenshot,
       };
 
       if (editingId) {
