@@ -11,7 +11,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Camera, X, Loader2, FileCheck2, RotateCcw, Plus, FileSignature, Trash2, Save, Eye } from 'lucide-react';
+import { Camera, X, Loader2, FileCheck2, RotateCcw, Plus, FileSignature, Trash2, Save, Eye, Link2 } from 'lucide-react';
 import { generateReportHash, generateReportNumber } from '@/utils/reportHash';
 import {
   generateAdvancedReportPdf,
@@ -23,6 +23,7 @@ import SignaturePad from './SignaturePad';
 import PdfPreviewDialog from './PdfPreviewDialog';
 import type jsPDF from 'jspdf';
 import delta7Logo from '@/assets/delta7-logo.png';
+import { detectExternalProvider } from '../UploadOrLinkInput';
 
 interface PhotoState extends AdvancedPhoto {
   id: string;
