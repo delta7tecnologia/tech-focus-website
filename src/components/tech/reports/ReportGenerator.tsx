@@ -129,7 +129,20 @@ const ReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       setReportNumber(draft.report_number);
       // Carregar fotos já enviadas
       const loaded: PhotoState[] = [];
-      for (const p of (draft.photos || []) as Array<{ path: string; caption: string }>) {
+      for (const p of (draft.photos || []) as Array<any>) {
+        if (p.external && p.url) {
+          loaded.push({
+            id: crypto.randomUUID(),
+            dataUrl: '',
+            caption: p.caption || '',
+            external: true,
+            externalUrl: p.url,
+            externalProvider: p.provider || detectExternalProvider(p.url),
+            uploaded: true,
+          });
+          continue;
+        }
+        if (!p.path) continue;
         try {
           const { data } = await supabase.storage.from('report-photos').download(p.path);
           if (data) {
