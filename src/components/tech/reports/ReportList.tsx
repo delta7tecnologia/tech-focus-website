@@ -10,8 +10,9 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Search, FileText, Trash2, Download, Loader2 } from 'lucide-react';
+import { Search, FileText, Trash2, Download, Loader2, Monitor } from 'lucide-react';
 import { downloadReportPdf, type ReportPhoto } from '@/utils/reportPdf';
+import { downloadAdvancedReportPdf } from '@/utils/reportPdfAdvanced';
 
 const statusColor = (s: string) =>
   s === 'Resolvido' ? 'bg-green-100 text-green-700'
