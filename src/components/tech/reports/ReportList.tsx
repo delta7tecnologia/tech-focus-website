@@ -31,6 +31,22 @@ const ReportList: React.FC<Props> = ({ onEditDraft }) => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
+  const { data: isAdmin = false } = useQuery({
+    queryKey: ['technical-reports-is-admin', user?.id],
+    queryFn: async () => {
+      if (!user) return false;
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+      if (error) return false;
+      return data?.role === 'admin';
+    },
+    enabled: !!user,
+  });
+
   const { data: reports = [], isLoading } = useQuery({
     queryKey: ['technical-reports'],
     queryFn: async () => {
@@ -207,7 +223,7 @@ const ReportList: React.FC<Props> = ({ onEditDraft }) => {
                   </p>
                 </div>
                 <div className="flex gap-1 flex-shrink-0">
-                  {r.created_by === user?.id && onEditDraft && (
+                  {onEditDraft && (r.created_by === user?.id || isAdmin) && (
                     <Button size="sm" variant="outline" className="text-blue-900" onClick={() => onEditDraft(r)}>
                       <Pencil className="w-4 h-4 mr-1" /> {r.is_draft ? 'Continuar' : 'Editar'}
                     </Button>
