@@ -184,12 +184,12 @@ const TechFileManager = () => {
             <Dialog open={isUploadOpen} onOpenChange={setIsUploadOpen}>
               <DialogTrigger asChild>
                 <Button>
-                  <Upload className="w-4 h-4 mr-2" /> Enviar Arquivo
+                  <Upload className="w-4 h-4 mr-2" /> Adicionar Arquivo
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Enviar Arquivo</DialogTitle>
+                  <DialogTitle>Adicionar Arquivo</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={(e) => { e.preventDefault(); uploadMutation.mutate(); }} className="space-y-4">
                   <div>
@@ -205,13 +205,22 @@ const TechFileManager = () => {
                     <Input value={category} onChange={(e) => setCategory(e.target.value)} placeholder="Geral" />
                   </div>
                   <div>
-                    <Label>Arquivo *</Label>
-                    <Input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} required />
+                    <Label>Origem do arquivo *</Label>
+                    <UploadOrLinkInput
+                      mode={sourceMode}
+                      onModeChange={setSourceMode}
+                      externalUrl={externalUrl}
+                      onExternalUrlChange={setExternalUrl}
+                      onFileChange={setFile}
+                      selectedFileName={file?.name}
+                      fileLabel="Selecionar arquivo"
+                      helpText="Use 'Link externo' para apontar para arquivos no OneDrive, Google Drive, Dropbox, etc. — sem usar o armazenamento interno."
+                    />
                   </div>
                   <div className="flex gap-2 justify-end">
                     <Button type="button" variant="outline" onClick={() => setIsUploadOpen(false)}>Cancelar</Button>
                     <Button type="submit" disabled={uploadMutation.isPending}>
-                      {uploadMutation.isPending ? 'Enviando...' : 'Enviar'}
+                      {uploadMutation.isPending ? 'Salvando...' : 'Salvar'}
                     </Button>
                   </div>
                 </form>
