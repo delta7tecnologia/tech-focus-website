@@ -6,6 +6,7 @@ import {
   narrateStatusFinal,
   escapeHtml,
 } from './reportNarrative';
+import { DELTA7_LOGO_DATA_URL } from '@/assets/delta7LogoBase64';
 
 export interface ReportPhoto {
   dataUrl: string;
@@ -69,13 +70,16 @@ function buildHtml(r: ReportData): string {
 <div style="width: 794px; padding: 40px 48px; font-family: 'Helvetica', Arial, sans-serif; color: #1e293b; background: white; box-sizing: border-box;">
   <!-- Cabeçalho timbrado -->
   <div style="border-bottom: 4px solid #1e3a8a; padding-bottom: 16px; margin-bottom: 24px;">
-    <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-      <div>
-        <div style="font-size: 22px; font-weight: 800; color: #1e3a8a; letter-spacing: 0.5px;">
-          DELTA7 SOLUÇÕES EM TECNOLOGIA
-        </div>
-        <div style="font-size: 11px; color: #64748b; margin-top: 4px;">
-          Laudo Técnico de Atendimento
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 16px;">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <img src="${DELTA7_LOGO_DATA_URL}" alt="Delta7" style="height: 56px; width: auto; display: block;" />
+        <div>
+          <div style="font-size: 18px; font-weight: 800; color: #1e3a8a; letter-spacing: 0.5px;">
+            DELTA7 SOLUÇÕES EM TECNOLOGIA
+          </div>
+          <div style="font-size: 11px; color: #64748b; margin-top: 2px;">
+            Laudo Técnico de Atendimento
+          </div>
         </div>
       </div>
       <div style="text-align: right; font-size: 11px;">

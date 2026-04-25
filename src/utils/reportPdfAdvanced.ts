@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { escapeHtml } from './reportNarrative';
+import { DELTA7_LOGO_DATA_URL } from '@/assets/delta7LogoBase64';
 import {
   narrateHardware,
   narrateSO,
@@ -190,13 +191,16 @@ function buildHtml(r: AdvancedReportData): string {
 <div style="width: 794px; padding: 36px 44px; font-family: 'Helvetica', Arial, sans-serif; color: #1e293b; background: white; box-sizing: border-box; font-size: 11px;">
   <!-- Cabeçalho timbrado Delta7 -->
   <div style="border-bottom: 4px solid #1e3a8a; padding-bottom: 14px; margin-bottom: 18px;">
-    <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-      <div>
-        <div style="font-size: 22px; font-weight: 800; color: #1e3a8a; letter-spacing: 0.5px;">
-          DELTA7 SOLUÇÕES EM TECNOLOGIA
-        </div>
-        <div style="font-size: 11px; color: #64748b; margin-top: 4px;">
-          LAUDO TÉCNICO DE EQUIPAMENTO — Computador / Estação de Trabalho
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 14px;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <img src="${DELTA7_LOGO_DATA_URL}" alt="Delta7" style="height: 54px; width: auto; display: block;" />
+        <div>
+          <div style="font-size: 17px; font-weight: 800; color: #1e3a8a; letter-spacing: 0.5px;">
+            DELTA7 SOLUÇÕES EM TECNOLOGIA
+          </div>
+          <div style="font-size: 11px; color: #64748b; margin-top: 2px;">
+            LAUDO TÉCNICO DE EQUIPAMENTO — Computador / Estação de Trabalho
+          </div>
         </div>
       </div>
       <div style="text-align: right; font-size: 11px;">
