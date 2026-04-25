@@ -1,165 +1,67 @@
-# Gerador de Laudos Técnicos Padronizados
+# Correção do PDF do laudo técnico
 
-Nova funcionalidade dentro da **Área Técnica** (`/area-tecnica`) para que técnicos aprovados gerem laudos profissionais timbrados Delta7, com checklist guiado, anexos fotográficos com legenda, hash de integridade SHA-256 e exportação em PDF formato A4.
+## Problemas confirmados no laudo `LDO-20260425-37NJ.pdf`
 
-## Onde fica
+1. **Palavras coladas**: `LAUDO TÉCNICODE`, `Análisenarrativa`, `JustificativaTécnica`, `SSDpode`, `CRÍTICA—exige`, `PlacaMãe`. Causa: `html2canvas` rasteriza a página em JPEG e o kerning das fontes em escala 2x faz caracteres adjacentes perderem o espaço visual.
+2. **Cortes na mudança de página**: títulos de seção (ex.: "5. DIAGNÓSTICO…" começando cortado no topo da página 2), fotos partidas, tabelas seccionadas. Causa: o código gera **uma única imagem gigante** e a fatia em alturas fixas de 297mm, sem respeitar limites de bloco.
 
-Adicionar uma terceira aba em `TechFileManager.tsx` ao lado de "Arquivos" e "Patrimônios":
+Ambos os problemas afetam tanto `reportPdf.ts` (laudo simples) quanto `reportPdfAdvanced.ts` (laudo de patrimônio — o que você gerou).
 
-```text
-[ Arquivos ]  [ Patrimônios ]  [ Laudos Técnicos ]
-```
+## Solução: substituir html2canvas por jsPDF nativo (texto vetorial + quebras inteligentes)
 
-Acesso restrito aos mesmos critérios já existentes (técnico aprovado ou admin).
+Reescrever a geração para usar a API nativa do jsPDF (`pdf.text`, `pdf.rect`, `pdf.setFillColor`, `autoTable`) em vez de rasterizar HTML. Cada bloco (cabeçalho, tabela, parágrafo, seção de fotos) verifica se ainda cabe na página antes de desenhar; se não couber, chama `pdf.addPage()` e redesenha o cabeçalho timbrado.
 
-## Tela do Gerador (formulário guiado)
+### Vantagens
+- **Texto vetorial real**: zero risco de palavras coladas. O PDF fica selecionável/pesquisável e muito mais leve.
+- **Quebras de página por bloco**: nenhuma linha de tabela, título de seção ou foto é cortada ao meio. Se um bloco não cabe, vai inteiro para a próxima página.
+- **Cabeçalho repetido**: logo Delta7 + nº do laudo aparecem no topo de cada página, com numeração "Página X de Y".
+- **Fotos sem distorção**: cada imagem é colocada com `pdf.addImage` no seu próprio espaço, com legenda abaixo, e checa altura disponível antes de inserir.
 
-Layout em cards numerados, mobile-first, paleta azul-marinho/cinza/branco já usada no projeto.
-
-**1. Identificação**
-- Empresa cliente (autocomplete reaproveitando `companies` de `assets`, com opção de digitar nova — mesmo padrão já implementado no Patrimônio)
-- Equipamento / nº de série / modelo
-- Técnico responsável (preenchido automaticamente com `profile.full_name`, editável)
-- Data/hora capturada automaticamente (somente leitura, exibida no topo)
-
-**2. Triagem**
-- Estado geral do equipamento — RadioGroup: Bom / Regular / Crítico
-- Lacre violado? — RadioGroup: Sim / Não
-- Acessórios recebidos (texto curto opcional)
-
-**3. Diagnóstico**
-- Testes realizados (Textarea)
-- Causa raiz identificada (Textarea)
-- Peças/componentes necessários (Textarea)
-
-**4. Conclusão**
-- Recomendações ao cliente (Textarea)
-- Status final — Select: Resolvido / Pendente / Condenado
-
-**5. Anexos fotográficos**
-- Botão "Adicionar fotos" (`<input type="file" accept="image/*" capture="environment" multiple>` — abre câmera no celular)
-- Grid de previews; cada foto tem campo de legenda inline e botão remover
-- Sem limite rígido, validação de tamanho (≤ 5 MB por foto)
-
-**6. Ações**
-- "Gerar Laudo Final" (gera PDF + salva no histórico)
-- "Limpar formulário"
-
-## Geração do PDF (A4)
-
-Usar **jsPDF + html2canvas** (já sugeridos pelo usuário). Renderizar um template HTML oculto estilizado e converter em PDF multi-página A4.
-
-Estrutura do laudo:
-
-```text
-┌─────────────────────────────────────────┐
-│  DELTA7 SOLUÇÕES EM TECNOLOGIA          │ ← cabeçalho timbrado
-│  Laudo Técnico Nº LDO-AAAAMMDD-XXXX     │   azul-marinho
-├─────────────────────────────────────────┤
-│  Data/Hora: 25/04/2026 14:32            │
-│  Técnico:   João Silva                  │
-│  Cliente:   Empresa XYZ                 │
-│  Equipamento: Notebook Dell ...         │
-├─────────────────────────────────────────┤
-│  1. TRIAGEM                             │
-│  Constatou-se que o equipamento ...     │ ← texto narrativo
-│                                         │
-│  2. DIAGNÓSTICO                         │
-│  Foram realizados os seguintes ...      │
-│                                         │
-│  3. CONCLUSÃO                           │
-│  Status final: RESOLVIDO                │
-│                                         │
-│  4. EVIDÊNCIAS FOTOGRÁFICAS             │
-│  [foto]  [foto]                         │
-│  Legenda     Legenda                    │
-├─────────────────────────────────────────┤
-│  Hash SHA-256: a3f2b9c8d4e5...          │
-│  Este documento possui integridade      │
-│  garantida pela hash de segurança       │
-│  da plataforma Delta7                   │
-└─────────────────────────────────────────┘
-```
-
-**Transformação de respostas curtas em narrativa** (helper `narrate()`):
-- Estado "Crítico" → "Constatou-se que o equipamento foi recebido em estado crítico, apresentando sinais evidentes de comprometimento."
-- Lacre "Sim" → "Constatou-se a violação do selo de garantia original, o que pode implicar perda da cobertura do fabricante."
-- Lacre "Não" → "Os selos de garantia originais encontram-se íntegros."
-- Status "Condenado" → "Após análise técnica detalhada, o equipamento foi considerado **CONDENADO** ..."
-
-## Hash de integridade SHA-256
-
-Usando a Web Crypto API nativa (sem libs):
-
-```text
-hash = SHA-256( JSON.stringify(form) + tecnico + ISOTimestamp )
-```
-
-- Gerado no momento do "Gerar Laudo Final"
-- Exibido no rodapé do PDF e salvo junto ao registro no banco
-- Permite verificação futura de adulteração
-
-## Persistência (Lovable Cloud)
-
-Nova tabela **`technical_reports`**:
-
-| coluna | tipo | nota |
-|---|---|---|
-| id | uuid PK | |
-| report_number | text | LDO-AAAAMMDD-XXXX (sequencial) |
-| created_by | uuid | técnico autor |
-| technician_name | text | snapshot do nome |
-| company_name | text | |
-| equipment | text | |
-| triagem | jsonb | estado, lacre, acessórios |
-| diagnostico | jsonb | testes, causa, peças |
-| conclusao | jsonb | recomendações, status |
-| photos | jsonb | `[{path, caption}]` |
-| integrity_hash | text | SHA-256 |
-| generated_at | timestamptz | |
-| created_at / updated_at | timestamptz | |
-
-**RLS** (mesmo padrão de `assets`):
-- SELECT: técnicos aprovados + admins
-- INSERT: técnicos aprovados (created_by = auth.uid())
-- UPDATE/DELETE: dono ou admin
-
-**Storage**: novo bucket privado **`report-photos`** com policies espelhando `asset-screenshots` (ownership-based update/delete, leitura por aprovados via signed URL de 1h).
-
-## Histórico de laudos
-
-Dentro da aba "Laudos Técnicos", abaixo do botão "Novo Laudo", lista dos laudos do técnico (admins veem todos):
-
-- Nº do laudo, cliente, equipamento, data, status (badge colorido)
-- Ações: **Ver** (re-gera o PDF a partir dos dados salvos), **Excluir**
-- Campo de busca por cliente/nº
-
-## Detalhes técnicos
-
-- Bibliotecas a instalar: `jspdf`, `html2canvas`
-- Hash: `crypto.subtle.digest('SHA-256', ...)` (nativo do browser, zero dependência)
-- Numeração: `LDO-{yyyymmdd}-{4 chars random}` gerada client-side, com unique constraint na coluna
-- PDF multi-página: html2canvas → split em páginas A4 (210×297mm) via jsPDF `addImage` + `addPage`
-- Upload das fotos: paralelo via `Promise.all`, paths salvos no jsonb
-- Mobile: input com `capture="environment"` aciona câmera traseira; previews em grid 2 colunas
-- O laudo no PDF embute as imagens como base64 (já carregadas no preview), garantindo render correto
+### Bibliotecas
+Usar `jspdf-autotable` (já compatível com o jsPDF que está no projeto) para as tabelas — gerencia automaticamente quebra de linha em células, repetição de cabeçalho da tabela e quebra de página dentro da tabela.
 
 ## Arquivos afetados
 
-**Novos**
-- `src/components/tech/reports/ReportGenerator.tsx` — formulário guiado
-- `src/components/tech/reports/ReportList.tsx` — histórico
-- `src/components/tech/reports/TechReports.tsx` — wrapper da aba
-- `src/utils/reportPdf.ts` — montagem HTML + jsPDF
-- `src/utils/reportHash.ts` — SHA-256 helper
-- `src/utils/reportNarrative.ts` — `narrate()` helpers
-- `supabase/migrations/<timestamp>_create_technical_reports.sql` — tabela, RLS, bucket, policies
+- `src/utils/reportPdfAdvanced.ts` — reescrita completa (laudo de patrimônio).
+- `src/utils/reportPdf.ts` — reescrita completa (laudo simples segue o mesmo padrão).
+- `package.json` — adicionar `jspdf-autotable`.
+- `src/components/tech/reports/PdfPreviewDialog.tsx` — sem mudança (continua recebendo o `jsPDF`).
 
-**Editados**
-- `src/components/tech/TechFileManager.tsx` — adiciona terceira aba "Laudos Técnicos"
-- `package.json` — adiciona `jspdf` e `html2canvas`
+## Estrutura do novo gerador (pseudocódigo)
 
-## Fora do escopo (podem virar v2)
-- Assinatura digital do cliente (canvas)
-- Verificação pública de hash via QR Code no PDF
-- Envio automático do laudo por e-mail ao cliente
+```text
+initPdf()                          // A4, margens 15mm
+drawHeader(page=1)                 // logo + título + nº + data + linha azul
+y = 45
+
+for cada seção (1..10):
+    needSpace(sectionTitleHeight)  // se não couber, addPage + drawHeader
+    drawSectionTitle("3. INSPEÇÃO DE HARDWARE")
+    
+    if seção é tabela:
+        autoTable({ startY: y, didDrawPage: drawHeader, ... })
+        y = pdf.lastAutoTable.finalY + 6
+    
+    if seção é texto:
+        lines = pdf.splitTextToSize(texto, contentWidth)
+        for cada linha:
+            needSpace(lineHeight)
+            pdf.text(linha, x, y); y += lineHeight
+    
+    if seção é fotos:
+        for cada foto (grid 2 col):
+            needSpace(photoHeight + captionHeight)
+            pdf.addImage(...) ; pdf.text(legenda, ...)
+
+drawFooter()                       // hash + "Página X de Y" em todas as páginas
+```
+
+## Validação
+
+Após implementar, gerar novamente um laudo de teste com o mesmo conteúdo e conferir:
+- Nenhuma palavra colada (`LAUDO TÉCNICO DE`, `Análise narrativa`, `Justificativa Técnica` separadas).
+- Título "5. DIAGNÓSTICO…" inicia íntegro no topo da pág. 2 (não cortado).
+- Foto que ficaria no limite vai inteira para a próxima página.
+- Texto continua selecionável (Ctrl+C funciona no PDF).
+- Pré-visualização no navegador continua funcionando normalmente (já usa `pdf.output('blob')`).
+
