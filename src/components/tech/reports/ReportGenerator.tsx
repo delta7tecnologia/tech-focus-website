@@ -10,18 +10,22 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileSignature, Camera, X, Loader2, FileCheck2, RotateCcw, Save, Eye } from 'lucide-react';
+import { FileSignature, Camera, X, Loader2, FileCheck2, RotateCcw, Save, Eye, Link2 } from 'lucide-react';
 import { generateReportHash, generateReportNumber } from '@/utils/reportHash';
 import { generateReportPdf, type ReportPhoto } from '@/utils/reportPdf';
 import type jsPDF from 'jspdf';
 import PdfPreviewDialog from './PdfPreviewDialog';
 import delta7Logo from '@/assets/delta7-logo.png';
+import { detectExternalProvider } from '../UploadOrLinkInput';
 
 interface PhotoState extends ReportPhoto {
   id: string;
   file?: File;
   storagePath?: string;
   uploaded?: boolean;
+  external?: boolean;
+  externalUrl?: string;
+  externalProvider?: string;
 }
 
 const fileToDataUrl = (file: File) =>
@@ -125,7 +129,20 @@ const ReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       setReportNumber(draft.report_number);
       // Carregar fotos já enviadas
       const loaded: PhotoState[] = [];
-      for (const p of (draft.photos || []) as Array<{ path: string; caption: string }>) {
+      for (const p of (draft.photos || []) as Array<any>) {
+        if (p.external && p.url) {
+          loaded.push({
+            id: crypto.randomUUID(),
+            dataUrl: '',
+            caption: p.caption || '',
+            external: true,
+            externalUrl: p.url,
+            externalProvider: p.provider || detectExternalProvider(p.url),
+            uploaded: true,
+          });
+          continue;
+        }
+        if (!p.path) continue;
         try {
           const { data } = await supabase.storage.from('report-photos').download(p.path);
           if (data) {
@@ -179,9 +196,35 @@ const ReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
     setReportNumber('');
   };
 
+  const addExternalPhoto = () => {
+    const url = window.prompt('Cole o link da foto (OneDrive, Google Drive, etc.):');
+    if (!url) return;
+    const trimmed = url.trim();
+    if (!/^https?:\/\//i.test(trimmed)) {
+      toast({ title: 'URL inválida', description: 'Deve começar com http:// ou https://', variant: 'destructive' });
+      return;
+    }
+    setPhotos((prev) => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
+        dataUrl: '',
+        caption: '',
+        external: true,
+        externalUrl: trimmed,
+        externalProvider: detectExternalProvider(trimmed),
+        uploaded: true,
+      },
+    ]);
+  };
+
   const ensureUploadedPhotos = async (rNum: string) => {
-    const out: { path: string; caption: string }[] = [];
+    const out: any[] = [];
     for (const p of photos) {
+      if (p.external && p.externalUrl) {
+        out.push({ external: true, url: p.externalUrl, provider: p.externalProvider || 'Externo', caption: p.caption });
+        continue;
+      }
       if (p.uploaded && p.storagePath) {
         out.push({ path: p.storagePath, caption: p.caption });
       } else if (p.file) {
@@ -296,7 +339,7 @@ const ReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
         triagem,
         diagnostico,
         conclusao,
-        photos: photos.map((p) => ({ dataUrl: p.dataUrl, caption: p.caption })),
+        photos: photos.map((p) => ({ dataUrl: p.dataUrl, caption: p.caption, external: p.external, externalUrl: p.externalUrl, externalProvider: p.externalProvider })),
         integrityHash,
       });
       return { pdf, rNum };
@@ -473,27 +516,42 @@ const ReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       {/* Anexos */}
       <Card>
         <CardContent className="p-6 space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
             <h4 className="font-semibold text-blue-900 border-l-4 border-blue-900 pl-3">4. Evidências fotográficas</h4>
-            <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
-              <Camera className="w-4 h-4 mr-2" /> Adicionar fotos
-            </Button>
-            <input ref={fileInputRef} type="file" accept="image/*" capture="environment" multiple className="hidden" onChange={(e) => handleAddPhotos(e.target.files)} />
+            <div className="flex gap-2">
+              <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
+                <Camera className="w-4 h-4 mr-2" /> Adicionar fotos
+              </Button>
+              <Button type="button" variant="outline" size="sm" onClick={addExternalPhoto} title="Cole o link de uma foto no OneDrive, Google Drive, etc.">
+                <Link2 className="w-4 h-4 mr-2" /> Adicionar link
+              </Button>
+              <input ref={fileInputRef} type="file" accept="image/*" capture="environment" multiple className="hidden" onChange={(e) => handleAddPhotos(e.target.files)} />
+            </div>
           </div>
 
           {photos.length === 0 ? (
-            <p className="text-sm text-gray-500 text-center py-6">Nenhuma foto adicionada. Toque em "Adicionar fotos" para usar a câmera ou galeria.</p>
+            <p className="text-sm text-gray-500 text-center py-6">Nenhuma evidência adicionada. Use "Adicionar fotos" (upload) ou "Adicionar link" (nuvem externa).</p>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {photos.map((p) => (
                 <div key={p.id} className="space-y-2">
                   <div className="relative">
-                    <img src={p.dataUrl} alt="Evidência" className="w-full h-32 object-cover rounded border" />
+                    {p.external ? (
+                      <div className="w-full h-32 rounded border border-dashed bg-purple-50 flex flex-col items-center justify-center p-2 text-center">
+                        <Link2 className="w-5 h-5 text-purple-700 mb-1" />
+                        <span className="text-[10px] font-semibold text-purple-700 uppercase">{p.externalProvider}</span>
+                        <a href={p.externalUrl} target="_blank" rel="noopener noreferrer" className="text-[10px] text-blue-700 underline truncate w-full mt-1">
+                          {p.externalUrl}
+                        </a>
+                      </div>
+                    ) : (
+                      <img src={p.dataUrl} alt="Evidência" className="w-full h-32 object-cover rounded border" />
+                    )}
                     <button type="button" className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 hover:bg-red-700" onClick={() => removePhoto(p.id)}>
                       <X className="w-3 h-3" />
                     </button>
                   </div>
-                  <Input placeholder="Legenda da foto" value={p.caption} onChange={(e) => updateCaption(p.id, e.target.value)} className="text-xs" />
+                  <Input placeholder="Legenda" value={p.caption} onChange={(e) => updateCaption(p.id, e.target.value)} className="text-xs" />
                 </div>
               ))}
             </div>

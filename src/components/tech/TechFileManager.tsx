@@ -9,9 +9,10 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Upload, Download, Trash2, FileText, LogOut, Search, Monitor, FileSignature } from 'lucide-react';
+import { Upload, Download, Trash2, FileText, LogOut, Search, Monitor, FileSignature, ExternalLink, Link2 } from 'lucide-react';
 import TechAssetViewer from './TechAssetViewer';
 import TechReports from './reports/TechReports';
+import UploadOrLinkInput, { detectExternalProvider, type SourceMode } from './UploadOrLinkInput';
 
 const TechFileManager = () => {
   const { user, signOut } = useAuth();
@@ -22,6 +23,8 @@ const TechFileManager = () => {
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('Geral');
   const [file, setFile] = useState<File | null>(null);
+  const [sourceMode, setSourceMode] = useState<SourceMode>('upload');
+  const [externalUrl, setExternalUrl] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
 
   const { data: files, isLoading } = useQuery({
@@ -38,8 +41,31 @@ const TechFileManager = () => {
 
   const uploadMutation = useMutation({
     mutationFn: async () => {
-      if (!file || !title.trim()) throw new Error('Preencha título e selecione um arquivo.');
+      if (!title.trim()) throw new Error('Preencha o título.');
 
+      if (sourceMode === 'external') {
+        const url = externalUrl.trim();
+        if (!url) throw new Error('Informe a URL do arquivo externo.');
+        if (!/^https?:\/\//i.test(url)) throw new Error('A URL deve começar com http:// ou https://');
+
+        const { error: dbError } = await supabase.from('technical_files').insert({
+          title: title.trim(),
+          description: description.trim() || null,
+          category: category.trim() || 'Geral',
+          uploaded_by: user!.id,
+          is_external: true,
+          external_url: url,
+          external_provider: detectExternalProvider(url),
+          file_path: null,
+          file_name: null,
+          file_size: null,
+          mime_type: null,
+        });
+        if (dbError) throw dbError;
+        return;
+      }
+
+      if (!file) throw new Error('Selecione um arquivo.');
       const fileExt = file.name.split('.').pop();
       const filePath = `${crypto.randomUUID()}.${fileExt}`;
 
@@ -57,27 +83,34 @@ const TechFileManager = () => {
         mime_type: file.type,
         category: category.trim() || 'Geral',
         uploaded_by: user!.id,
+        is_external: false,
       });
       if (dbError) throw dbError;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['technical-files'] });
-      toast({ title: 'Arquivo enviado com sucesso!' });
+      toast({ title: 'Arquivo registrado com sucesso!' });
       setIsUploadOpen(false);
       setTitle('');
       setDescription('');
       setCategory('Geral');
       setFile(null);
+      setExternalUrl('');
+      setSourceMode('upload');
     },
     onError: (error: any) => {
-      toast({ title: 'Erro ao enviar', description: error.message, variant: 'destructive' });
+      toast({ title: 'Erro ao registrar', description: error.message, variant: 'destructive' });
     },
   });
 
-  const handleDownload = async (filePath: string, fileName: string) => {
+  const handleDownload = async (f: any) => {
+    if (f.is_external && f.external_url) {
+      window.open(f.external_url, '_blank', 'noopener,noreferrer');
+      return;
+    }
     const { data, error } = await supabase.storage
       .from('technical-files')
-      .download(filePath);
+      .download(f.file_path);
     if (error) {
       toast({ title: 'Erro ao baixar arquivo', variant: 'destructive' });
       return;
@@ -85,14 +118,16 @@ const TechFileManager = () => {
     const url = URL.createObjectURL(data);
     const a = document.createElement('a');
     a.href = url;
-    a.download = fileName;
+    a.download = f.file_name;
     a.click();
     URL.revokeObjectURL(url);
   };
 
   const deleteMutation = useMutation({
-    mutationFn: async ({ id, filePath }: { id: string; filePath: string }) => {
-      await supabase.storage.from('technical-files').remove([filePath]);
+    mutationFn: async ({ id, filePath, isExternal }: { id: string; filePath: string | null; isExternal: boolean }) => {
+      if (!isExternal && filePath) {
+        await supabase.storage.from('technical-files').remove([filePath]);
+      }
       const { error } = await supabase.from('technical_files').delete().eq('id', id);
       if (error) throw error;
     },
@@ -112,7 +147,8 @@ const TechFileManager = () => {
   const filtered = files?.filter(
     (f) =>
       f.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      f.file_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (f.file_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (f.external_url || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       (f.category || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -148,12 +184,12 @@ const TechFileManager = () => {
             <Dialog open={isUploadOpen} onOpenChange={setIsUploadOpen}>
               <DialogTrigger asChild>
                 <Button>
-                  <Upload className="w-4 h-4 mr-2" /> Enviar Arquivo
+                  <Upload className="w-4 h-4 mr-2" /> Adicionar Arquivo
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Enviar Arquivo</DialogTitle>
+                  <DialogTitle>Adicionar Arquivo</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={(e) => { e.preventDefault(); uploadMutation.mutate(); }} className="space-y-4">
                   <div>
@@ -169,13 +205,22 @@ const TechFileManager = () => {
                     <Input value={category} onChange={(e) => setCategory(e.target.value)} placeholder="Geral" />
                   </div>
                   <div>
-                    <Label>Arquivo *</Label>
-                    <Input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} required />
+                    <Label>Origem do arquivo *</Label>
+                    <UploadOrLinkInput
+                      mode={sourceMode}
+                      onModeChange={setSourceMode}
+                      externalUrl={externalUrl}
+                      onExternalUrlChange={setExternalUrl}
+                      onFileChange={setFile}
+                      selectedFileName={file?.name}
+                      fileLabel="Selecionar arquivo"
+                      helpText="Use 'Link externo' para apontar para arquivos no OneDrive, Google Drive, Dropbox, etc. — sem usar o armazenamento interno."
+                    />
                   </div>
                   <div className="flex gap-2 justify-end">
                     <Button type="button" variant="outline" onClick={() => setIsUploadOpen(false)}>Cancelar</Button>
                     <Button type="submit" disabled={uploadMutation.isPending}>
-                      {uploadMutation.isPending ? 'Enviando...' : 'Enviar'}
+                      {uploadMutation.isPending ? 'Salvando...' : 'Salvar'}
                     </Button>
                   </div>
                 </form>
@@ -213,8 +258,17 @@ const TechFileManager = () => {
                           <FileText className="w-5 h-5 text-blue-600" />
                         </div>
                         <div className="min-w-0">
-                          <p className="font-semibold text-gray-900 truncate">{f.title}</p>
-                          <p className="text-xs text-gray-500 truncate">{f.file_name} · {formatSize(f.file_size)}</p>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="font-semibold text-gray-900 truncate">{f.title}</p>
+                            {f.is_external && (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-medium bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded">
+                                <Link2 className="w-3 h-3" /> {f.external_provider || 'Externo'}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-gray-500 truncate">
+                            {f.is_external ? f.external_url : `${f.file_name} · ${formatSize(f.file_size)}`}
+                          </p>
                           {f.description && <p className="text-sm text-gray-500 mt-1">{f.description}</p>}
                           <span className="inline-block text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded mt-1">
                             {f.category}
@@ -222,11 +276,11 @@ const TechFileManager = () => {
                         </div>
                       </div>
                       <div className="flex gap-1 flex-shrink-0">
-                        <Button size="icon" variant="ghost" onClick={() => handleDownload(f.file_path, f.file_name)}>
-                          <Download className="w-4 h-4" />
+                        <Button size="icon" variant="ghost" onClick={() => handleDownload(f)} title={f.is_external ? 'Abrir link externo' : 'Baixar arquivo'}>
+                          {f.is_external ? <ExternalLink className="w-4 h-4" /> : <Download className="w-4 h-4" />}
                         </Button>
                         {f.uploaded_by === user?.id && (
-                          <Button size="icon" variant="ghost" className="text-red-600" onClick={() => deleteMutation.mutate({ id: f.id, filePath: f.file_path })}>
+                          <Button size="icon" variant="ghost" className="text-red-600" onClick={() => deleteMutation.mutate({ id: f.id, filePath: f.file_path, isExternal: f.is_external })}>
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         )}

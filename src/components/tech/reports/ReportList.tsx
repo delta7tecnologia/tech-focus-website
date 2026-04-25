@@ -71,9 +71,11 @@ const ReportList: React.FC<Props> = ({ onEditDraft }) => {
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       const report = reports.find((r: any) => r.id === id);
-      // Remove fotos do storage
+      // Remove apenas fotos internas do storage
       if (report?.photos && Array.isArray(report.photos) && report.photos.length > 0) {
-        const paths = (report.photos as Array<{ path: string }>).map((p) => p.path).filter(Boolean);
+        const paths = (report.photos as Array<any>)
+          .filter((p) => !p.external && p.path)
+          .map((p) => p.path);
         if (paths.length > 0) {
           await supabase.storage.from('report-photos').remove(paths);
         }
@@ -95,7 +97,18 @@ const ReportList: React.FC<Props> = ({ onEditDraft }) => {
     setDownloadingId(r.id);
     try {
       const photos: ReportPhoto[] = [];
-      for (const p of (r.photos || []) as Array<{ path: string; caption: string }>) {
+      for (const p of (r.photos || []) as Array<any>) {
+        if (p.external && p.url) {
+          photos.push({
+            dataUrl: '',
+            caption: p.caption || '',
+            external: true,
+            externalUrl: p.url,
+            externalProvider: p.provider || 'Externo',
+          });
+          continue;
+        }
+        if (!p.path) continue;
         const { data } = await supabase.storage.from('report-photos').download(p.path);
         if (data) {
           const dataUrl = await new Promise<string>((res, rej) => {

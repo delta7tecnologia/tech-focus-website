@@ -16,6 +16,9 @@ import {
 export interface AdvancedPhoto {
   dataUrl: string;
   caption: string;
+  external?: boolean;
+  externalUrl?: string;
+  externalProvider?: string;
 }
 
 export interface AdvancedReportData {
@@ -159,15 +162,28 @@ function buildHtml(r: AdvancedReportData): string {
 
   // Photos
   const photos = r.photos
-    .map(
-      (p) => `
+    .map((p) => {
+      if (p.external) {
+        return `
+        <div style="break-inside: avoid; page-break-inside: avoid; width: 48%; margin-bottom: 14px;">
+          <div style="width: 100%; height: 170px; border: 1px dashed #94a3b8; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px; background: #f1f5f9; box-sizing: border-box;">
+            <div style="font-size: 10px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">📎 Anexo externo</div>
+            <div style="font-size: 11px; color: #1e3a8a; margin-top: 6px; font-weight: 600;">${escapeHtml(p.externalProvider || 'Link externo')}</div>
+            <div style="font-size: 9px; color: #64748b; margin-top: 6px; word-break: break-all; text-align: center; max-width: 100%;">${escapeHtml(p.externalUrl || '')}</div>
+          </div>
+          <div style="font-size: 10px; color: #475569; margin-top: 4px; text-align: center; font-style: italic;">
+            ${escapeHtml(p.caption || 'Sem legenda')}
+          </div>
+        </div>`;
+      }
+      return `
         <div style="break-inside: avoid; page-break-inside: avoid; width: 48%; margin-bottom: 14px;">
           <img src="${p.dataUrl}" style="width: 100%; height: 170px; object-fit: cover; border: 1px solid #cbd5e1; border-radius: 4px;" />
           <div style="font-size: 10px; color: #475569; margin-top: 4px; text-align: center; font-style: italic;">
             ${escapeHtml(p.caption || 'Sem legenda')}
           </div>
-        </div>`
-    )
+        </div>`;
+    })
     .join('');
 
   const finalidades = [

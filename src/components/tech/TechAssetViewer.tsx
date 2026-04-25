@@ -7,10 +7,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Search, Monitor, Eye, Copy, Plus, Pencil, Upload, Printer, Trash2 } from 'lucide-react';
+import { Search, Monitor, Eye, Copy, Plus, Pencil, Upload, Printer, Trash2, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { printAssetReport } from '@/utils/printAssetReport';
+import UploadOrLinkInput, { type SourceMode } from './UploadOrLinkInput';
 
 const emptyForm = {
   machine_name: '',
@@ -38,6 +39,8 @@ const TechAssetViewer = () => {
   const [form, setForm] = useState(emptyForm);
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
+  const [screenshotMode, setScreenshotMode] = useState<SourceMode>('upload');
+  const [externalScreenshotUrl, setExternalScreenshotUrl] = useState('');
   const [saving, setSaving] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [showCompanyDropdown, setShowCompanyDropdown] = useState(false);
@@ -82,6 +85,8 @@ const TechAssetViewer = () => {
     setForm(emptyForm);
     setScreenshotFile(null);
     setScreenshotPreview(null);
+    setScreenshotMode('upload');
+    setExternalScreenshotUrl('');
     setDialogOpen(true);
   };
 
@@ -97,8 +102,16 @@ const TechAssetViewer = () => {
       notes: asset.notes || '',
     });
     setScreenshotFile(null);
-    const preview = asset.screenshot_url ? await getSignedUrl(asset.screenshot_url) : null;
-    setScreenshotPreview(preview);
+    if (asset.is_external_screenshot && asset.screenshot_url) {
+      setScreenshotMode('external');
+      setExternalScreenshotUrl(asset.screenshot_url);
+      setScreenshotPreview(null);
+    } else {
+      setScreenshotMode('upload');
+      setExternalScreenshotUrl('');
+      const preview = asset.screenshot_url ? await getSignedUrl(asset.screenshot_url) : null;
+      setScreenshotPreview(preview);
+    }
     setDialogOpen(true);
   };
 
@@ -134,8 +147,12 @@ const TechAssetViewer = () => {
     return data.signedUrl;
   };
 
-  const handleViewImage = async (pathOrUrl: string) => {
-    const url = await getSignedUrl(pathOrUrl);
+  const handleViewImage = async (asset: any) => {
+    if (asset.is_external_screenshot) {
+      window.open(asset.screenshot_url, '_blank', 'noopener,noreferrer');
+      return;
+    }
+    const url = await getSignedUrl(asset.screenshot_url);
     if (url) setViewImage(url);
     else toast({ title: 'Erro', description: 'Não foi possível carregar a imagem.', variant: 'destructive' });
   };
@@ -147,12 +164,22 @@ const TechAssetViewer = () => {
     }
     setSaving(true);
     try {
-      let screenshot_url = editingId
-        ? assets.find(a => a.id === editingId)?.screenshot_url || null
-        : null;
+      const existing = editingId ? assets.find(a => a.id === editingId) : null;
+      let screenshot_url: string | null = existing?.screenshot_url || null;
+      let is_external_screenshot = existing?.is_external_screenshot || false;
 
-      if (screenshotFile) {
+      if (screenshotMode === 'external') {
+        const url = externalScreenshotUrl.trim();
+        if (url) {
+          if (!/^https?:\/\//i.test(url)) {
+            throw new Error('A URL da evidência deve começar com http:// ou https://');
+          }
+          screenshot_url = url;
+          is_external_screenshot = true;
+        }
+      } else if (screenshotFile) {
         screenshot_url = await uploadScreenshot(screenshotFile);
+        is_external_screenshot = false;
       }
 
       const payload = {
@@ -164,6 +191,7 @@ const TechAssetViewer = () => {
         office_license: form.office_license.trim() || null,
         notes: form.notes.trim() || null,
         screenshot_url,
+        is_external_screenshot,
       };
 
       if (editingId) {
@@ -268,8 +296,8 @@ const TechAssetViewer = () => {
                       <Trash2 className="w-4 h-4" />
                     </Button>
                     {asset.screenshot_url && (
-                      <Button size="icon" variant="ghost" onClick={() => handleViewImage(asset.screenshot_url)}>
-                        <Eye className="w-4 h-4" />
+                      <Button size="icon" variant="ghost" onClick={() => handleViewImage(asset)} title={asset.is_external_screenshot ? 'Abrir link externo' : 'Ver evidência'}>
+                        {asset.is_external_screenshot ? <ExternalLink className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </Button>
                     )}
                   </div>
@@ -391,14 +419,25 @@ const TechAssetViewer = () => {
             <div>
               <label className="text-sm font-medium">Evidência (Print Screen)</label>
               <div className="mt-1">
-                <input type="file" ref={fileInputRef} accept="image/*" onChange={handleFileChange} className="hidden" />
-                <Button type="button" variant="outline" className="gap-2" onClick={() => fileInputRef.current?.click()}>
-                  <Upload className="w-4 h-4" /> Selecionar imagem
-                </Button>
+                <UploadOrLinkInput
+                  mode={screenshotMode}
+                  onModeChange={(m) => {
+                    setScreenshotMode(m);
+                    if (m === 'external') { setScreenshotFile(null); setScreenshotPreview(null); }
+                  }}
+                  externalUrl={externalScreenshotUrl}
+                  onExternalUrlChange={setExternalScreenshotUrl}
+                  onFileChange={(f) => {
+                    setScreenshotFile(f);
+                    setScreenshotPreview(f ? URL.createObjectURL(f) : null);
+                  }}
+                  selectedFileName={screenshotFile?.name}
+                  fileLabel="Selecionar imagem"
+                  accept="image/*"
+                  preview={screenshotPreview}
+                  helpText="Cole o link compartilhável (OneDrive, Google Drive...) para evitar uso do armazenamento interno."
+                />
               </div>
-              {screenshotPreview && (
-                <img src={screenshotPreview} alt="Preview" className="mt-2 rounded-lg border max-h-48 object-contain w-full" />
-              )}
             </div>
             <div>
               <label className="text-sm font-medium">Observações</label>
