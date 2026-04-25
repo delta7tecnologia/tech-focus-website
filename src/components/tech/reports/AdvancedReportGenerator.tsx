@@ -328,9 +328,35 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
     setReportNumber('');
   };
 
+  const addExternalPhoto = () => {
+    const url = window.prompt('Cole o link da foto (OneDrive, Google Drive, etc.):');
+    if (!url) return;
+    const trimmed = url.trim();
+    if (!/^https?:\/\//i.test(trimmed)) {
+      toast({ title: 'URL inválida', description: 'Deve começar com http:// ou https://', variant: 'destructive' });
+      return;
+    }
+    setPhotos((prev) => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
+        dataUrl: '',
+        caption: '',
+        external: true,
+        externalUrl: trimmed,
+        externalProvider: detectExternalProvider(trimmed),
+        uploaded: true,
+      },
+    ]);
+  };
+
   const ensureUploadedPhotos = async (rNum: string) => {
-    const out: { path: string; caption: string }[] = [];
+    const out: any[] = [];
     for (const p of photos) {
+      if (p.external && p.externalUrl) {
+        out.push({ external: true, url: p.externalUrl, provider: p.externalProvider || 'Externo', caption: p.caption });
+        continue;
+      }
       if (p.uploaded && p.storagePath) {
         out.push({ path: p.storagePath, caption: p.caption });
       } else if (p.file) {
