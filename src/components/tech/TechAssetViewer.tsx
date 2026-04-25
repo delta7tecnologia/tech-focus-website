@@ -7,10 +7,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Search, Monitor, Eye, Copy, Plus, Pencil, Upload, Printer, Trash2 } from 'lucide-react';
+import { Search, Monitor, Eye, Copy, Plus, Pencil, Upload, Printer, Trash2, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { printAssetReport } from '@/utils/printAssetReport';
+import UploadOrLinkInput, { type SourceMode } from './UploadOrLinkInput';
 
 const emptyForm = {
   machine_name: '',
