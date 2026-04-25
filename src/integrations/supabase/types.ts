@@ -389,6 +389,60 @@ export type Database = {
         }
         Relationships: []
       }
+      technical_reports: {
+        Row: {
+          company_name: string
+          conclusao: Json
+          created_at: string
+          created_by: string
+          diagnostico: Json
+          equipment: string
+          generated_at: string
+          id: string
+          integrity_hash: string
+          photos: Json
+          report_number: string
+          status_final: string
+          technician_name: string
+          triagem: Json
+          updated_at: string
+        }
+        Insert: {
+          company_name: string
+          conclusao?: Json
+          created_at?: string
+          created_by: string
+          diagnostico?: Json
+          equipment: string
+          generated_at?: string
+          id?: string
+          integrity_hash: string
+          photos?: Json
+          report_number: string
+          status_final?: string
+          technician_name: string
+          triagem?: Json
+          updated_at?: string
+        }
+        Update: {
+          company_name?: string
+          conclusao?: Json
+          created_at?: string
+          created_by?: string
+          diagnostico?: Json
+          equipment?: string
+          generated_at?: string
+          id?: string
+          integrity_hash?: string
+          photos?: Json
+          report_number?: string
+          status_final?: string
+          technician_name?: string
+          triagem?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       testimonials: {
         Row: {
           avatar_url: string | null
