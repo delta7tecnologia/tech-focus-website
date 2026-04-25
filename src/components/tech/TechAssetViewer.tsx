@@ -419,14 +419,25 @@ const TechAssetViewer = () => {
             <div>
               <label className="text-sm font-medium">Evidência (Print Screen)</label>
               <div className="mt-1">
-                <input type="file" ref={fileInputRef} accept="image/*" onChange={handleFileChange} className="hidden" />
-                <Button type="button" variant="outline" className="gap-2" onClick={() => fileInputRef.current?.click()}>
-                  <Upload className="w-4 h-4" /> Selecionar imagem
-                </Button>
+                <UploadOrLinkInput
+                  mode={screenshotMode}
+                  onModeChange={(m) => {
+                    setScreenshotMode(m);
+                    if (m === 'external') { setScreenshotFile(null); setScreenshotPreview(null); }
+                  }}
+                  externalUrl={externalScreenshotUrl}
+                  onExternalUrlChange={setExternalScreenshotUrl}
+                  onFileChange={(f) => {
+                    setScreenshotFile(f);
+                    setScreenshotPreview(f ? URL.createObjectURL(f) : null);
+                  }}
+                  selectedFileName={screenshotFile?.name}
+                  fileLabel="Selecionar imagem"
+                  accept="image/*"
+                  preview={screenshotPreview}
+                  helpText="Cole o link compartilhável (OneDrive, Google Drive...) para evitar uso do armazenamento interno."
+                />
               </div>
-              {screenshotPreview && (
-                <img src={screenshotPreview} alt="Preview" className="mt-2 rounded-lg border max-h-48 object-contain w-full" />
-              )}
             </div>
             <div>
               <label className="text-sm font-medium">Observações</label>
