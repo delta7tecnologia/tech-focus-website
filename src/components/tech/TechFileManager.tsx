@@ -103,10 +103,14 @@ const TechFileManager = () => {
     },
   });
 
-  const handleDownload = async (filePath: string, fileName: string) => {
+  const handleDownload = async (f: any) => {
+    if (f.is_external && f.external_url) {
+      window.open(f.external_url, '_blank', 'noopener,noreferrer');
+      return;
+    }
     const { data, error } = await supabase.storage
       .from('technical-files')
-      .download(filePath);
+      .download(f.file_path);
     if (error) {
       toast({ title: 'Erro ao baixar arquivo', variant: 'destructive' });
       return;
@@ -114,17 +118,24 @@ const TechFileManager = () => {
     const url = URL.createObjectURL(data);
     const a = document.createElement('a');
     a.href = url;
-    a.download = fileName;
+    a.download = f.file_name;
     a.click();
     URL.revokeObjectURL(url);
   };
 
   const deleteMutation = useMutation({
-    mutationFn: async ({ id, filePath }: { id: string; filePath: string }) => {
-      await supabase.storage.from('technical-files').remove([filePath]);
+    mutationFn: async ({ id, filePath, isExternal }: { id: string; filePath: string | null; isExternal: boolean }) => {
+      if (!isExternal && filePath) {
+        await supabase.storage.from('technical-files').remove([filePath]);
+      }
       const { error } = await supabase.from('technical_files').delete().eq('id', id);
       if (error) throw error;
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['technical-files'] });
+      toast({ title: 'Arquivo removido!' });
+    },
+  });
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['technical-files'] });
       toast({ title: 'Arquivo removido!' });
