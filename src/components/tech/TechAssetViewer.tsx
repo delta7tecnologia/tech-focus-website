@@ -39,6 +39,8 @@ const TechAssetViewer = () => {
   const [form, setForm] = useState(emptyForm);
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
+  const [screenshotMode, setScreenshotMode] = useState<SourceMode>('upload');
+  const [externalScreenshotUrl, setExternalScreenshotUrl] = useState('');
   const [saving, setSaving] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [showCompanyDropdown, setShowCompanyDropdown] = useState(false);
