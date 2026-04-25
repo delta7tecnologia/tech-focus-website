@@ -298,7 +298,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
         continue;
       }
       const dataUrl = await fileToDataUrl(file);
-      arr.push({ id: crypto.randomUUID(), file, dataUrl, caption: '' });
+      arr.push({ id: crypto.randomUUID(), file, dataUrl, caption: '', uploaded: false });
     }
     setPhotos((prev) => [...prev, ...arr]);
     if (fileInputRef.current) fileInputRef.current.value = '';
@@ -310,7 +310,104 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
   const reset = () => {
     setS({ ...initialState(), technicianName: s.technicianName });
     setPhotos([]);
+    setDraftId(null);
+    setReportNumber('');
   };
+
+  const ensureUploadedPhotos = async (rNum: string) => {
+    const out: { path: string; caption: string }[] = [];
+    for (const p of photos) {
+      if (p.uploaded && p.storagePath) {
+        out.push({ path: p.storagePath, caption: p.caption });
+      } else if (p.file) {
+        const ext = p.file.name.split('.').pop() || 'jpg';
+        const path = `${user!.id}/${rNum}/${crypto.randomUUID()}.${ext}`;
+        const { error } = await supabase.storage.from('report-photos').upload(path, p.file);
+        if (error) throw error;
+        out.push({ path, caption: p.caption });
+        p.uploaded = true;
+        p.storagePath = path;
+      }
+    }
+    return out;
+  };
+
+  const buildPersistPayload = (rNum: string, generatedAt: string, integrityHash: string, uploadedPhotos: any[], isDraft: boolean) => {
+    const equipmentLabel = [s.marca, s.modelo, s.patrimonio ? `SN: ${s.patrimonio}` : '']
+      .filter(Boolean).join(' ') || 'Equipamento sem identificação';
+    const triagem = {
+      identificacao: {
+        patrimonio: s.patrimonio, marca: s.marca, modelo: s.modelo, tipo: s.tipo,
+        setor: s.setor, unidade: s.unidade, usuario: s.usuario, contato: s.contato,
+        dataAquisicao: s.dataAquisicao, garantia: s.garantia,
+        finalidades: s.finalidades, finalidadeOutro: s.finalidadeOutro,
+      },
+      hardware: s.hardware,
+      software: s.software,
+    };
+    const diagnostico = { problemas: s.problemas, estado: s.estado };
+    const conclusao = {
+      parecer: s.parecer,
+      parecerTexto: s.parecerTexto,
+      recomendacoes: s.recomendacoes,
+      observacoesFinais: s.observacoesFinais,
+      assinaturas: {
+        tecnico: !!s.assinaturaTecnico,
+        gestor: !!s.assinaturaGestor,
+        usuario: !!s.assinaturaUsuario,
+        gestorNome: s.gestorNome, gestorCargo: s.gestorCargo,
+        usuarioNome: s.usuarioNome, usuarioMatricula: s.usuarioMatricula,
+      },
+    };
+    return {
+      report_number: rNum,
+      report_type: 'equipamento',
+      created_by: user!.id,
+      technician_name: s.technicianName || 'Não informado',
+      company_name: s.companyName || 'Rascunho',
+      equipment: equipmentLabel,
+      triagem,
+      diagnostico,
+      conclusao,
+      photos: uploadedPhotos,
+      integrity_hash: integrityHash,
+      status_final: s.parecer || 'Pendente',
+      generated_at: generatedAt,
+      is_draft: isDraft,
+      form_data: s,
+    };
+  };
+
+  const saveDraftMutation = useMutation({
+    mutationFn: async () => {
+      const rNum = reportNumber || generateReportNumber();
+      const generatedAt = new Date().toISOString();
+      const uploadedPhotos = await ensureUploadedPhotos(rNum);
+      const integrityHash = await generateReportHash(
+        { rNum, draft: true, s },
+        s.technicianName || 'rascunho',
+        generatedAt,
+      );
+      const payload = buildPersistPayload(rNum, generatedAt, integrityHash, uploadedPhotos, true);
+      if (draftId) {
+        const { error } = await supabase.from('technical_reports').update(payload).eq('id', draftId);
+        if (error) throw error;
+      } else {
+        const { data, error } = await supabase.from('technical_reports').insert(payload).select('id').single();
+        if (error) throw error;
+        setDraftId(data.id);
+      }
+      setReportNumber(rNum);
+      return rNum;
+    },
+    onSuccess: (num) => {
+      toast({ title: 'Rascunho salvo', description: `Você pode continuar editando ${num} a qualquer momento.` });
+      queryClient.invalidateQueries({ queryKey: ['technical-reports'] });
+    },
+    onError: (e: any) => {
+      toast({ title: 'Erro ao salvar rascunho', description: e.message, variant: 'destructive' });
+    },
+  });
 
   const generateMutation = useMutation({
     mutationFn: async () => {
@@ -319,83 +416,35 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       if (!s.technicianName.trim()) throw new Error('Informe o técnico responsável.');
       if (!s.parecer) throw new Error('Selecione o parecer conclusivo.');
 
-      const reportNumber = generateReportNumber();
+      const rNum = reportNumber || generateReportNumber();
       const generatedAt = new Date().toISOString();
 
-      // Hash de legitimidade combinando técnico + Nº de série + diagnóstico
       const integrityHash = await generateReportHash(
         {
-          reportNumber,
-          patrimonio: s.patrimonio,
-          marca: s.marca,
-          modelo: s.modelo,
-          hardware: s.hardware,
-          software: s.software,
-          problemas: s.problemas,
-          parecer: s.parecer,
+          reportNumber: rNum,
+          patrimonio: s.patrimonio, marca: s.marca, modelo: s.modelo,
+          hardware: s.hardware, software: s.software,
+          problemas: s.problemas, parecer: s.parecer,
         },
         s.technicianName,
         generatedAt,
       );
 
-      // Upload das fotos
-      const uploadedPhotos: { path: string; caption: string }[] = [];
-      for (const p of photos) {
-        const ext = p.file.name.split('.').pop() || 'jpg';
-        const path = `${user!.id}/${reportNumber}/${crypto.randomUUID()}.${ext}`;
-        const { error: upErr } = await supabase.storage.from('report-photos').upload(path, p.file);
-        if (upErr) throw upErr;
-        uploadedPhotos.push({ path, caption: p.caption });
+      const uploadedPhotos = await ensureUploadedPhotos(rNum);
+      const payload = buildPersistPayload(rNum, generatedAt, integrityHash, uploadedPhotos, false);
+
+      if (draftId) {
+        const { error } = await supabase.from('technical_reports').update(payload).eq('id', draftId);
+        if (error) throw error;
+      } else {
+        const { data, error } = await supabase.from('technical_reports').insert(payload).select('id').single();
+        if (error) throw error;
+        setDraftId(data.id);
       }
-
-      const equipmentLabel = [s.marca, s.modelo, s.patrimonio ? `SN: ${s.patrimonio}` : '']
-        .filter(Boolean).join(' ');
-
-      // Dados consolidados gravados nos jsonb existentes
-      const triagem = {
-        identificacao: {
-          patrimonio: s.patrimonio, marca: s.marca, modelo: s.modelo, tipo: s.tipo,
-          setor: s.setor, unidade: s.unidade, usuario: s.usuario, contato: s.contato,
-          dataAquisicao: s.dataAquisicao, garantia: s.garantia,
-          finalidades: s.finalidades, finalidadeOutro: s.finalidadeOutro,
-        },
-        hardware: s.hardware,
-        software: s.software,
-      };
-      const diagnostico = { problemas: s.problemas, estado: s.estado };
-      const conclusao = {
-        parecer: s.parecer,
-        parecerTexto: s.parecerTexto,
-        recomendacoes: s.recomendacoes,
-        observacoesFinais: s.observacoesFinais,
-        assinaturas: {
-          tecnico: !!s.assinaturaTecnico,
-          gestor: !!s.assinaturaGestor,
-          usuario: !!s.assinaturaUsuario,
-          gestorNome: s.gestorNome, gestorCargo: s.gestorCargo,
-          usuarioNome: s.usuarioNome, usuarioMatricula: s.usuarioMatricula,
-        },
-      };
-
-      const { error: dbErr } = await supabase.from('technical_reports').insert({
-        report_number: reportNumber,
-        report_type: 'equipamento',
-        created_by: user!.id,
-        technician_name: s.technicianName,
-        company_name: s.companyName,
-        equipment: equipmentLabel || 'Equipamento sem identificação',
-        triagem,
-        diagnostico,
-        conclusao,
-        photos: uploadedPhotos,
-        integrity_hash: integrityHash,
-        status_final: s.parecer,
-        generated_at: generatedAt,
-      });
-      if (dbErr) throw dbErr;
+      setReportNumber(rNum);
 
       const data: AdvancedReportData = {
-        reportNumber, generatedAt, technicianName: s.technicianName,
+        reportNumber: rNum, generatedAt, technicianName: s.technicianName,
         patrimonio: s.patrimonio, marca: s.marca, modelo: s.modelo, tipo: s.tipo,
         setor: s.setor, unidade: s.unidade, usuario: s.usuario, contato: s.contato,
         dataAquisicao: s.dataAquisicao, garantia: s.garantia,
@@ -413,19 +462,38 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
         usuarioNome: s.usuarioNome, usuarioMatricula: s.usuarioMatricula,
         integrityHash,
       };
-      await downloadAdvancedReportPdf(data);
-      return reportNumber;
+      const pdf = await generateAdvancedReportPdf(data);
+      return { pdf, rNum };
     },
-    onSuccess: (num) => {
-      toast({ title: 'Laudo gerado!', description: `Documento ${num} salvo e baixado.` });
+    onSuccess: ({ pdf, rNum }) => {
+      setPreviewPdf(pdf);
+      setPreviewLoading(false);
+      setPreviewOpen(true);
+      toast({ title: 'Laudo finalizado', description: `Documento ${rNum} pronto para revisão.` });
       queryClient.invalidateQueries({ queryKey: ['technical-reports'] });
-      reset();
-      onSaved?.();
     },
     onError: (e: any) => {
+      setPreviewLoading(false);
+      setPreviewOpen(false);
       toast({ title: 'Erro ao gerar laudo', description: e.message, variant: 'destructive' });
     },
   });
+
+  const handleGenerate = () => {
+    setPreviewLoading(true);
+    setPreviewPdf(null);
+    setPreviewOpen(true);
+    generateMutation.mutate();
+  };
+
+  const handlePreviewClose = (open: boolean) => {
+    setPreviewOpen(open);
+    if (!open && previewPdf) {
+      reset();
+      onSaved?.();
+    }
+  };
+
 
   const now = new Date().toLocaleString('pt-BR');
 
