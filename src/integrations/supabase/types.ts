@@ -20,6 +20,7 @@ export type Database = {
           created_at: string
           created_by: string
           id: string
+          is_external_screenshot: boolean
           machine_name: string
           notes: string | null
           office_activation_date: string | null
@@ -34,6 +35,7 @@ export type Database = {
           created_at?: string
           created_by: string
           id?: string
+          is_external_screenshot?: boolean
           machine_name: string
           notes?: string | null
           office_activation_date?: string | null
@@ -48,6 +50,7 @@ export type Database = {
           created_at?: string
           created_by?: string
           id?: string
+          is_external_screenshot?: boolean
           machine_name?: string
           notes?: string | null
           office_activation_date?: string | null
@@ -352,10 +355,13 @@ export type Database = {
           category: string | null
           created_at: string
           description: string | null
-          file_name: string
-          file_path: string
+          external_provider: string | null
+          external_url: string | null
+          file_name: string | null
+          file_path: string | null
           file_size: number | null
           id: string
+          is_external: boolean
           mime_type: string | null
           title: string
           updated_at: string
@@ -365,10 +371,13 @@ export type Database = {
           category?: string | null
           created_at?: string
           description?: string | null
-          file_name: string
-          file_path: string
+          external_provider?: string | null
+          external_url?: string | null
+          file_name?: string | null
+          file_path?: string | null
           file_size?: number | null
           id?: string
+          is_external?: boolean
           mime_type?: string | null
           title: string
           updated_at?: string
@@ -378,10 +387,13 @@ export type Database = {
           category?: string | null
           created_at?: string
           description?: string | null
-          file_name?: string
-          file_path?: string
+          external_provider?: string | null
+          external_url?: string | null
+          file_name?: string | null
+          file_path?: string | null
           file_size?: number | null
           id?: string
+          is_external?: boolean
           mime_type?: string | null
           title?: string
           updated_at?: string
