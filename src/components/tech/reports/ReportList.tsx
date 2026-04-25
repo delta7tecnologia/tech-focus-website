@@ -10,8 +10,9 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Search, FileText, Trash2, Download, Loader2 } from 'lucide-react';
+import { Search, FileText, Trash2, Download, Loader2, Monitor } from 'lucide-react';
 import { downloadReportPdf, type ReportPhoto } from '@/utils/reportPdf';
+import { downloadAdvancedReportPdf } from '@/utils/reportPdfAdvanced';
 
 const statusColor = (s: string) =>
   s === 'Resolvido' ? 'bg-green-100 text-green-700'
@@ -73,7 +74,6 @@ const ReportList: React.FC = () => {
   const handleDownload = async (r: any) => {
     setDownloadingId(r.id);
     try {
-      // Baixa fotos como dataURL
       const photos: ReportPhoto[] = [];
       for (const p of (r.photos || []) as Array<{ path: string; caption: string }>) {
         const { data } = await supabase.storage.from('report-photos').download(p.path);
@@ -87,18 +87,66 @@ const ReportList: React.FC = () => {
           photos.push({ dataUrl, caption: p.caption });
         }
       }
-      await downloadReportPdf({
-        reportNumber: r.report_number,
-        technicianName: r.technician_name,
-        companyName: r.company_name,
-        equipment: r.equipment,
-        generatedAt: r.generated_at,
-        triagem: r.triagem,
-        diagnostico: r.diagnostico,
-        conclusao: r.conclusao,
-        photos,
-        integrityHash: r.integrity_hash,
-      });
+
+      if (r.report_type === 'equipamento') {
+        const ident = r.triagem?.identificacao || {};
+        const conc = r.conclusao || {};
+        const ass = conc.assinaturas || {};
+        await downloadAdvancedReportPdf({
+          reportNumber: r.report_number,
+          generatedAt: r.generated_at,
+          technicianName: r.technician_name,
+          patrimonio: ident.patrimonio || '',
+          marca: ident.marca || '',
+          modelo: ident.modelo || '',
+          tipo: ident.tipo || '',
+          setor: ident.setor || '',
+          unidade: ident.unidade || '',
+          usuario: ident.usuario || '',
+          contato: ident.contato || '',
+          dataAquisicao: ident.dataAquisicao || '',
+          garantia: ident.garantia || '',
+          finalidades: ident.finalidades || [],
+          finalidadeOutro: ident.finalidadeOutro || '',
+          hardware: r.triagem?.hardware || [],
+          software: r.triagem?.software || {
+            so: { descricao: '', situacao: '', obs: '' },
+            office: { descricao: '', situacao: '', obs: '' },
+            antivirus: { descricao: '', situacao: '', obs: '' },
+            especifico: { descricao: '', situacao: '', obs: '' },
+            drivers: { descricao: '', situacao: '', obs: '' },
+          },
+          problemas: r.diagnostico?.problemas || [],
+          estado: r.diagnostico?.estado || { conservacao: '', desempenho: '', seguranca: '', conectividade: '' },
+          parecer: conc.parecer || '',
+          parecerTexto: conc.parecerTexto || '',
+          recomendacoes: conc.recomendacoes || [],
+          observacoesFinais: conc.observacoesFinais || '',
+          // Assinaturas não são re-baixadas (não persistidas como dataURL)
+          assinaturaTecnico: '',
+          assinaturaGestor: '',
+          assinaturaUsuario: '',
+          gestorNome: ass.gestorNome || '',
+          gestorCargo: ass.gestorCargo || '',
+          usuarioNome: ass.usuarioNome || '',
+          usuarioMatricula: ass.usuarioMatricula || '',
+          photos,
+          integrityHash: r.integrity_hash,
+        });
+      } else {
+        await downloadReportPdf({
+          reportNumber: r.report_number,
+          technicianName: r.technician_name,
+          companyName: r.company_name,
+          equipment: r.equipment,
+          generatedAt: r.generated_at,
+          triagem: r.triagem,
+          diagnostico: r.diagnostico,
+          conclusao: r.conclusao,
+          photos,
+          integrityHash: r.integrity_hash,
+        });
+      }
     } catch (e: any) {
       toast({ title: 'Erro ao baixar laudo', description: e.message, variant: 'destructive' });
     } finally {
@@ -135,6 +183,11 @@ const ReportList: React.FC = () => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-mono text-sm font-bold text-blue-900">{r.report_number}</span>
+                    <span className={`text-xs px-2 py-0.5 rounded inline-flex items-center gap-1 ${r.report_type === 'equipamento' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'}`}>
+                      {r.report_type === 'equipamento'
+                        ? <><Monitor className="w-3 h-3" /> Equipamento</>
+                        : <><FileText className="w-3 h-3" /> Atendimento</>}
+                    </span>
                     <span className={`text-xs px-2 py-0.5 rounded ${statusColor(r.status_final)}`}>
                       {r.status_final}
                     </span>
