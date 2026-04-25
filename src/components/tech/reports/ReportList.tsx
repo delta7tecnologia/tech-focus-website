@@ -183,6 +183,11 @@ const ReportList: React.FC = () => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-mono text-sm font-bold text-blue-900">{r.report_number}</span>
+                    <span className={`text-xs px-2 py-0.5 rounded inline-flex items-center gap-1 ${r.report_type === 'equipamento' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'}`}>
+                      {r.report_type === 'equipamento'
+                        ? <><Monitor className="w-3 h-3" /> Equipamento</>
+                        : <><FileText className="w-3 h-3" /> Atendimento</>}
+                    </span>
                     <span className={`text-xs px-2 py-0.5 rounded ${statusColor(r.status_final)}`}>
                       {r.status_final}
                     </span>
