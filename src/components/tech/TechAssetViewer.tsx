@@ -85,6 +85,8 @@ const TechAssetViewer = () => {
     setForm(emptyForm);
     setScreenshotFile(null);
     setScreenshotPreview(null);
+    setScreenshotMode('upload');
+    setExternalScreenshotUrl('');
     setDialogOpen(true);
   };
 
@@ -100,8 +102,16 @@ const TechAssetViewer = () => {
       notes: asset.notes || '',
     });
     setScreenshotFile(null);
-    const preview = asset.screenshot_url ? await getSignedUrl(asset.screenshot_url) : null;
-    setScreenshotPreview(preview);
+    if (asset.is_external_screenshot && asset.screenshot_url) {
+      setScreenshotMode('external');
+      setExternalScreenshotUrl(asset.screenshot_url);
+      setScreenshotPreview(null);
+    } else {
+      setScreenshotMode('upload');
+      setExternalScreenshotUrl('');
+      const preview = asset.screenshot_url ? await getSignedUrl(asset.screenshot_url) : null;
+      setScreenshotPreview(preview);
+    }
     setDialogOpen(true);
   };
 
