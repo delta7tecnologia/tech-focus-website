@@ -258,8 +258,17 @@ const TechFileManager = () => {
                           <FileText className="w-5 h-5 text-blue-600" />
                         </div>
                         <div className="min-w-0">
-                          <p className="font-semibold text-gray-900 truncate">{f.title}</p>
-                          <p className="text-xs text-gray-500 truncate">{f.file_name} · {formatSize(f.file_size)}</p>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="font-semibold text-gray-900 truncate">{f.title}</p>
+                            {f.is_external && (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-medium bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded">
+                                <Link2 className="w-3 h-3" /> {f.external_provider || 'Externo'}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-gray-500 truncate">
+                            {f.is_external ? f.external_url : `${f.file_name} · ${formatSize(f.file_size)}`}
+                          </p>
                           {f.description && <p className="text-sm text-gray-500 mt-1">{f.description}</p>}
                           <span className="inline-block text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded mt-1">
                             {f.category}
@@ -267,11 +276,11 @@ const TechFileManager = () => {
                         </div>
                       </div>
                       <div className="flex gap-1 flex-shrink-0">
-                        <Button size="icon" variant="ghost" onClick={() => handleDownload(f.file_path, f.file_name)}>
-                          <Download className="w-4 h-4" />
+                        <Button size="icon" variant="ghost" onClick={() => handleDownload(f)} title={f.is_external ? 'Abrir link externo' : 'Baixar arquivo'}>
+                          {f.is_external ? <ExternalLink className="w-4 h-4" /> : <Download className="w-4 h-4" />}
                         </Button>
                         {f.uploaded_by === user?.id && (
-                          <Button size="icon" variant="ghost" className="text-red-600" onClick={() => deleteMutation.mutate({ id: f.id, filePath: f.file_path })}>
+                          <Button size="icon" variant="ghost" className="text-red-600" onClick={() => deleteMutation.mutate({ id: f.id, filePath: f.file_path, isExternal: f.is_external })}>
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         )}
