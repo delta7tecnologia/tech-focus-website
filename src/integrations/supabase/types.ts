@@ -397,9 +397,11 @@ export type Database = {
           created_by: string
           diagnostico: Json
           equipment: string
+          form_data: Json | null
           generated_at: string
           id: string
           integrity_hash: string
+          is_draft: boolean
           photos: Json
           report_number: string
           report_type: string
@@ -415,9 +417,11 @@ export type Database = {
           created_by: string
           diagnostico?: Json
           equipment: string
+          form_data?: Json | null
           generated_at?: string
           id?: string
           integrity_hash: string
+          is_draft?: boolean
           photos?: Json
           report_number: string
           report_type?: string
@@ -433,9 +437,11 @@ export type Database = {
           created_by?: string
           diagnostico?: Json
           equipment?: string
+          form_data?: Json | null
           generated_at?: string
           id?: string
           integrity_hash?: string
+          is_draft?: boolean
           photos?: Json
           report_number?: string
           report_type?: string
