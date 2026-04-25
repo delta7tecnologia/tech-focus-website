@@ -15,6 +15,7 @@ import { generateReportHash, generateReportNumber } from '@/utils/reportHash';
 import { generateReportPdf, type ReportPhoto } from '@/utils/reportPdf';
 import type jsPDF from 'jspdf';
 import PdfPreviewDialog from './PdfPreviewDialog';
+import delta7Logo from '@/assets/delta7-logo.png';
 
 interface PhotoState extends ReportPhoto {
   id: string;
