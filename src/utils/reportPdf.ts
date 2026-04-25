@@ -11,6 +11,9 @@ import { DELTA7_LOGO_DATA_URL } from '@/assets/delta7LogoBase64';
 export interface ReportPhoto {
   dataUrl: string;
   caption: string;
+  external?: boolean;
+  externalUrl?: string;
+  externalProvider?: string;
 }
 
 export interface ReportData {
