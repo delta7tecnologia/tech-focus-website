@@ -23,6 +23,8 @@ const TechFileManager = () => {
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('Geral');
   const [file, setFile] = useState<File | null>(null);
+  const [sourceMode, setSourceMode] = useState<SourceMode>('upload');
+  const [externalUrl, setExternalUrl] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
 
   const { data: files, isLoading } = useQuery({
