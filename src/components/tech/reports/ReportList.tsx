@@ -97,7 +97,18 @@ const ReportList: React.FC<Props> = ({ onEditDraft }) => {
     setDownloadingId(r.id);
     try {
       const photos: ReportPhoto[] = [];
-      for (const p of (r.photos || []) as Array<{ path: string; caption: string }>) {
+      for (const p of (r.photos || []) as Array<any>) {
+        if (p.external && p.url) {
+          photos.push({
+            dataUrl: '',
+            caption: p.caption || '',
+            external: true,
+            externalUrl: p.url,
+            externalProvider: p.provider || 'Externo',
+          });
+          continue;
+        }
+        if (!p.path) continue;
         const { data } = await supabase.storage.from('report-photos').download(p.path);
         if (data) {
           const dataUrl = await new Promise<string>((res, rej) => {
