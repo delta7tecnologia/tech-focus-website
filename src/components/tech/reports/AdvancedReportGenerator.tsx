@@ -133,7 +133,7 @@ const initialState = () => ({
   usuarioMatricula: '',
 });
 
-const AdvancedReportGenerator: React.FC<Props> = ({ onSaved }) => {
+const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -142,6 +142,72 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved }) => {
   const [s, setS] = useState(initialState);
   const [photos, setPhotos] = useState<PhotoState[]>([]);
   const [showCompanyDropdown, setShowCompanyDropdown] = useState(false);
+  const [draftId, setDraftId] = useState<string | null>(null);
+  const [reportNumber, setReportNumber] = useState<string>('');
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewPdf, setPreviewPdf] = useState<jsPDF | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+
+  useEffect(() => {
+    const load = async () => {
+      if (!draft) return;
+      const fd = (draft.form_data || {}) as any;
+      const ident = draft.triagem?.identificacao || {};
+      const conc = draft.conclusao || {};
+      const ass = conc.assinaturas || {};
+      setS({
+        patrimonio: fd.patrimonio ?? ident.patrimonio ?? '',
+        marca: fd.marca ?? ident.marca ?? '',
+        modelo: fd.modelo ?? ident.modelo ?? '',
+        tipo: fd.tipo ?? ident.tipo ?? '',
+        setor: fd.setor ?? ident.setor ?? '',
+        unidade: fd.unidade ?? ident.unidade ?? '',
+        usuario: fd.usuario ?? ident.usuario ?? '',
+        contato: fd.contato ?? ident.contato ?? '',
+        dataAquisicao: fd.dataAquisicao ?? ident.dataAquisicao ?? '',
+        garantia: fd.garantia ?? ident.garantia ?? '',
+        finalidades: fd.finalidades ?? ident.finalidades ?? [],
+        finalidadeOutro: fd.finalidadeOutro ?? ident.finalidadeOutro ?? '',
+        companyName: draft.company_name || '',
+        technicianName: draft.technician_name || '',
+        hardware: fd.hardware ?? draft.triagem?.hardware ?? initialState().hardware,
+        software: fd.software ?? draft.triagem?.software ?? initialState().software,
+        problemas: fd.problemas ?? draft.diagnostico?.problemas ?? [{ area: '', descricao: '', criticidade: '', acao: '' }],
+        estado: fd.estado ?? draft.diagnostico?.estado ?? { conservacao: '', desempenho: '', seguranca: '', conectividade: '' },
+        parecer: fd.parecer ?? conc.parecer ?? '',
+        parecerTexto: fd.parecerTexto ?? conc.parecerTexto ?? '',
+        recomendacoes: fd.recomendacoes ?? conc.recomendacoes ?? [{ texto: '', responsavel: '', prazo: '' }],
+        observacoesFinais: fd.observacoesFinais ?? conc.observacoesFinais ?? '',
+        assinaturaTecnico: fd.assinaturaTecnico ?? '',
+        assinaturaGestor: fd.assinaturaGestor ?? '',
+        assinaturaUsuario: fd.assinaturaUsuario ?? '',
+        gestorNome: fd.gestorNome ?? ass.gestorNome ?? '',
+        gestorCargo: fd.gestorCargo ?? ass.gestorCargo ?? '',
+        usuarioNome: fd.usuarioNome ?? ass.usuarioNome ?? '',
+        usuarioMatricula: fd.usuarioMatricula ?? ass.usuarioMatricula ?? '',
+      });
+      setDraftId(draft.id);
+      setReportNumber(draft.report_number);
+      const loaded: PhotoState[] = [];
+      for (const p of (draft.photos || []) as Array<{ path: string; caption: string }>) {
+        try {
+          const { data } = await supabase.storage.from('report-photos').download(p.path);
+          if (data) {
+            const dataUrl = await new Promise<string>((res, rej) => {
+              const r = new FileReader();
+              r.onload = () => res(r.result as string);
+              r.onerror = rej;
+              r.readAsDataURL(data);
+            });
+            loaded.push({ id: crypto.randomUUID(), dataUrl, caption: p.caption || '', storagePath: p.path, uploaded: true });
+          }
+        } catch {}
+      }
+      setPhotos(loaded);
+    };
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draft]);
 
   useQuery({
     queryKey: ['adv-report-profile', user?.id],
