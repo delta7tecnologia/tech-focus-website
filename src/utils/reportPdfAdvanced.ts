@@ -16,6 +16,9 @@ import {
 export interface AdvancedPhoto {
   dataUrl: string;
   caption: string;
+  external?: boolean;
+  externalUrl?: string;
+  externalProvider?: string;
 }
 
 export interface AdvancedReportData {
