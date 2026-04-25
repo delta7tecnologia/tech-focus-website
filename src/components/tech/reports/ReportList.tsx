@@ -71,9 +71,11 @@ const ReportList: React.FC<Props> = ({ onEditDraft }) => {
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       const report = reports.find((r: any) => r.id === id);
-      // Remove fotos do storage
+      // Remove apenas fotos internas do storage
       if (report?.photos && Array.isArray(report.photos) && report.photos.length > 0) {
-        const paths = (report.photos as Array<{ path: string }>).map((p) => p.path).filter(Boolean);
+        const paths = (report.photos as Array<any>)
+          .filter((p) => !p.external && p.path)
+          .map((p) => p.path);
         if (paths.length > 0) {
           await supabase.storage.from('report-photos').remove(paths);
         }
