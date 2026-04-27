@@ -147,6 +147,9 @@ const initialState = () => ({
   usuarioMatricula: '',
 });
 
+const firstFilled = (...values: any[]) =>
+  values.find((value) => typeof value === 'string' ? value.trim().length > 0 : Boolean(value)) ?? '';
+
 const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -199,13 +202,13 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
         parecerTexto: fd.parecerTexto ?? conc.parecerTexto ?? '',
         recomendacoes: fd.recomendacoes ?? conc.recomendacoes ?? [{ texto: '', responsavel: '', prazo: '' }],
         observacoesFinais: fd.observacoesFinais ?? conc.observacoesFinais ?? '',
-        assinaturaTecnico: fd.assinaturaTecnico ?? ass.assinaturaTecnico ?? '',
-        assinaturaGestor: fd.assinaturaGestor ?? ass.assinaturaGestor ?? '',
-        assinaturaUsuario: fd.assinaturaUsuario ?? ass.assinaturaUsuario ?? '',
-        gestorNome: fd.gestorNome ?? ass.gestorNome ?? '',
-        gestorCargo: fd.gestorCargo ?? ass.gestorCargo ?? '',
-        usuarioNome: fd.usuarioNome ?? ass.usuarioNome ?? '',
-        usuarioMatricula: fd.usuarioMatricula ?? ass.usuarioMatricula ?? '',
+        assinaturaTecnico: firstFilled(fd.assinaturaTecnico, ass.assinaturaTecnico),
+        assinaturaGestor: firstFilled(fd.assinaturaGestor, ass.assinaturaGestor),
+        assinaturaUsuario: firstFilled(fd.assinaturaUsuario, ass.assinaturaUsuario),
+        gestorNome: firstFilled(fd.gestorNome, ass.gestorNome),
+        gestorCargo: firstFilled(fd.gestorCargo, ass.gestorCargo),
+        usuarioNome: firstFilled(fd.usuarioNome, ass.usuarioNome),
+        usuarioMatricula: firstFilled(fd.usuarioMatricula, ass.usuarioMatricula),
       };
       setS(nextState);
       setPersistedForm(nextState);
