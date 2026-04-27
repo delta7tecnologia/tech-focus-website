@@ -454,7 +454,17 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
         s.technicianName || 'rascunho',
         generatedAt,
       );
-      const payload = buildPersistPayload(rNum, generatedAt, integrityHash, uploadedPhotos, true);
+      const nextHistory = appendSignatureHistory({
+        previousForm: persistedForm,
+        nextForm: s,
+        existingHistory: signatureHistory,
+        reportNumber: rNum,
+        signedAt: generatedAt,
+        technicianName: s.technicianName,
+        previousHash: draft?.integrity_hash,
+        nextHash: integrityHash,
+      });
+      const payload = buildPersistPayload(rNum, generatedAt, integrityHash, uploadedPhotos, true, nextHistory);
       if (draftId) {
         const { error } = await supabase.from('technical_reports').update(payload).eq('id', draftId);
         if (error) throw error;
@@ -464,10 +474,12 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
         setDraftId(data.id);
       }
       setReportNumber(rNum);
-      return rNum;
+      setPersistedForm(s);
+      setSignatureHistory(nextHistory);
+      return { rNum, history: nextHistory };
     },
-    onSuccess: (num) => {
-      toast({ title: 'Rascunho salvo', description: `Você pode continuar editando ${num} a qualquer momento.` });
+    onSuccess: ({ rNum }) => {
+      toast({ title: 'Rascunho salvo', description: `Você pode continuar editando ${rNum} a qualquer momento.` });
       queryClient.invalidateQueries({ queryKey: ['technical-reports'] });
     },
     onError: (e: any) => {
@@ -497,7 +509,17 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       );
 
       const uploadedPhotos = await ensureUploadedPhotos(rNum);
-      const payload = buildPersistPayload(rNum, generatedAt, integrityHash, uploadedPhotos, false);
+      const nextHistory = appendSignatureHistory({
+        previousForm: persistedForm,
+        nextForm: s,
+        existingHistory: signatureHistory,
+        reportNumber: rNum,
+        signedAt: generatedAt,
+        technicianName: s.technicianName,
+        previousHash: draft?.integrity_hash,
+        nextHash: integrityHash,
+      });
+      const payload = buildPersistPayload(rNum, generatedAt, integrityHash, uploadedPhotos, false, nextHistory);
 
       if (draftId) {
         const { error } = await supabase.from('technical_reports').update(payload).eq('id', draftId);
@@ -508,6 +530,8 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
         setDraftId(data.id);
       }
       setReportNumber(rNum);
+      setPersistedForm(s);
+      setSignatureHistory(nextHistory);
 
       const data: AdvancedReportData = {
         reportNumber: rNum, generatedAt, technicianName: s.technicianName,
