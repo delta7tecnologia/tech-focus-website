@@ -105,35 +105,24 @@ const SignaturePad: React.FC<Props> = ({ label, value, onChange, readOnly = fals
             variant="outline"
             size="sm"
             onClick={clear}
-            className="h-8 px-3 text-xs flex-shrink-0 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+            onTouchEnd={(e) => { e.preventDefault(); clear(); }}
+            className="h-9 px-3 text-xs flex-shrink-0 border-red-300 text-red-600 hover:bg-red-50 hover:text-red-700 active:bg-red-100"
           >
-            <Eraser className="w-3.5 h-3.5 mr-1" /> Limpar
+            <Eraser className="w-4 h-4 mr-1" /> Limpar
           </Button>
         )}
       </div>
-      <div className="relative">
-        <canvas
-          ref={canvasRef}
-          className="w-full h-32 border-2 border-dashed border-gray-300 rounded bg-white touch-none block"
-          onMouseDown={start}
-          onMouseMove={move}
-          onMouseUp={end}
-          onMouseLeave={end}
-          onTouchStart={start}
-          onTouchMove={move}
-          onTouchEnd={end}
-        />
-        {!readOnly && hasDrawn && (
-          <button
-            type="button"
-            onClick={clear}
-            aria-label="Limpar assinatura"
-            className="absolute top-2 right-2 bg-white/90 hover:bg-red-50 border border-red-200 text-red-600 rounded-full p-1.5 shadow-sm"
-          >
-            <Eraser className="w-4 h-4" />
-          </button>
-        )}
-      </div>
+      <canvas
+        ref={canvasRef}
+        className="w-full h-32 border-2 border-dashed border-gray-300 rounded bg-white touch-none block"
+        onMouseDown={start}
+        onMouseMove={move}
+        onMouseUp={end}
+        onMouseLeave={end}
+        onTouchStart={start}
+        onTouchMove={move}
+        onTouchEnd={end}
+      />
       {!hasDrawn && !readOnly && (
         <p className="text-xs text-gray-400 text-center">Assine com o mouse ou dedo</p>
       )}
