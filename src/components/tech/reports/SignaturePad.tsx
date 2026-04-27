@@ -14,35 +14,56 @@ const SignaturePad: React.FC<Props> = ({ label, value, onChange, readOnly = fals
   const [drawing, setDrawing] = useState(false);
   const [hasDrawn, setHasDrawn] = useState(!!value);
 
+  const lastEmittedRef = useRef<string>('');
+
   useEffect(() => {
     const c = canvasRef.current;
     if (!c) return;
-    // Setup hi-dpi
     const ratio = window.devicePixelRatio || 1;
     const rect = c.getBoundingClientRect();
     c.width = rect.width * ratio;
     c.height = rect.height * ratio;
     const ctx = c.getContext('2d');
-    if (ctx) {
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.clearRect(0, 0, c.width, c.height);
-      ctx.scale(ratio, ratio);
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = '#0f172a';
-    }
+    if (!ctx) return;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, c.width, c.height);
+    ctx.scale(ratio, ratio);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#0f172a';
     if (value) {
       const img = new Image();
       img.onload = () => {
-        ctx?.clearRect(0, 0, rect.width, rect.height);
-        ctx?.drawImage(img, 0, 0, rect.width, rect.height);
+        ctx.clearRect(0, 0, rect.width, rect.height);
+        ctx.drawImage(img, 0, 0, rect.width, rect.height);
+        setHasDrawn(true);
+        lastEmittedRef.current = value;
+      };
+      img.src = value;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Reload only if value changed from outside (not our own onChange echo)
+  useEffect(() => {
+    if (value === lastEmittedRef.current) return;
+    const c = canvasRef.current;
+    const ctx = c?.getContext('2d');
+    if (!c || !ctx) return;
+    const rect = c.getBoundingClientRect();
+    ctx.clearRect(0, 0, rect.width, rect.height);
+    if (value) {
+      const img = new Image();
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, rect.width, rect.height);
         setHasDrawn(true);
       };
       img.src = value;
     } else {
       setHasDrawn(false);
     }
+    lastEmittedRef.current = value;
   }, [value]);
 
   const getPos = (e: React.MouseEvent | React.TouchEvent) => {
