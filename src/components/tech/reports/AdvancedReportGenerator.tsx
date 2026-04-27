@@ -633,7 +633,12 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
             </div>
             <div>
               <Label>Técnico Responsável *</Label>
-              <Input value={s.technicianName} onChange={(e) => update('technicianName', e.target.value)} />
+              <Input
+                value={s.technicianName}
+                onChange={(e) => update('technicianName', e.target.value)}
+                disabled={isSavedReport}
+              />
+              {isSavedReport && <p className="text-xs text-gray-500 mt-1">Laudo já emitido: o responsável original não pode ser alterado.</p>}
             </div>
             <div>
               <Label>Patrimônio / Nº de Série</Label>
