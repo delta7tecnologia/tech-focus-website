@@ -169,8 +169,13 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
 
   const isSavedReport = !!draft && draft.is_draft === false;
   const documentVersion = getDocumentVersion(signatureHistory);
-  const allSignaturesComplete =
-    !!s.assinaturaTecnico && !!s.assinaturaGestor && !!s.assinaturaUsuario;
+  const hasSignatureHistoryRole = (role: 'tecnico' | 'gestor' | 'usuario') =>
+    signatureHistory.some((item) => item.role === role);
+  const hasTechnicianSignature = !!s.assinaturaTecnico;
+  const hasManagerSignature = !!s.assinaturaGestor || hasSignatureHistoryRole('gestor');
+  const hasUserSignature = !!s.assinaturaUsuario || hasSignatureHistoryRole('usuario');
+  const allSignaturesComplete = hasTechnicianSignature && hasManagerSignature && hasUserSignature;
+  const remoteSignaturesComplete = hasManagerSignature && hasUserSignature;
   const allSignaturesNotifiedRef = useRef(false);
 
   useEffect(() => {
@@ -289,6 +294,51 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       return Array.from(set).sort();
     },
   });
+  const { data: remoteSignedLinks = [] } = useQuery({
+    queryKey: ['signed-signature-links', draft?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('report_signature_links')
+        .select('signer_role, signer_name, signature_data, signed_at')
+        .eq('report_id', draft!.id)
+        .not('signed_at', 'is', null)
+        .order('signed_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!draft?.id,
+  });
+
+  useEffect(() => {
+    if (!remoteSignedLinks.length) return;
+
+    const updates: Partial<ReturnType<typeof initialState>> = {};
+    for (const link of remoteSignedLinks as any[]) {
+      if (link.signer_role === 'gestor') {
+        if (link.signature_data && !updates.assinaturaGestor) updates.assinaturaGestor = link.signature_data;
+        if (link.signer_name && !updates.gestorNome) updates.gestorNome = link.signer_name;
+      }
+      if (link.signer_role === 'cliente' || link.signer_role === 'usuario') {
+        if (link.signature_data && !updates.assinaturaUsuario) updates.assinaturaUsuario = link.signature_data;
+        if (link.signer_name && !updates.usuarioNome) updates.usuarioNome = link.signer_name;
+      }
+    }
+
+    const applyMissingUpdates = (prev: ReturnType<typeof initialState>) => {
+      let changed = false;
+      const next = { ...prev };
+      for (const [key, value] of Object.entries(updates)) {
+        if (value && !(next as any)[key]) {
+          (next as any)[key] = value;
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
+    };
+
+    setS(applyMissingUpdates);
+    setPersistedForm((prev: any) => (prev ? applyMissingUpdates(prev) : prev));
+  }, [remoteSignedLinks]);
   const filteredCompanies = existingCompanies.filter((c) =>
     c.toLowerCase().includes(s.companyName.toLowerCase())
   );
