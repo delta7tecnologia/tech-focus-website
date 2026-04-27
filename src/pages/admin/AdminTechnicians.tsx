@@ -15,7 +15,8 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { UserCheck, UserX, Users, Pencil, KeyRound, Eye, EyeOff, Trash2 } from 'lucide-react';
+import { UserCheck, UserX, Users, Pencil, KeyRound, Eye, EyeOff, Trash2, FileEdit } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 import {
   AlertDialog,
   AlertDialogAction,
