@@ -31,21 +31,22 @@ const ReportList: React.FC<Props> = ({ onEditDraft }) => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
-  const { data: isAdmin = false } = useQuery({
-    queryKey: ['technical-reports-is-admin', user?.id],
+  const { data: perms = { isAdmin: false, canEditReports: false } } = useQuery({
+    queryKey: ['technical-reports-perms', user?.id],
     queryFn: async () => {
-      if (!user) return false;
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .eq('role', 'admin')
-        .maybeSingle();
-      if (error) return false;
-      return data?.role === 'admin';
+      if (!user) return { isAdmin: false, canEditReports: false };
+      const [{ data: roleData }, { data: profileData }] = await Promise.all([
+        supabase.from('user_roles').select('role').eq('user_id', user.id).eq('role', 'admin').maybeSingle(),
+        supabase.from('profiles').select('can_edit_reports').eq('user_id', user.id).maybeSingle(),
+      ]);
+      return {
+        isAdmin: roleData?.role === 'admin',
+        canEditReports: !!(profileData as any)?.can_edit_reports,
+      };
     },
     enabled: !!user,
   });
+  const { isAdmin, canEditReports } = perms;
 
   const { data: reports = [], isLoading } = useQuery({
     queryKey: ['technical-reports'],
