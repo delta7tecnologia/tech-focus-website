@@ -64,6 +64,7 @@ const App = () => (
               <Route path="faq" element={<AdminFaq />} />
               <Route path="patrimonios" element={<AdminAssets />} />
               <Route path="arquivos" element={<AdminFiles />} />
+              <Route path="laudos" element={<AdminReports />} />
               <Route path="configuracoes" element={<AdminSettings />} />
             </Route>
             
