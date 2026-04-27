@@ -253,7 +253,7 @@ const ReportList: React.FC<Props> = ({ onEditDraft }) => {
                         : <Download className="w-4 h-4" />}
                     </Button>
                   )}
-                  {r.created_by === user?.id && (
+                  {(r.created_by === user?.id || isAdmin) && (
                     <Button
                       size="sm"
                       variant="ghost"
