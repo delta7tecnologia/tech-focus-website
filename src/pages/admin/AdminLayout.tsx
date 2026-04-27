@@ -16,7 +16,8 @@ import {
   ShoppingBag,
   Users,
   Monitor,
-  FileSignature
+  FileSignature,
+  ClipboardList
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { supabase } from '@/integrations/supabase/client';
@@ -89,6 +90,7 @@ const AdminLayout = () => {
     { name: 'Patrimônios', icon: Monitor, path: '/admin/patrimonios' },
     { name: 'Arquivos Técnicos', icon: Package, path: '/admin/arquivos' },
     { name: 'Laudos', icon: FileSignature, path: '/admin/laudos' },
+    { name: 'Ordens de Serviço', icon: ClipboardList, path: '/admin/ordens-servico' },
     { name: 'FAQ', icon: HelpCircle, path: '/admin/faq' },
     { name: 'Configurações', icon: Settings, path: '/admin/configuracoes' },
   ];
