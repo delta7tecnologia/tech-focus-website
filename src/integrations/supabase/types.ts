@@ -362,6 +362,180 @@ export type Database = {
         }
         Relationships: []
       }
+      service_order_signature_links: {
+        Row: {
+          created_at: string
+          created_by: string
+          expires_at: string
+          id: string
+          service_order_id: string
+          signature_data: string | null
+          signed_at: string | null
+          signed_ip: string | null
+          signer_document: string | null
+          signer_email: string | null
+          signer_name: string | null
+          signer_role: string
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          expires_at?: string
+          id?: string
+          service_order_id: string
+          signature_data?: string | null
+          signed_at?: string | null
+          signed_ip?: string | null
+          signer_document?: string | null
+          signer_email?: string | null
+          signer_name?: string | null
+          signer_role: string
+          token: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          expires_at?: string
+          id?: string
+          service_order_id?: string
+          signature_data?: string | null
+          signed_at?: string | null
+          signed_ip?: string | null
+          signer_document?: string | null
+          signer_email?: string | null
+          signer_name?: string | null
+          signer_role?: string
+          token?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      service_orders: {
+        Row: {
+          checkin_accuracy: number | null
+          checkin_at: string | null
+          checkin_lat: number | null
+          checkin_lng: number | null
+          checklist: Json
+          checkout_accuracy: number | null
+          checkout_at: string | null
+          checkout_lat: number | null
+          checkout_lng: number | null
+          client_address: string
+          client_contact: string | null
+          client_name: string
+          created_at: string
+          created_by: string
+          evidences: Json
+          finished_at: string | null
+          generated_at: string
+          id: string
+          integrity_hash: string | null
+          is_draft: boolean
+          materials: Json
+          os_number: string
+          requested_by: string | null
+          requested_by_role: string | null
+          scheduled_at: string | null
+          signature_data: string | null
+          signed_at: string | null
+          signer_document: string | null
+          signer_name: string | null
+          signer_role: string | null
+          started_at: string | null
+          status: string
+          summary: string | null
+          technician_id: string
+          technician_name: string
+          travel: Json
+          updated_at: string
+          visit_type: string
+        }
+        Insert: {
+          checkin_accuracy?: number | null
+          checkin_at?: string | null
+          checkin_lat?: number | null
+          checkin_lng?: number | null
+          checklist?: Json
+          checkout_accuracy?: number | null
+          checkout_at?: string | null
+          checkout_lat?: number | null
+          checkout_lng?: number | null
+          client_address: string
+          client_contact?: string | null
+          client_name: string
+          created_at?: string
+          created_by: string
+          evidences?: Json
+          finished_at?: string | null
+          generated_at?: string
+          id?: string
+          integrity_hash?: string | null
+          is_draft?: boolean
+          materials?: Json
+          os_number: string
+          requested_by?: string | null
+          requested_by_role?: string | null
+          scheduled_at?: string | null
+          signature_data?: string | null
+          signed_at?: string | null
+          signer_document?: string | null
+          signer_name?: string | null
+          signer_role?: string | null
+          started_at?: string | null
+          status?: string
+          summary?: string | null
+          technician_id: string
+          technician_name: string
+          travel?: Json
+          updated_at?: string
+          visit_type?: string
+        }
+        Update: {
+          checkin_accuracy?: number | null
+          checkin_at?: string | null
+          checkin_lat?: number | null
+          checkin_lng?: number | null
+          checklist?: Json
+          checkout_accuracy?: number | null
+          checkout_at?: string | null
+          checkout_lat?: number | null
+          checkout_lng?: number | null
+          client_address?: string
+          client_contact?: string | null
+          client_name?: string
+          created_at?: string
+          created_by?: string
+          evidences?: Json
+          finished_at?: string | null
+          generated_at?: string
+          id?: string
+          integrity_hash?: string | null
+          is_draft?: boolean
+          materials?: Json
+          os_number?: string
+          requested_by?: string | null
+          requested_by_role?: string | null
+          scheduled_at?: string | null
+          signature_data?: string | null
+          signed_at?: string | null
+          signer_document?: string | null
+          signer_name?: string | null
+          signer_role?: string | null
+          started_at?: string | null
+          status?: string
+          summary?: string | null
+          technician_id?: string
+          technician_name?: string
+          travel?: Json
+          updated_at?: string
+          visit_type?: string
+        }
+        Relationships: []
+      }
       services: {
         Row: {
           created_at: string
