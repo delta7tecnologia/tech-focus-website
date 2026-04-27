@@ -169,6 +169,23 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
 
   const isSavedReport = !!draft && draft.is_draft === false;
   const documentVersion = getDocumentVersion(signatureHistory);
+  const allSignaturesComplete =
+    !!s.assinaturaTecnico && !!s.assinaturaGestor && !!s.assinaturaUsuario;
+  const allSignaturesNotifiedRef = useRef(false);
+
+  useEffect(() => {
+    // Notifica uma única vez quando todas as 3 assinaturas estiverem prontas
+    if (allSignaturesComplete && !allSignaturesNotifiedRef.current && isSavedReport) {
+      allSignaturesNotifiedRef.current = true;
+      toast({
+        title: '✓ Todas as assinaturas concluídas',
+        description: `Laudo ${reportNumber} foi assinado por Técnico, Gestor e Cliente.`,
+      });
+    }
+    if (!allSignaturesComplete) {
+      allSignaturesNotifiedRef.current = false;
+    }
+  }, [allSignaturesComplete, isSavedReport, reportNumber]);
 
   useEffect(() => {
     const load = async () => {
