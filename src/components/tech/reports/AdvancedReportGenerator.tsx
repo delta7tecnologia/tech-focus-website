@@ -24,6 +24,13 @@ import PdfPreviewDialog from './PdfPreviewDialog';
 import type jsPDF from 'jspdf';
 import delta7Logo from '@/assets/delta7-logo.png';
 import { detectExternalProvider } from '../UploadOrLinkInput';
+import {
+  appendSignatureHistory,
+  formatSignatureDate,
+  getDocumentVersion,
+  normalizeSignatureHistory,
+  type SignatureHistoryEntry,
+} from '@/utils/reportSignatures';
 
 interface PhotoState extends AdvancedPhoto {
   id: string;
@@ -76,6 +83,10 @@ interface DraftReport {
   conclusao: any;
   photos: any;
   form_data: any;
+  is_draft?: boolean;
+  generated_at?: string;
+  integrity_hash?: string;
+  signature_history?: any;
 }
 
 interface Props {
