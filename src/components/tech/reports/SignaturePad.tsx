@@ -143,13 +143,11 @@ const SignaturePad: React.FC<Props> = ({ label, value, onChange, readOnly = fals
       <canvas
         ref={canvasRef}
         className="w-full h-32 border-2 border-dashed border-gray-300 rounded bg-white touch-none block"
-        onMouseDown={start}
-        onMouseMove={move}
-        onMouseUp={end}
-        onMouseLeave={end}
-        onTouchStart={start}
-        onTouchMove={move}
-        onTouchEnd={end}
+        onPointerDown={start}
+        onPointerMove={move}
+        onPointerUp={end}
+        onPointerCancel={end}
+        onPointerLeave={end}
       />
       {!hasDrawn && !readOnly && (
         <p className="text-xs text-gray-400 text-center">Assine com o mouse ou dedo</p>
