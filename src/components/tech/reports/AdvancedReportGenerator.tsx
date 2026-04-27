@@ -987,15 +987,20 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       <Card>
         <CardContent className="p-6 space-y-4">
           <h4 className="font-semibold text-blue-900 border-l-4 border-blue-900 pl-3">9. Assinaturas digitais</h4>
+          {isSavedReport && (
+            <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded p-3">
+              Laudo emitido: os dados do documento ficam preservados. Use esta área apenas para coletar assinaturas pendentes.
+            </p>
+          )}
           <div className="grid md:grid-cols-3 gap-6">
             <div className="space-y-2">
               <SignaturePad label="Técnico Responsável" value={s.assinaturaTecnico}
-                onChange={(v) => update('assinaturaTecnico', v)} />
+                onChange={(v) => update('assinaturaTecnico', v)} readOnly={!!s.assinaturaTecnico} />
               <Input value={s.technicianName} disabled className="text-xs h-8" />
             </div>
             <div className="space-y-2">
               <SignaturePad label="Gestor / Supervisor" value={s.assinaturaGestor}
-                onChange={(v) => update('assinaturaGestor', v)} />
+                onChange={(v) => update('assinaturaGestor', v)} readOnly={!!s.assinaturaGestor} />
               <Input placeholder="Nome do gestor" value={s.gestorNome}
                 onChange={(e) => update('gestorNome', e.target.value)} className="text-xs h-8" />
               <Input placeholder="Cargo" value={s.gestorCargo}
@@ -1003,12 +1008,32 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
             </div>
             <div className="space-y-2">
               <SignaturePad label="Usuário do Equipamento" value={s.assinaturaUsuario}
-                onChange={(v) => update('assinaturaUsuario', v)} />
+                onChange={(v) => update('assinaturaUsuario', v)} readOnly={!!s.assinaturaUsuario} />
               <Input placeholder="Nome do usuário" value={s.usuarioNome}
                 onChange={(e) => update('usuarioNome', e.target.value)} className="text-xs h-8" />
               <Input placeholder="Matrícula" value={s.usuarioMatricula}
                 onChange={(e) => update('usuarioMatricula', e.target.value)} className="text-xs h-8" />
             </div>
+          </div>
+          <div className="border rounded-md overflow-hidden">
+            <div className="px-3 py-2 bg-gray-50 border-b flex items-center justify-between gap-2">
+              <span className="text-sm font-semibold text-gray-900">Histórico de assinaturas</span>
+              <span className="text-xs text-gray-500">Versão atual: v{documentVersion}</span>
+            </div>
+            {signatureHistory.length === 0 ? (
+              <p className="text-sm text-gray-500 p-3">Nenhuma assinatura registrada neste laudo.</p>
+            ) : (
+              <div className="divide-y">
+                {signatureHistory.map((item) => (
+                  <div key={item.id} className="p-3 text-sm grid sm:grid-cols-4 gap-2">
+                    <div className="font-medium text-gray-900">{item.signerName}</div>
+                    <div className="text-gray-600">{item.roleLabel}</div>
+                    <div className="text-gray-600">{formatSignatureDate(item.signedAt)}</div>
+                    <div className="text-gray-600">v{item.versionBefore} → v{item.versionAfter}</div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <div>
             <Label>Observações finais</Label>
