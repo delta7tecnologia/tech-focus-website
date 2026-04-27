@@ -159,6 +159,11 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewPdf, setPreviewPdf] = useState<jsPDF | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
+  const [persistedForm, setPersistedForm] = useState<any>(null);
+  const [signatureHistory, setSignatureHistory] = useState<SignatureHistoryEntry[]>([]);
+
+  const isSavedReport = !!draft && draft.is_draft === false;
+  const documentVersion = getDocumentVersion(signatureHistory);
 
   useEffect(() => {
     const load = async () => {
