@@ -14,35 +14,56 @@ const SignaturePad: React.FC<Props> = ({ label, value, onChange, readOnly = fals
   const [drawing, setDrawing] = useState(false);
   const [hasDrawn, setHasDrawn] = useState(!!value);
 
+  const lastEmittedRef = useRef<string>('');
+
   useEffect(() => {
     const c = canvasRef.current;
     if (!c) return;
-    // Setup hi-dpi
     const ratio = window.devicePixelRatio || 1;
     const rect = c.getBoundingClientRect();
     c.width = rect.width * ratio;
     c.height = rect.height * ratio;
     const ctx = c.getContext('2d');
-    if (ctx) {
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.clearRect(0, 0, c.width, c.height);
-      ctx.scale(ratio, ratio);
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = '#0f172a';
-    }
+    if (!ctx) return;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, c.width, c.height);
+    ctx.scale(ratio, ratio);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#0f172a';
     if (value) {
       const img = new Image();
       img.onload = () => {
-        ctx?.clearRect(0, 0, rect.width, rect.height);
-        ctx?.drawImage(img, 0, 0, rect.width, rect.height);
+        ctx.clearRect(0, 0, rect.width, rect.height);
+        ctx.drawImage(img, 0, 0, rect.width, rect.height);
+        setHasDrawn(true);
+        lastEmittedRef.current = value;
+      };
+      img.src = value;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Reload only if value changed from outside (not our own onChange echo)
+  useEffect(() => {
+    if (value === lastEmittedRef.current) return;
+    const c = canvasRef.current;
+    const ctx = c?.getContext('2d');
+    if (!c || !ctx) return;
+    const rect = c.getBoundingClientRect();
+    ctx.clearRect(0, 0, rect.width, rect.height);
+    if (value) {
+      const img = new Image();
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, rect.width, rect.height);
         setHasDrawn(true);
       };
       img.src = value;
     } else {
       setHasDrawn(false);
     }
+    lastEmittedRef.current = value;
   }, [value]);
 
   const getPos = (e: React.MouseEvent | React.TouchEvent) => {
@@ -81,7 +102,11 @@ const SignaturePad: React.FC<Props> = ({ label, value, onChange, readOnly = fals
     if (!drawing) return;
     setDrawing(false);
     const c = canvasRef.current;
-    if (c) onChange(c.toDataURL('image/png'));
+    if (c) {
+      const dataUrl = c.toDataURL('image/png');
+      lastEmittedRef.current = dataUrl;
+      onChange(dataUrl);
+    }
   };
 
   const clear = () => {
@@ -92,6 +117,7 @@ const SignaturePad: React.FC<Props> = ({ label, value, onChange, readOnly = fals
     const ratio = window.devicePixelRatio || 1;
     ctx?.clearRect(0, 0, c.width / ratio, c.height / ratio);
     setHasDrawn(false);
+    lastEmittedRef.current = '';
     onChange('');
   };
 
@@ -105,35 +131,24 @@ const SignaturePad: React.FC<Props> = ({ label, value, onChange, readOnly = fals
             variant="outline"
             size="sm"
             onClick={clear}
-            className="h-8 px-3 text-xs flex-shrink-0 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+            onTouchEnd={(e) => { e.preventDefault(); clear(); }}
+            className="h-9 px-3 text-xs flex-shrink-0 border-red-300 text-red-600 hover:bg-red-50 hover:text-red-700 active:bg-red-100"
           >
-            <Eraser className="w-3.5 h-3.5 mr-1" /> Limpar
+            <Eraser className="w-4 h-4 mr-1" /> Limpar
           </Button>
         )}
       </div>
-      <div className="relative">
-        <canvas
-          ref={canvasRef}
-          className="w-full h-32 border-2 border-dashed border-gray-300 rounded bg-white touch-none block"
-          onMouseDown={start}
-          onMouseMove={move}
-          onMouseUp={end}
-          onMouseLeave={end}
-          onTouchStart={start}
-          onTouchMove={move}
-          onTouchEnd={end}
-        />
-        {!readOnly && hasDrawn && (
-          <button
-            type="button"
-            onClick={clear}
-            aria-label="Limpar assinatura"
-            className="absolute top-2 right-2 bg-white/90 hover:bg-red-50 border border-red-200 text-red-600 rounded-full p-1.5 shadow-sm"
-          >
-            <Eraser className="w-4 h-4" />
-          </button>
-        )}
-      </div>
+      <canvas
+        ref={canvasRef}
+        className="w-full h-32 border-2 border-dashed border-gray-300 rounded bg-white touch-none block"
+        onMouseDown={start}
+        onMouseMove={move}
+        onMouseUp={end}
+        onMouseLeave={end}
+        onTouchStart={start}
+        onTouchMove={move}
+        onTouchEnd={end}
+      />
       {!hasDrawn && !readOnly && (
         <p className="text-xs text-gray-400 text-center">Assine com o mouse ou dedo</p>
       )}
