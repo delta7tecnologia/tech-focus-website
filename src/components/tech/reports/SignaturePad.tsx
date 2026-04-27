@@ -97,25 +97,45 @@ const SignaturePad: React.FC<Props> = ({ label, value, onChange, readOnly = fals
 
   return (
     <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-gray-700">{label}</span>
-        {!readOnly && <Button type="button" variant="ghost" size="sm" onClick={clear} className="h-7 px-2 text-xs">
-          <Eraser className="w-3 h-3 mr-1" /> Limpar
-        </Button>}
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-sm font-medium text-gray-700 truncate">{label}</span>
+        {!readOnly && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={clear}
+            className="h-8 px-3 text-xs flex-shrink-0 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+          >
+            <Eraser className="w-3.5 h-3.5 mr-1" /> Limpar
+          </Button>
+        )}
       </div>
-      <canvas
-        ref={canvasRef}
-        className="w-full h-32 border-2 border-dashed border-gray-300 rounded bg-white touch-none"
-        onMouseDown={start}
-        onMouseMove={move}
-        onMouseUp={end}
-        onMouseLeave={end}
-        onTouchStart={start}
-        onTouchMove={move}
-        onTouchEnd={end}
-      />
+      <div className="relative">
+        <canvas
+          ref={canvasRef}
+          className="w-full h-32 border-2 border-dashed border-gray-300 rounded bg-white touch-none block"
+          onMouseDown={start}
+          onMouseMove={move}
+          onMouseUp={end}
+          onMouseLeave={end}
+          onTouchStart={start}
+          onTouchMove={move}
+          onTouchEnd={end}
+        />
+        {!readOnly && hasDrawn && (
+          <button
+            type="button"
+            onClick={clear}
+            aria-label="Limpar assinatura"
+            className="absolute top-2 right-2 bg-white/90 hover:bg-red-50 border border-red-200 text-red-600 rounded-full p-1.5 shadow-sm"
+          >
+            <Eraser className="w-4 h-4" />
+          </button>
+        )}
+      </div>
       {!hasDrawn && !readOnly && (
-        <p className="text-xs text-gray-400 text-center -mt-1">Assine com o mouse ou dedo</p>
+        <p className="text-xs text-gray-400 text-center">Assine com o mouse ou dedo</p>
       )}
     </div>
   );
