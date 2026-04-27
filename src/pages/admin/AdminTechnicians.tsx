@@ -15,7 +15,8 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { UserCheck, UserX, Users, Pencil, KeyRound, Eye, EyeOff, Trash2 } from 'lucide-react';
+import { UserCheck, UserX, Users, Pencil, KeyRound, Eye, EyeOff, Trash2, FileEdit } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,6 +34,7 @@ interface Profile {
   email: string;
   full_name: string | null;
   is_approved: boolean;
+  can_edit_reports?: boolean;
   created_at: string;
 }
 
@@ -170,6 +172,23 @@ const AdminTechnicians = () => {
     },
   });
 
+  const toggleEditReports = useMutation({
+    mutationFn: async ({ userId, canEdit }: { userId: string; canEdit: boolean }) => {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ can_edit_reports: canEdit } as any)
+        .eq('user_id', userId);
+      if (error) throw error;
+    },
+    onSuccess: (_, { canEdit }) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-technicians'] });
+      toast({ title: canEdit ? 'Permissão de editar laudos concedida!' : 'Permissão de editar laudos removida!' });
+    },
+    onError: (error: any) => {
+      toast({ title: 'Erro', description: error.message, variant: 'destructive' });
+    },
+  });
+
   const updateProfile = useMutation({
     mutationFn: async ({ userId, full_name, email }: { userId: string; full_name: string; email: string }) => {
       const { error } = await supabase
@@ -245,16 +264,34 @@ const AdminTechnicians = () => {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between flex-wrap gap-4">
                   <div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-semibold">{p.full_name || 'Sem nome'}</span>
                       <Badge variant={p.is_approved ? 'default' : 'secondary'}>
                         {p.is_approved ? 'Aprovado' : 'Pendente'}
                       </Badge>
+                      {p.can_edit_reports && (
+                        <Badge variant="outline" className="border-blue-600 text-blue-700">
+                          <FileEdit className="w-3 h-3 mr-1" /> Edita Laudos
+                        </Badge>
+                      )}
                     </div>
                     <p className="text-sm text-gray-500">{p.email}</p>
                     <p className="text-xs text-gray-400 mt-1">
                       Cadastrado em {new Date(p.created_at).toLocaleDateString('pt-BR')}
                     </p>
+                    <div className="flex items-center gap-2 mt-3">
+                      <Switch
+                        id={`edit-reports-${p.user_id}`}
+                        checked={!!p.can_edit_reports}
+                        disabled={!p.is_approved || toggleEditReports.isPending}
+                        onCheckedChange={(checked) =>
+                          toggleEditReports.mutate({ userId: p.user_id, canEdit: checked })
+                        }
+                      />
+                      <Label htmlFor={`edit-reports-${p.user_id}`} className="text-sm text-gray-600 cursor-pointer">
+                        Permitir editar laudos de outros técnicos
+                      </Label>
+                    </div>
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
                     <Button
