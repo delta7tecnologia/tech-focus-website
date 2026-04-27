@@ -15,6 +15,7 @@ import LinksUteis from "./pages/LinksUteis";
 import AreaTecnica from "./pages/AreaTecnica";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
+import SignReport from "./pages/SignReport";
 
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminSetup from "./pages/admin/AdminSetup";
@@ -50,6 +51,7 @@ const App = () => (
             <Route path="/links-uteis" element={<LinksUteis />} />
             <Route path="/area-tecnica" element={<AreaTecnica />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/assinar/:token" element={<SignReport />} />
             
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
