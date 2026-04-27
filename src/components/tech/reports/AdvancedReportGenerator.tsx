@@ -173,7 +173,9 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       const fd = (draft.form_data || {}) as any;
       const ident = draft.triagem?.identificacao || {};
       const conc = draft.conclusao || {};
-      const ass = conc.assinaturas || {};
+      // Assinaturas podem vir do form_data.signatures (gravado pelo SignReport remoto)
+      // ou de conclusao.assinaturas (legado). Mesclamos com prioridade para form_data.signatures.
+      const ass = { ...(conc.assinaturas || {}), ...(fd.signatures || {}) };
       const nextState = {
         patrimonio: fd.patrimonio ?? ident.patrimonio ?? '',
         marca: fd.marca ?? ident.marca ?? '',
