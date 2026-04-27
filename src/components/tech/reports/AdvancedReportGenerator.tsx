@@ -169,8 +169,13 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
 
   const isSavedReport = !!draft && draft.is_draft === false;
   const documentVersion = getDocumentVersion(signatureHistory);
-  const allSignaturesComplete =
-    !!s.assinaturaTecnico && !!s.assinaturaGestor && !!s.assinaturaUsuario;
+  const hasSignatureHistoryRole = (role: 'tecnico' | 'gestor' | 'usuario') =>
+    signatureHistory.some((item) => item.role === role);
+  const hasTechnicianSignature = !!s.assinaturaTecnico;
+  const hasManagerSignature = !!s.assinaturaGestor || hasSignatureHistoryRole('gestor');
+  const hasUserSignature = !!s.assinaturaUsuario || hasSignatureHistoryRole('usuario');
+  const allSignaturesComplete = hasTechnicianSignature && hasManagerSignature && hasUserSignature;
+  const remoteSignaturesComplete = hasManagerSignature && hasUserSignature;
   const allSignaturesNotifiedRef = useRef(false);
 
   useEffect(() => {
@@ -289,6 +294,51 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       return Array.from(set).sort();
     },
   });
+  const { data: remoteSignedLinks = [] } = useQuery({
+    queryKey: ['signed-signature-links', draft?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('report_signature_links')
+        .select('signer_role, signer_name, signature_data, signed_at')
+        .eq('report_id', draft!.id)
+        .not('signed_at', 'is', null)
+        .order('signed_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!draft?.id,
+  });
+
+  useEffect(() => {
+    if (!remoteSignedLinks.length) return;
+
+    const updates: Partial<ReturnType<typeof initialState>> = {};
+    for (const link of remoteSignedLinks as any[]) {
+      if (link.signer_role === 'gestor') {
+        if (link.signature_data && !updates.assinaturaGestor) updates.assinaturaGestor = link.signature_data;
+        if (link.signer_name && !updates.gestorNome) updates.gestorNome = link.signer_name;
+      }
+      if (link.signer_role === 'cliente' || link.signer_role === 'usuario') {
+        if (link.signature_data && !updates.assinaturaUsuario) updates.assinaturaUsuario = link.signature_data;
+        if (link.signer_name && !updates.usuarioNome) updates.usuarioNome = link.signer_name;
+      }
+    }
+
+    const applyMissingUpdates = (prev: ReturnType<typeof initialState>) => {
+      let changed = false;
+      const next = { ...prev };
+      for (const [key, value] of Object.entries(updates)) {
+        if (value && !(next as any)[key]) {
+          (next as any)[key] = value;
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
+    };
+
+    setS(applyMissingUpdates);
+    setPersistedForm((prev: any) => (prev ? applyMissingUpdates(prev) : prev));
+  }, [remoteSignedLinks]);
   const filteredCompanies = existingCompanies.filter((c) =>
     c.toLowerCase().includes(s.companyName.toLowerCase())
   );
@@ -487,7 +537,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
         previousHash: draft?.integrity_hash,
         nextHash: integrityHash,
       });
-      const payload = buildPersistPayload(rNum, generatedAt, integrityHash, uploadedPhotos, true, nextHistory);
+      const payload = buildPersistPayload(rNum, generatedAt, integrityHash, uploadedPhotos, !isSavedReport, nextHistory);
       if (draftId) {
         const { error } = await supabase.from('technical_reports').update(payload).eq('id', draftId);
         if (error) throw error;
@@ -499,10 +549,13 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       setReportNumber(rNum);
       setPersistedForm(s);
       setSignatureHistory(nextHistory);
-      return { rNum, history: nextHistory };
+      return { rNum, history: nextHistory, savedAsIssued: isSavedReport };
     },
-    onSuccess: ({ rNum }) => {
-      toast({ title: 'Rascunho salvo', description: `Você pode continuar editando ${rNum} a qualquer momento.` });
+    onSuccess: ({ rNum, savedAsIssued }) => {
+      toast({
+        title: savedAsIssued ? 'Assinaturas salvas' : 'Rascunho salvo',
+        description: savedAsIssued ? `Assinaturas do laudo ${rNum} atualizadas.` : `Você pode continuar editando ${rNum} a qualquer momento.`,
+      });
       queryClient.invalidateQueries({ queryKey: ['technical-reports'] });
     },
     onError: (e: any) => {
@@ -1037,9 +1090,13 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
               label="Técnico Responsável (assina aqui)"
               value={s.assinaturaTecnico}
               onChange={(v) => update('assinaturaTecnico', v)}
-              readOnly={isSavedReport}
             />
             <Input value={s.technicianName} disabled className="text-xs h-8" />
+            {isSavedReport && (
+              <p className="text-xs text-gray-500">
+                Se a assinatura do técnico estiver errada, toque em Limpar, assine novamente e salve o laudo.
+              </p>
+            )}
           </div>
 
           {/* Gestor e Cliente: identificação + status, sem pad */}
@@ -1048,7 +1105,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
               {
                 key: 'gestor' as const,
                 title: 'Gestor / Supervisor',
-                signed: !!s.assinaturaGestor,
+                signed: hasManagerSignature,
                 fields: (
                   <>
                     <Input
@@ -1069,7 +1126,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
               {
                 key: 'usuario' as const,
                 title: 'Usuário / Cliente',
-                signed: !!s.assinaturaUsuario,
+                signed: hasUserSignature,
                 fields: (
                   <>
                     <Input
@@ -1136,7 +1193,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
             )}
           </div>
 
-          {draft?.id ? (
+          {draft?.id && !remoteSignaturesComplete ? (
             <div className="border-2 border-blue-200 rounded-md p-4 bg-blue-50/40 space-y-3">
               <div>
                 <h5 className="font-semibold text-blue-900 flex items-center gap-2">
@@ -1148,6 +1205,10 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
               </div>
               <SignatureLinksManager reportId={draft.id} />
             </div>
+          ) : draft?.id ? (
+            <p className="text-sm text-green-800 bg-green-50 border border-green-200 rounded p-3">
+              Gestor e Cliente já assinaram. Nenhum link pendente precisa ser gerado.
+            </p>
           ) : (
             <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded p-3">
               Salve o rascunho para liberar o envio de links de assinatura ao Gestor e ao Cliente.
