@@ -102,7 +102,11 @@ const SignaturePad: React.FC<Props> = ({ label, value, onChange, readOnly = fals
     if (!drawing) return;
     setDrawing(false);
     const c = canvasRef.current;
-    if (c) onChange(c.toDataURL('image/png'));
+    if (c) {
+      const dataUrl = c.toDataURL('image/png');
+      lastEmittedRef.current = dataUrl;
+      onChange(dataUrl);
+    }
   };
 
   const clear = () => {
@@ -113,6 +117,7 @@ const SignaturePad: React.FC<Props> = ({ label, value, onChange, readOnly = fals
     const ratio = window.devicePixelRatio || 1;
     ctx?.clearRect(0, 0, c.width / ratio, c.height / ratio);
     setHasDrawn(false);
+    lastEmittedRef.current = '';
     onChange('');
   };
 
