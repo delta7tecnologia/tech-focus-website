@@ -314,6 +314,54 @@ export type Database = {
         }
         Relationships: []
       }
+      report_signature_links: {
+        Row: {
+          created_at: string
+          created_by: string
+          expires_at: string
+          id: string
+          report_id: string
+          signature_data: string | null
+          signed_at: string | null
+          signed_ip: string | null
+          signer_email: string | null
+          signer_name: string | null
+          signer_role: string
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          expires_at?: string
+          id?: string
+          report_id: string
+          signature_data?: string | null
+          signed_at?: string | null
+          signed_ip?: string | null
+          signer_email?: string | null
+          signer_name?: string | null
+          signer_role: string
+          token: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          expires_at?: string
+          id?: string
+          report_id?: string
+          signature_data?: string | null
+          signed_at?: string | null
+          signed_ip?: string | null
+          signer_email?: string | null
+          signer_name?: string | null
+          signer_role?: string
+          token?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       services: {
         Row: {
           created_at: string

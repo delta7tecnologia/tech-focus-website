@@ -20,6 +20,7 @@ import {
 } from '@/utils/reportPdfAdvanced';
 import type { SituacaoHW } from '@/utils/reportNarrativeAdvanced';
 import SignaturePad from './SignaturePad';
+import SignatureLinksManager from './SignatureLinksManager';
 import PdfPreviewDialog from './PdfPreviewDialog';
 import type jsPDF from 'jspdf';
 import delta7Logo from '@/assets/delta7-logo.png';
@@ -1044,6 +1045,8 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
           </div>
         </CardContent>
       </Card>
+
+      {draft?.id && <SignatureLinksManager reportId={draft.id} />}
 
       <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
         <Button type="button" variant="outline" onClick={reset} disabled={generateMutation.isPending || saveDraftMutation.isPending}>
