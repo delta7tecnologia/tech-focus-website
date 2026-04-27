@@ -995,29 +995,91 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
               Laudo emitido: os dados do documento ficam preservados. Use esta área apenas para coletar assinaturas pendentes.
             </p>
           )}
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="space-y-2">
-              <SignaturePad label="Técnico Responsável" value={s.assinaturaTecnico}
-                onChange={(v) => update('assinaturaTecnico', v)} readOnly={!!s.assinaturaTecnico} />
-              <Input value={s.technicianName} disabled className="text-xs h-8" />
-            </div>
-            <div className="space-y-2">
-              <SignaturePad label="Gestor / Supervisor" value={s.assinaturaGestor}
-                onChange={(v) => update('assinaturaGestor', v)} readOnly={!!s.assinaturaGestor} />
-              <Input placeholder="Nome do gestor" value={s.gestorNome}
-                onChange={(e) => update('gestorNome', e.target.value)} className="text-xs h-8" />
-              <Input placeholder="Cargo" value={s.gestorCargo}
-                onChange={(e) => update('gestorCargo', e.target.value)} className="text-xs h-8" />
-            </div>
-            <div className="space-y-2">
-              <SignaturePad label="Usuário do Equipamento" value={s.assinaturaUsuario}
-                onChange={(v) => update('assinaturaUsuario', v)} readOnly={!!s.assinaturaUsuario} />
-              <Input placeholder="Nome do usuário" value={s.usuarioNome}
-                onChange={(e) => update('usuarioNome', e.target.value)} className="text-xs h-8" />
-              <Input placeholder="Matrícula" value={s.usuarioMatricula}
-                onChange={(e) => update('usuarioMatricula', e.target.value)} className="text-xs h-8" />
-            </div>
+
+          {/* Técnico assina aqui (presencial) */}
+          <div className="space-y-2">
+            <SignaturePad
+              label="Técnico Responsável (assina aqui)"
+              value={s.assinaturaTecnico}
+              onChange={(v) => update('assinaturaTecnico', v)}
+              readOnly={!!s.assinaturaTecnico}
+            />
+            <Input value={s.technicianName} disabled className="text-xs h-8" />
           </div>
+
+          {/* Gestor e Cliente: identificação + status, sem pad */}
+          <div className="grid md:grid-cols-2 gap-4">
+            {[
+              {
+                key: 'gestor' as const,
+                title: 'Gestor / Supervisor',
+                signed: !!s.assinaturaGestor,
+                fields: (
+                  <>
+                    <Input
+                      placeholder="Nome do gestor"
+                      value={s.gestorNome}
+                      onChange={(e) => update('gestorNome', e.target.value)}
+                      className="text-xs h-8"
+                    />
+                    <Input
+                      placeholder="Cargo"
+                      value={s.gestorCargo}
+                      onChange={(e) => update('gestorCargo', e.target.value)}
+                      className="text-xs h-8"
+                    />
+                  </>
+                ),
+              },
+              {
+                key: 'usuario' as const,
+                title: 'Usuário / Cliente',
+                signed: !!s.assinaturaUsuario,
+                fields: (
+                  <>
+                    <Input
+                      placeholder="Nome do usuário"
+                      value={s.usuarioNome}
+                      onChange={(e) => update('usuarioNome', e.target.value)}
+                      className="text-xs h-8"
+                    />
+                    <Input
+                      placeholder="Matrícula"
+                      value={s.usuarioMatricula}
+                      onChange={(e) => update('usuarioMatricula', e.target.value)}
+                      className="text-xs h-8"
+                    />
+                  </>
+                ),
+              },
+            ].map((card) => {
+              const entry = signatureHistory.find((h) => h.role === card.key);
+              return (
+                <div key={card.key} className="border rounded-md p-3 space-y-2 bg-gray-50/50">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-sm font-semibold text-gray-900">{card.title}</span>
+                    {card.signed ? (
+                      <span className="text-xs font-medium px-2 py-1 rounded bg-green-100 text-green-800 border border-green-200">
+                        ✓ Assinado{entry ? ` em ${formatSignatureDate(entry.signedAt)}` : ''}
+                      </span>
+                    ) : (
+                      <span className="text-xs font-medium px-2 py-1 rounded bg-amber-100 text-amber-800 border border-amber-200">
+                        Aguardando link
+                      </span>
+                    )}
+                  </div>
+                  <div className="space-y-2">{card.fields}</div>
+                  {!card.signed && (
+                    <p className="text-[11px] text-gray-500 flex items-center gap-1">
+                      <Link2 className="w-3 h-3" />
+                      A assinatura será coletada pelo link enviado abaixo.
+                    </p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
           <div className="border rounded-md overflow-hidden">
             <div className="px-3 py-2 bg-gray-50 border-b flex items-center justify-between gap-2">
               <span className="text-sm font-semibold text-gray-900">Histórico de assinaturas</span>
@@ -1038,6 +1100,25 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
               </div>
             )}
           </div>
+
+          {draft?.id ? (
+            <div className="border-2 border-blue-200 rounded-md p-4 bg-blue-50/40 space-y-3">
+              <div>
+                <h5 className="font-semibold text-blue-900 flex items-center gap-2">
+                  <Link2 className="w-4 h-4" /> Enviar para assinatura remota
+                </h5>
+                <p className="text-xs text-gray-600 mt-1">
+                  Gere e copie o link abaixo. Envie ao Gestor e ao Cliente para que assinem pelo celular ou computador. Os links expiram em 7 dias.
+                </p>
+              </div>
+              <SignatureLinksManager reportId={draft.id} />
+            </div>
+          ) : (
+            <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded p-3">
+              Salve o rascunho para liberar o envio de links de assinatura ao Gestor e ao Cliente.
+            </p>
+          )}
+
           <div>
             <Label>Observações finais</Label>
             <Textarea rows={3} value={s.observacoesFinais}
@@ -1045,8 +1126,6 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
           </div>
         </CardContent>
       </Card>
-
-      {draft?.id && <SignatureLinksManager reportId={draft.id} />}
 
       <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
         <Button type="button" variant="outline" onClick={reset} disabled={generateMutation.isPending || saveDraftMutation.isPending}>
