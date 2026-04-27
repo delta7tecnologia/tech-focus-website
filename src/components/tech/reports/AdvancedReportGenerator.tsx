@@ -605,6 +605,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
         </CardContent>
       </Card>
 
+      <fieldset disabled={isSavedReport} className={isSavedReport ? 'space-y-6 opacity-75' : 'space-y-6'}>
       {/* 1. Identificação */}
       <Card>
         <CardContent className="p-6 space-y-4">
@@ -982,6 +983,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
           )}
         </CardContent>
       </Card>
+      </fieldset>
 
       {/* 9. Assinaturas */}
       <Card>
