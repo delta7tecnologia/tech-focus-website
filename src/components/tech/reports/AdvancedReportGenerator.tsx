@@ -537,7 +537,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
         previousHash: draft?.integrity_hash,
         nextHash: integrityHash,
       });
-      const payload = buildPersistPayload(rNum, generatedAt, integrityHash, uploadedPhotos, true, nextHistory);
+      const payload = buildPersistPayload(rNum, generatedAt, integrityHash, uploadedPhotos, !isSavedReport, nextHistory);
       if (draftId) {
         const { error } = await supabase.from('technical_reports').update(payload).eq('id', draftId);
         if (error) throw error;
@@ -549,10 +549,13 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       setReportNumber(rNum);
       setPersistedForm(s);
       setSignatureHistory(nextHistory);
-      return { rNum, history: nextHistory };
+      return { rNum, history: nextHistory, savedAsIssued: isSavedReport };
     },
-    onSuccess: ({ rNum }) => {
-      toast({ title: 'Rascunho salvo', description: `Você pode continuar editando ${rNum} a qualquer momento.` });
+    onSuccess: ({ rNum, savedAsIssued }) => {
+      toast({
+        title: savedAsIssued ? 'Assinaturas salvas' : 'Rascunho salvo',
+        description: savedAsIssued ? `Assinaturas do laudo ${rNum} atualizadas.` : `Você pode continuar editando ${rNum} a qualquer momento.`,
+      });
       queryClient.invalidateQueries({ queryKey: ['technical-reports'] });
     },
     onError: (e: any) => {
