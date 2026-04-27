@@ -6,9 +6,10 @@ interface Props {
   label: string;
   value: string; // dataURL
   onChange: (dataUrl: string) => void;
+  readOnly?: boolean;
 }
 
-const SignaturePad: React.FC<Props> = ({ label, value, onChange }) => {
+const SignaturePad: React.FC<Props> = ({ label, value, onChange, readOnly = false }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [drawing, setDrawing] = useState(false);
   const [hasDrawn, setHasDrawn] = useState(!!value);
@@ -23,6 +24,8 @@ const SignaturePad: React.FC<Props> = ({ label, value, onChange }) => {
     c.height = rect.height * ratio;
     const ctx = c.getContext('2d');
     if (ctx) {
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, c.width, c.height);
       ctx.scale(ratio, ratio);
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
@@ -31,11 +34,16 @@ const SignaturePad: React.FC<Props> = ({ label, value, onChange }) => {
     }
     if (value) {
       const img = new Image();
-      img.onload = () => ctx?.drawImage(img, 0, 0, rect.width, rect.height);
+      img.onload = () => {
+        ctx?.clearRect(0, 0, rect.width, rect.height);
+        ctx?.drawImage(img, 0, 0, rect.width, rect.height);
+        setHasDrawn(true);
+      };
       img.src = value;
+    } else {
+      setHasDrawn(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [value]);
 
   const getPos = (e: React.MouseEvent | React.TouchEvent) => {
     const c = canvasRef.current!;
@@ -49,6 +57,7 @@ const SignaturePad: React.FC<Props> = ({ label, value, onChange }) => {
 
   const start = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
+    if (readOnly) return;
     const ctx = canvasRef.current?.getContext('2d');
     if (!ctx) return;
     const { x, y } = getPos(e);
@@ -58,7 +67,7 @@ const SignaturePad: React.FC<Props> = ({ label, value, onChange }) => {
   };
 
   const move = (e: React.MouseEvent | React.TouchEvent) => {
-    if (!drawing) return;
+    if (!drawing || readOnly) return;
     e.preventDefault();
     const ctx = canvasRef.current?.getContext('2d');
     if (!ctx) return;
@@ -76,6 +85,7 @@ const SignaturePad: React.FC<Props> = ({ label, value, onChange }) => {
   };
 
   const clear = () => {
+    if (readOnly) return;
     const c = canvasRef.current;
     if (!c) return;
     const ctx = c.getContext('2d');
@@ -89,9 +99,9 @@ const SignaturePad: React.FC<Props> = ({ label, value, onChange }) => {
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium text-gray-700">{label}</span>
-        <Button type="button" variant="ghost" size="sm" onClick={clear} className="h-7 px-2 text-xs">
+        {!readOnly && <Button type="button" variant="ghost" size="sm" onClick={clear} className="h-7 px-2 text-xs">
           <Eraser className="w-3 h-3 mr-1" /> Limpar
-        </Button>
+        </Button>}
       </div>
       <canvas
         ref={canvasRef}
@@ -104,7 +114,7 @@ const SignaturePad: React.FC<Props> = ({ label, value, onChange }) => {
         onTouchMove={move}
         onTouchEnd={end}
       />
-      {!hasDrawn && (
+      {!hasDrawn && !readOnly && (
         <p className="text-xs text-gray-400 text-center -mt-1">Assine com o mouse ou dedo</p>
       )}
     </div>
