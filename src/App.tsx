@@ -29,6 +29,7 @@ import AdminTechnicians from "./pages/admin/AdminTechnicians";
 import AdminFaq from "./pages/admin/AdminFaq";
 import AdminAssets from "./pages/admin/AdminAssets";
 import AdminFiles from "./pages/admin/AdminFiles";
+import AdminReports from "./pages/admin/AdminReports";
 
 const queryClient = new QueryClient();
 
