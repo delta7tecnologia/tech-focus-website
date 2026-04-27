@@ -172,7 +172,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       const ident = draft.triagem?.identificacao || {};
       const conc = draft.conclusao || {};
       const ass = conc.assinaturas || {};
-      setS({
+      const nextState = {
         patrimonio: fd.patrimonio ?? ident.patrimonio ?? '',
         marca: fd.marca ?? ident.marca ?? '',
         modelo: fd.modelo ?? ident.modelo ?? '',
@@ -195,14 +195,17 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
         parecerTexto: fd.parecerTexto ?? conc.parecerTexto ?? '',
         recomendacoes: fd.recomendacoes ?? conc.recomendacoes ?? [{ texto: '', responsavel: '', prazo: '' }],
         observacoesFinais: fd.observacoesFinais ?? conc.observacoesFinais ?? '',
-        assinaturaTecnico: fd.assinaturaTecnico ?? '',
-        assinaturaGestor: fd.assinaturaGestor ?? '',
-        assinaturaUsuario: fd.assinaturaUsuario ?? '',
+        assinaturaTecnico: fd.assinaturaTecnico ?? ass.assinaturaTecnico ?? '',
+        assinaturaGestor: fd.assinaturaGestor ?? ass.assinaturaGestor ?? '',
+        assinaturaUsuario: fd.assinaturaUsuario ?? ass.assinaturaUsuario ?? '',
         gestorNome: fd.gestorNome ?? ass.gestorNome ?? '',
         gestorCargo: fd.gestorCargo ?? ass.gestorCargo ?? '',
         usuarioNome: fd.usuarioNome ?? ass.usuarioNome ?? '',
         usuarioMatricula: fd.usuarioMatricula ?? ass.usuarioMatricula ?? '',
-      });
+      };
+      setS(nextState);
+      setPersistedForm(nextState);
+      setSignatureHistory(normalizeSignatureHistory(draft.signature_history));
       setDraftId(draft.id);
       setReportNumber(draft.report_number);
       const loaded: PhotoState[] = [];
