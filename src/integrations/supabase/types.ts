@@ -283,6 +283,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          can_edit_reports: boolean
           created_at: string
           email: string
           full_name: string | null
@@ -292,6 +293,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          can_edit_reports?: boolean
           created_at?: string
           email: string
           full_name?: string | null
@@ -301,6 +303,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          can_edit_reports?: boolean
           created_at?: string
           email?: string
           full_name?: string | null
