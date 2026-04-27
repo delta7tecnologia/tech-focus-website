@@ -393,7 +393,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
     return out;
   };
 
-  const buildPersistPayload = (rNum: string, generatedAt: string, integrityHash: string, uploadedPhotos: any[], isDraft: boolean) => {
+  const buildPersistPayload = (rNum: string, generatedAt: string, integrityHash: string, uploadedPhotos: any[], isDraft: boolean, history = signatureHistory) => {
     const equipmentLabel = [s.marca, s.modelo, s.patrimonio ? `SN: ${s.patrimonio}` : '']
       .filter(Boolean).join(' ') || 'Equipamento sem identificação';
     const triagem = {
@@ -436,6 +436,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       generated_at: generatedAt,
       is_draft: isDraft,
       form_data: s,
+      signature_history: history,
     };
   };
 
