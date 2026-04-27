@@ -156,10 +156,9 @@ const ReportList: React.FC<Props> = ({ onEditDraft }) => {
           parecerTexto: conc.parecerTexto || '',
           recomendacoes: conc.recomendacoes || [],
           observacoesFinais: conc.observacoesFinais || '',
-          // Assinaturas não são re-baixadas (não persistidas como dataURL)
-          assinaturaTecnico: '',
-          assinaturaGestor: '',
-          assinaturaUsuario: '',
+          assinaturaTecnico: r.form_data?.assinaturaTecnico || ass.assinaturaTecnico || '',
+          assinaturaGestor: r.form_data?.assinaturaGestor || ass.assinaturaGestor || '',
+          assinaturaUsuario: r.form_data?.assinaturaUsuario || ass.assinaturaUsuario || '',
           gestorNome: ass.gestorNome || '',
           gestorCargo: ass.gestorCargo || '',
           usuarioNome: ass.usuarioNome || '',
