@@ -79,12 +79,14 @@ const ReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
     queryFn: async () => {
       const { data } = await supabase
         .from('profiles').select('full_name').eq('user_id', user!.id).single();
-      if (data?.full_name && !form.technicianName) {
+      // Só preenche o nome do técnico em laudos NOVOS (sem draft).
+      // Ao editar laudo de outra pessoa, mantém o técnico responsável original.
+      if (data?.full_name && !form.technicianName && !draft) {
         setForm((prev) => ({ ...prev, technicianName: data.full_name as string }));
       }
       return data;
     },
-    enabled: !!user,
+    enabled: !!user && !draft,
   });
 
   const { data: existingCompanies = [] } = useQuery({
