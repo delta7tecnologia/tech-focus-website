@@ -1012,7 +1012,20 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       <Card>
         <CardContent className="p-6 space-y-4">
           <h4 className="font-semibold text-blue-900 border-l-4 border-blue-900 pl-3">9. Assinaturas digitais</h4>
-          {isSavedReport && (
+          {allSignaturesComplete && (
+            <div className="flex items-start gap-3 rounded-md border border-green-300 bg-green-50 p-3">
+              <FileCheck2 className="w-5 h-5 text-green-700 mt-0.5 shrink-0" />
+              <div className="space-y-0.5">
+                <p className="text-sm font-semibold text-green-900">
+                  ✓ Todas as assinaturas foram concluídas
+                </p>
+                <p className="text-xs text-green-800">
+                  Técnico, Gestor e Cliente já assinaram o laudo {reportNumber}. O documento está pronto para emissão final.
+                </p>
+              </div>
+            </div>
+          )}
+          {isSavedReport && !allSignaturesComplete && (
             <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded p-3">
               Laudo emitido: os dados do documento ficam preservados. Use esta área apenas para coletar assinaturas pendentes.
             </p>
