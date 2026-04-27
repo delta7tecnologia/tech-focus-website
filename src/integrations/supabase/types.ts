@@ -420,6 +420,7 @@ export type Database = {
           photos: Json
           report_number: string
           report_type: string
+          signature_history: Json
           status_final: string
           technician_name: string
           triagem: Json
@@ -440,6 +441,7 @@ export type Database = {
           photos?: Json
           report_number: string
           report_type?: string
+          signature_history?: Json
           status_final?: string
           technician_name: string
           triagem?: Json
@@ -460,6 +462,7 @@ export type Database = {
           photos?: Json
           report_number?: string
           report_type?: string
+          signature_history?: Json
           status_final?: string
           technician_name?: string
           triagem?: Json
