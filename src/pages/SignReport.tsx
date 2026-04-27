@@ -73,14 +73,17 @@ const SignReport = () => {
         updatedSignatures.gestorNome = name;
       }
 
-      const history = normalizeSignatureHistory(report.signature_history);
+      const existingHistory = normalizeSignatureHistory(report.signature_history);
       const nextHistory = appendSignatureHistory({
-        history,
-        signerName: name,
-        roleLabel: ROLE_LABEL[link.signer_role] || link.signer_role,
+        previousForm: signatures,
+        nextForm: updatedSignatures,
+        existingHistory,
+        reportNumber: report.report_number,
         signedAt: now,
-        source: 'remote-link',
-      } as any);
+        technicianName: report.technician_name,
+        previousHash: report.integrity_hash,
+        nextHash: report.integrity_hash,
+      });
 
       const { error: updErr } = await supabase
         .from('technical_reports')
