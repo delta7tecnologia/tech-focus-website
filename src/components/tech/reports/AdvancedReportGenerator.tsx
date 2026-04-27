@@ -416,6 +416,9 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
         tecnico: !!s.assinaturaTecnico,
         gestor: !!s.assinaturaGestor,
         usuario: !!s.assinaturaUsuario,
+        assinaturaTecnico: s.assinaturaTecnico,
+        assinaturaGestor: s.assinaturaGestor,
+        assinaturaUsuario: s.assinaturaUsuario,
         gestorNome: s.gestorNome, gestorCargo: s.gestorCargo,
         usuarioNome: s.usuarioNome, usuarioMatricula: s.usuarioMatricula,
       },
@@ -436,7 +439,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       generated_at: generatedAt,
       is_draft: isDraft,
       form_data: s,
-      signature_history: history,
+      signature_history: history as any,
     };
   };
 
