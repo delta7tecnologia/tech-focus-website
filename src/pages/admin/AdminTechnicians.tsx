@@ -34,6 +34,7 @@ interface Profile {
   email: string;
   full_name: string | null;
   is_approved: boolean;
+  can_edit_reports?: boolean;
   created_at: string;
 }
 
