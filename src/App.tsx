@@ -16,6 +16,7 @@ import AreaTecnica from "./pages/AreaTecnica";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
 import SignReport from "./pages/SignReport";
+import SignServiceOrder from "./pages/SignServiceOrder";
 
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminSetup from "./pages/admin/AdminSetup";
@@ -31,6 +32,7 @@ import AdminFaq from "./pages/admin/AdminFaq";
 import AdminAssets from "./pages/admin/AdminAssets";
 import AdminFiles from "./pages/admin/AdminFiles";
 import AdminReports from "./pages/admin/AdminReports";
+import AdminServiceOrders from "./pages/admin/AdminServiceOrders";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +54,7 @@ const App = () => (
             <Route path="/area-tecnica" element={<AreaTecnica />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/assinar/:token" element={<SignReport />} />
+            <Route path="/assinar-os/:token" element={<SignServiceOrder />} />
             
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
@@ -67,6 +70,7 @@ const App = () => (
               <Route path="patrimonios" element={<AdminAssets />} />
               <Route path="arquivos" element={<AdminFiles />} />
               <Route path="laudos" element={<AdminReports />} />
+              <Route path="ordens-servico" element={<AdminServiceOrders />} />
               <Route path="configuracoes" element={<AdminSettings />} />
             </Route>
             
