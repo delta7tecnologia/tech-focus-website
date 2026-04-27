@@ -172,6 +172,23 @@ const AdminTechnicians = () => {
     },
   });
 
+  const toggleEditReports = useMutation({
+    mutationFn: async ({ userId, canEdit }: { userId: string; canEdit: boolean }) => {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ can_edit_reports: canEdit } as any)
+        .eq('user_id', userId);
+      if (error) throw error;
+    },
+    onSuccess: (_, { canEdit }) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-technicians'] });
+      toast({ title: canEdit ? 'Permissão de editar laudos concedida!' : 'Permissão de editar laudos removida!' });
+    },
+    onError: (error: any) => {
+      toast({ title: 'Erro', description: error.message, variant: 'destructive' });
+    },
+  });
+
   const updateProfile = useMutation({
     mutationFn: async ({ userId, full_name, email }: { userId: string; full_name: string; email: string }) => {
       const { error } = await supabase
