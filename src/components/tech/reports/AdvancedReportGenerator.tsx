@@ -1002,7 +1002,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
               label="Técnico Responsável (assina aqui)"
               value={s.assinaturaTecnico}
               onChange={(v) => update('assinaturaTecnico', v)}
-              readOnly={!!s.assinaturaTecnico}
+              readOnly={isSavedReport}
             />
             <Input value={s.technicianName} disabled className="text-xs h-8" />
           </div>
