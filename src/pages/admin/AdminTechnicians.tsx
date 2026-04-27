@@ -264,16 +264,34 @@ const AdminTechnicians = () => {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between flex-wrap gap-4">
                   <div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-semibold">{p.full_name || 'Sem nome'}</span>
                       <Badge variant={p.is_approved ? 'default' : 'secondary'}>
                         {p.is_approved ? 'Aprovado' : 'Pendente'}
                       </Badge>
+                      {p.can_edit_reports && (
+                        <Badge variant="outline" className="border-blue-600 text-blue-700">
+                          <FileEdit className="w-3 h-3 mr-1" /> Edita Laudos
+                        </Badge>
+                      )}
                     </div>
                     <p className="text-sm text-gray-500">{p.email}</p>
                     <p className="text-xs text-gray-400 mt-1">
                       Cadastrado em {new Date(p.created_at).toLocaleDateString('pt-BR')}
                     </p>
+                    <div className="flex items-center gap-2 mt-3">
+                      <Switch
+                        id={`edit-reports-${p.user_id}`}
+                        checked={!!p.can_edit_reports}
+                        disabled={!p.is_approved || toggleEditReports.isPending}
+                        onCheckedChange={(checked) =>
+                          toggleEditReports.mutate({ userId: p.user_id, canEdit: checked })
+                        }
+                      />
+                      <Label htmlFor={`edit-reports-${p.user_id}`} className="text-sm text-gray-600 cursor-pointer">
+                        Permitir editar laudos de outros técnicos
+                      </Label>
+                    </div>
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
                     <Button
