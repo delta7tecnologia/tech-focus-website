@@ -237,7 +237,7 @@ const ReportList: React.FC<Props> = ({ onEditDraft }) => {
                   </p>
                 </div>
                 <div className="flex gap-1 flex-shrink-0">
-                  {onEditDraft && (r.created_by === user?.id || isAdmin) && (
+                  {onEditDraft && (r.created_by === user?.id || isAdmin || canEditReports) && (
                     <Button size="sm" variant="outline" className="text-blue-900" onClick={() => onEditDraft(r)}>
                       <Pencil className="w-4 h-4 mr-1" /> {r.is_draft ? 'Continuar' : 'Editar'}
                     </Button>
