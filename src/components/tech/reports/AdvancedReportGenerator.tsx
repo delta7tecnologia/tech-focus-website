@@ -75,6 +75,7 @@ const REDE_OPCOES = ['Funcional', 'Instável', 'Sem acesso à rede', 'N/A'];
 
 interface DraftReport {
   id: string;
+  created_by?: string;
   report_number: string;
   technician_name: string;
   company_name: string;
@@ -426,7 +427,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
     return {
       report_number: rNum,
       report_type: 'equipamento',
-      created_by: user!.id,
+      created_by: draft?.created_by || user!.id,
       technician_name: s.technicianName || 'Não informado',
       company_name: s.companyName || 'Rascunho',
       equipment: equipmentLabel,
