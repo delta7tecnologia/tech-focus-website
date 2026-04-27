@@ -11,10 +11,10 @@ interface Props {
 
 const SignaturePad: React.FC<Props> = ({ label, value, onChange, readOnly = false }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [drawing, setDrawing] = useState(false);
   const [hasDrawn, setHasDrawn] = useState(!!value);
 
   const lastEmittedRef = useRef<string>('');
+  const drawingRef = useRef(false);
 
   useEffect(() => {
     const c = canvasRef.current;
@@ -66,29 +66,26 @@ const SignaturePad: React.FC<Props> = ({ label, value, onChange, readOnly = fals
     lastEmittedRef.current = value;
   }, [value]);
 
-  const getPos = (e: React.MouseEvent | React.TouchEvent) => {
+  const getPos = (e: React.PointerEvent<HTMLCanvasElement>) => {
     const c = canvasRef.current!;
     const rect = c.getBoundingClientRect();
-    if ('touches' in e) {
-      const t = e.touches[0] || e.changedTouches[0];
-      return { x: t.clientX - rect.left, y: t.clientY - rect.top };
-    }
-    return { x: (e as React.MouseEvent).clientX - rect.left, y: (e as React.MouseEvent).clientY - rect.top };
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
   };
 
-  const start = (e: React.MouseEvent | React.TouchEvent) => {
+  const start = (e: React.PointerEvent<HTMLCanvasElement>) => {
     e.preventDefault();
     if (readOnly) return;
+    e.currentTarget.setPointerCapture(e.pointerId);
     const ctx = canvasRef.current?.getContext('2d');
     if (!ctx) return;
     const { x, y } = getPos(e);
     ctx.beginPath();
     ctx.moveTo(x, y);
-    setDrawing(true);
+    drawingRef.current = true;
   };
 
-  const move = (e: React.MouseEvent | React.TouchEvent) => {
-    if (!drawing || readOnly) return;
+  const move = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!drawingRef.current || readOnly) return;
     e.preventDefault();
     const ctx = canvasRef.current?.getContext('2d');
     if (!ctx) return;
@@ -98,9 +95,13 @@ const SignaturePad: React.FC<Props> = ({ label, value, onChange, readOnly = fals
     setHasDrawn(true);
   };
 
-  const end = () => {
-    if (!drawing) return;
-    setDrawing(false);
+  const end = (e?: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!drawingRef.current) return;
+    e?.preventDefault();
+    if (e?.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+    drawingRef.current = false;
     const c = canvasRef.current;
     if (c) {
       const dataUrl = c.toDataURL('image/png');
@@ -111,6 +112,7 @@ const SignaturePad: React.FC<Props> = ({ label, value, onChange, readOnly = fals
 
   const clear = () => {
     if (readOnly) return;
+    drawingRef.current = false;
     const c = canvasRef.current;
     if (!c) return;
     const ctx = c.getContext('2d');
