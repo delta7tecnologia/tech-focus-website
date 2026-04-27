@@ -24,6 +24,13 @@ import PdfPreviewDialog from './PdfPreviewDialog';
 import type jsPDF from 'jspdf';
 import delta7Logo from '@/assets/delta7-logo.png';
 import { detectExternalProvider } from '../UploadOrLinkInput';
+import {
+  appendSignatureHistory,
+  formatSignatureDate,
+  getDocumentVersion,
+  normalizeSignatureHistory,
+  type SignatureHistoryEntry,
+} from '@/utils/reportSignatures';
 
 interface PhotoState extends AdvancedPhoto {
   id: string;
@@ -68,6 +75,7 @@ const REDE_OPCOES = ['Funcional', 'Instável', 'Sem acesso à rede', 'N/A'];
 
 interface DraftReport {
   id: string;
+  created_by?: string;
   report_number: string;
   technician_name: string;
   company_name: string;
@@ -76,6 +84,10 @@ interface DraftReport {
   conclusao: any;
   photos: any;
   form_data: any;
+  is_draft?: boolean;
+  generated_at?: string;
+  integrity_hash?: string;
+  signature_history?: any;
 }
 
 interface Props {
@@ -148,6 +160,11 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewPdf, setPreviewPdf] = useState<jsPDF | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
+  const [persistedForm, setPersistedForm] = useState<any>(null);
+  const [signatureHistory, setSignatureHistory] = useState<SignatureHistoryEntry[]>([]);
+
+  const isSavedReport = !!draft && draft.is_draft === false;
+  const documentVersion = getDocumentVersion(signatureHistory);
 
   useEffect(() => {
     const load = async () => {
@@ -156,7 +173,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       const ident = draft.triagem?.identificacao || {};
       const conc = draft.conclusao || {};
       const ass = conc.assinaturas || {};
-      setS({
+      const nextState = {
         patrimonio: fd.patrimonio ?? ident.patrimonio ?? '',
         marca: fd.marca ?? ident.marca ?? '',
         modelo: fd.modelo ?? ident.modelo ?? '',
@@ -179,14 +196,17 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
         parecerTexto: fd.parecerTexto ?? conc.parecerTexto ?? '',
         recomendacoes: fd.recomendacoes ?? conc.recomendacoes ?? [{ texto: '', responsavel: '', prazo: '' }],
         observacoesFinais: fd.observacoesFinais ?? conc.observacoesFinais ?? '',
-        assinaturaTecnico: fd.assinaturaTecnico ?? '',
-        assinaturaGestor: fd.assinaturaGestor ?? '',
-        assinaturaUsuario: fd.assinaturaUsuario ?? '',
+        assinaturaTecnico: fd.assinaturaTecnico ?? ass.assinaturaTecnico ?? '',
+        assinaturaGestor: fd.assinaturaGestor ?? ass.assinaturaGestor ?? '',
+        assinaturaUsuario: fd.assinaturaUsuario ?? ass.assinaturaUsuario ?? '',
         gestorNome: fd.gestorNome ?? ass.gestorNome ?? '',
         gestorCargo: fd.gestorCargo ?? ass.gestorCargo ?? '',
         usuarioNome: fd.usuarioNome ?? ass.usuarioNome ?? '',
         usuarioMatricula: fd.usuarioMatricula ?? ass.usuarioMatricula ?? '',
-      });
+      };
+      setS(nextState);
+      setPersistedForm(nextState);
+      setSignatureHistory(normalizeSignatureHistory(draft.signature_history));
       setDraftId(draft.id);
       setReportNumber(draft.report_number);
       const loaded: PhotoState[] = [];
@@ -374,7 +394,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
     return out;
   };
 
-  const buildPersistPayload = (rNum: string, generatedAt: string, integrityHash: string, uploadedPhotos: any[], isDraft: boolean) => {
+  const buildPersistPayload = (rNum: string, generatedAt: string, integrityHash: string, uploadedPhotos: any[], isDraft: boolean, history = signatureHistory) => {
     const equipmentLabel = [s.marca, s.modelo, s.patrimonio ? `SN: ${s.patrimonio}` : '']
       .filter(Boolean).join(' ') || 'Equipamento sem identificação';
     const triagem = {
@@ -397,6 +417,9 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
         tecnico: !!s.assinaturaTecnico,
         gestor: !!s.assinaturaGestor,
         usuario: !!s.assinaturaUsuario,
+        assinaturaTecnico: s.assinaturaTecnico,
+        assinaturaGestor: s.assinaturaGestor,
+        assinaturaUsuario: s.assinaturaUsuario,
         gestorNome: s.gestorNome, gestorCargo: s.gestorCargo,
         usuarioNome: s.usuarioNome, usuarioMatricula: s.usuarioMatricula,
       },
@@ -404,7 +427,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
     return {
       report_number: rNum,
       report_type: 'equipamento',
-      created_by: user!.id,
+      created_by: draft?.created_by || user!.id,
       technician_name: s.technicianName || 'Não informado',
       company_name: s.companyName || 'Rascunho',
       equipment: equipmentLabel,
@@ -417,6 +440,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       generated_at: generatedAt,
       is_draft: isDraft,
       form_data: s,
+      signature_history: history as any,
     };
   };
 
@@ -430,7 +454,17 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
         s.technicianName || 'rascunho',
         generatedAt,
       );
-      const payload = buildPersistPayload(rNum, generatedAt, integrityHash, uploadedPhotos, true);
+      const nextHistory = appendSignatureHistory({
+        previousForm: persistedForm,
+        nextForm: s,
+        existingHistory: signatureHistory,
+        reportNumber: rNum,
+        signedAt: generatedAt,
+        technicianName: s.technicianName,
+        previousHash: draft?.integrity_hash,
+        nextHash: integrityHash,
+      });
+      const payload = buildPersistPayload(rNum, generatedAt, integrityHash, uploadedPhotos, true, nextHistory);
       if (draftId) {
         const { error } = await supabase.from('technical_reports').update(payload).eq('id', draftId);
         if (error) throw error;
@@ -440,10 +474,12 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
         setDraftId(data.id);
       }
       setReportNumber(rNum);
-      return rNum;
+      setPersistedForm(s);
+      setSignatureHistory(nextHistory);
+      return { rNum, history: nextHistory };
     },
-    onSuccess: (num) => {
-      toast({ title: 'Rascunho salvo', description: `Você pode continuar editando ${num} a qualquer momento.` });
+    onSuccess: ({ rNum }) => {
+      toast({ title: 'Rascunho salvo', description: `Você pode continuar editando ${rNum} a qualquer momento.` });
       queryClient.invalidateQueries({ queryKey: ['technical-reports'] });
     },
     onError: (e: any) => {
@@ -473,7 +509,17 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       );
 
       const uploadedPhotos = await ensureUploadedPhotos(rNum);
-      const payload = buildPersistPayload(rNum, generatedAt, integrityHash, uploadedPhotos, false);
+      const nextHistory = appendSignatureHistory({
+        previousForm: persistedForm,
+        nextForm: s,
+        existingHistory: signatureHistory,
+        reportNumber: rNum,
+        signedAt: generatedAt,
+        technicianName: s.technicianName,
+        previousHash: draft?.integrity_hash,
+        nextHash: integrityHash,
+      });
+      const payload = buildPersistPayload(rNum, generatedAt, integrityHash, uploadedPhotos, false, nextHistory);
 
       if (draftId) {
         const { error } = await supabase.from('technical_reports').update(payload).eq('id', draftId);
@@ -484,6 +530,8 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
         setDraftId(data.id);
       }
       setReportNumber(rNum);
+      setPersistedForm(s);
+      setSignatureHistory(nextHistory);
 
       const data: AdvancedReportData = {
         reportNumber: rNum, generatedAt, technicianName: s.technicianName,
@@ -557,6 +605,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
         </CardContent>
       </Card>
 
+      <fieldset disabled={isSavedReport} className={isSavedReport ? 'space-y-6 opacity-75' : 'space-y-6'}>
       {/* 1. Identificação */}
       <Card>
         <CardContent className="p-6 space-y-4">
@@ -585,7 +634,12 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
             </div>
             <div>
               <Label>Técnico Responsável *</Label>
-              <Input value={s.technicianName} onChange={(e) => update('technicianName', e.target.value)} />
+              <Input
+                value={s.technicianName}
+                onChange={(e) => update('technicianName', e.target.value)}
+                disabled={isSavedReport}
+              />
+              {isSavedReport && <p className="text-xs text-gray-500 mt-1">Laudo já emitido: o responsável original não pode ser alterado.</p>}
             </div>
             <div>
               <Label>Patrimônio / Nº de Série</Label>
@@ -929,20 +983,26 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
           )}
         </CardContent>
       </Card>
+      </fieldset>
 
       {/* 9. Assinaturas */}
       <Card>
         <CardContent className="p-6 space-y-4">
           <h4 className="font-semibold text-blue-900 border-l-4 border-blue-900 pl-3">9. Assinaturas digitais</h4>
+          {isSavedReport && (
+            <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded p-3">
+              Laudo emitido: os dados do documento ficam preservados. Use esta área apenas para coletar assinaturas pendentes.
+            </p>
+          )}
           <div className="grid md:grid-cols-3 gap-6">
             <div className="space-y-2">
               <SignaturePad label="Técnico Responsável" value={s.assinaturaTecnico}
-                onChange={(v) => update('assinaturaTecnico', v)} />
+                onChange={(v) => update('assinaturaTecnico', v)} readOnly={!!s.assinaturaTecnico} />
               <Input value={s.technicianName} disabled className="text-xs h-8" />
             </div>
             <div className="space-y-2">
               <SignaturePad label="Gestor / Supervisor" value={s.assinaturaGestor}
-                onChange={(v) => update('assinaturaGestor', v)} />
+                onChange={(v) => update('assinaturaGestor', v)} readOnly={!!s.assinaturaGestor} />
               <Input placeholder="Nome do gestor" value={s.gestorNome}
                 onChange={(e) => update('gestorNome', e.target.value)} className="text-xs h-8" />
               <Input placeholder="Cargo" value={s.gestorCargo}
@@ -950,12 +1010,32 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
             </div>
             <div className="space-y-2">
               <SignaturePad label="Usuário do Equipamento" value={s.assinaturaUsuario}
-                onChange={(v) => update('assinaturaUsuario', v)} />
+                onChange={(v) => update('assinaturaUsuario', v)} readOnly={!!s.assinaturaUsuario} />
               <Input placeholder="Nome do usuário" value={s.usuarioNome}
                 onChange={(e) => update('usuarioNome', e.target.value)} className="text-xs h-8" />
               <Input placeholder="Matrícula" value={s.usuarioMatricula}
                 onChange={(e) => update('usuarioMatricula', e.target.value)} className="text-xs h-8" />
             </div>
+          </div>
+          <div className="border rounded-md overflow-hidden">
+            <div className="px-3 py-2 bg-gray-50 border-b flex items-center justify-between gap-2">
+              <span className="text-sm font-semibold text-gray-900">Histórico de assinaturas</span>
+              <span className="text-xs text-gray-500">Versão atual: v{documentVersion}</span>
+            </div>
+            {signatureHistory.length === 0 ? (
+              <p className="text-sm text-gray-500 p-3">Nenhuma assinatura registrada neste laudo.</p>
+            ) : (
+              <div className="divide-y">
+                {signatureHistory.map((item) => (
+                  <div key={item.id} className="p-3 text-sm grid sm:grid-cols-4 gap-2">
+                    <div className="font-medium text-gray-900">{item.signerName}</div>
+                    <div className="text-gray-600">{item.roleLabel}</div>
+                    <div className="text-gray-600">{formatSignatureDate(item.signedAt)}</div>
+                    <div className="text-gray-600">v{item.versionBefore} → v{item.versionAfter}</div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <div>
             <Label>Observações finais</Label>
