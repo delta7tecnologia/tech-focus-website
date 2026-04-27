@@ -1087,9 +1087,13 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
               label="Técnico Responsável (assina aqui)"
               value={s.assinaturaTecnico}
               onChange={(v) => update('assinaturaTecnico', v)}
-              readOnly={isSavedReport}
             />
             <Input value={s.technicianName} disabled className="text-xs h-8" />
+            {isSavedReport && (
+              <p className="text-xs text-gray-500">
+                Se a assinatura do técnico estiver errada, toque em Limpar, assine novamente e salve o laudo.
+              </p>
+            )}
           </div>
 
           {/* Gestor e Cliente: identificação + status, sem pad */}
@@ -1098,7 +1102,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
               {
                 key: 'gestor' as const,
                 title: 'Gestor / Supervisor',
-                signed: !!s.assinaturaGestor,
+                signed: hasManagerSignature,
                 fields: (
                   <>
                     <Input
@@ -1119,7 +1123,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
               {
                 key: 'usuario' as const,
                 title: 'Usuário / Cliente',
-                signed: !!s.assinaturaUsuario,
+                signed: hasUserSignature,
                 fields: (
                   <>
                     <Input
@@ -1186,7 +1190,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
             )}
           </div>
 
-          {draft?.id ? (
+          {draft?.id && !remoteSignaturesComplete ? (
             <div className="border-2 border-blue-200 rounded-md p-4 bg-blue-50/40 space-y-3">
               <div>
                 <h5 className="font-semibold text-blue-900 flex items-center gap-2">
@@ -1198,6 +1202,10 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
               </div>
               <SignatureLinksManager reportId={draft.id} />
             </div>
+          ) : draft?.id ? (
+            <p className="text-sm text-green-800 bg-green-50 border border-green-200 rounded p-3">
+              Gestor e Cliente já assinaram. Nenhum link pendente precisa ser gerado.
+            </p>
           ) : (
             <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded p-3">
               Salve o rascunho para liberar o envio de links de assinatura ao Gestor e ao Cliente.
