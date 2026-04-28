@@ -917,7 +917,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       </Card>
 
       {/* 4. Diagnóstico de problemas */}
-      <Card>
+      <Card style={{ display: sectionVisible(4) ? undefined : 'none' }}>
         <CardContent className="p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h4 className="font-semibold text-blue-900 border-l-4 border-blue-900 pl-3">4. Diagnóstico de problemas</h4>
