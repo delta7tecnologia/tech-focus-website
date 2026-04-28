@@ -478,6 +478,33 @@ export async function generateAdvancedReportPdf(report: AdvancedReportData): Pro
 
   try {
     const target = container.firstElementChild as HTMLElement;
+
+    // Anti-quebra do rodapé: medir e empurrar para a próxima página caso seja cortado
+    const pageWidthMM = 210;
+    const pageHeightMM = 297;
+    const targetWidthPx = target.offsetWidth;
+    const pxPerMM = targetWidthPx / pageWidthMM;
+    const pageHeightPx = pageHeightMM * pxPerMM;
+
+    const footer = target.querySelector('#report-footer-block') as HTMLElement | null;
+    if (footer) {
+      const footerTop = footer.offsetTop;
+      const footerHeight = footer.offsetHeight;
+      const footerBottom = footerTop + footerHeight;
+      const startPage = Math.floor(footerTop / pageHeightPx);
+      const endPage = Math.floor((footerBottom - 1) / pageHeightPx);
+      if (endPage > startPage) {
+        // Empurra o rodapé para iniciar na próxima página
+        const nextPageStart = (startPage + 1) * pageHeightPx;
+        const extraPx = nextPageStart - footerTop + 8; // pequena folga
+        const extraMM = extraPx / pxPerMM;
+        footer.style.marginTop = `${24 + extraMM * (pageWidthMM / pageWidthMM)}px`;
+        // recalcular usando px direto:
+        footer.style.marginTop = `${parseFloat(footer.style.marginTop) || 0}px`;
+        footer.style.marginTop = `${extraPx + 24}px`;
+      }
+    }
+
     const canvas = await html2canvas(target, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
     const pdf = new jsPDF('p', 'mm', 'a4');
     const pageWidth = pdf.internal.pageSize.getWidth();
