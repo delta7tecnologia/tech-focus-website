@@ -584,7 +584,25 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
     },
   });
 
-  const generateMutation = useMutation({
+  // Auto-save: a cada 30s salva rascunho silenciosamente se houve mudanças
+  useEffect(() => {
+    if (isSavedReport) return; // não auto-salva laudo emitido
+    if (!s.companyName.trim() && !s.patrimonio.trim() && !s.modelo.trim()) return;
+    const interval = setInterval(async () => {
+      if (!dirtyRef.current || saveDraftMutation.isPending) return;
+      try {
+        setAutoSaveStatus('saving');
+        await saveDraftMutation.mutateAsync();
+        dirtyRef.current = false;
+        setAutoSaveStatus('saved');
+        setLastSavedAt(new Date());
+      } catch {
+        setAutoSaveStatus('error');
+      }
+    }, 30000);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSavedReport, s.companyName, s.patrimonio, s.modelo]);
     mutationFn: async () => {
       if (!s.companyName.trim()) throw new Error('Informe o cliente / empresa.');
       if (!s.patrimonio.trim() && !s.modelo.trim()) throw new Error('Informe ao menos patrimônio/Nº de série ou modelo.');
