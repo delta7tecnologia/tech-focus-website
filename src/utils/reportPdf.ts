@@ -228,6 +228,25 @@ export async function generateReportPdf(report: ReportData): Promise<jsPDF> {
 
   try {
     const target = container.firstElementChild as HTMLElement;
+
+    // Anti-quebra do rodapé com QR Code: empurra para a próxima página se for cortado
+    const pageWidthMM = 210;
+    const pageHeightMM = 297;
+    const pxPerMM = target.offsetWidth / pageWidthMM;
+    const pageHeightPx = pageHeightMM * pxPerMM;
+    const footer = target.querySelector('#report-footer-block') as HTMLElement | null;
+    if (footer) {
+      const footerTop = footer.offsetTop;
+      const footerBottom = footerTop + footer.offsetHeight;
+      const startPage = Math.floor(footerTop / pageHeightPx);
+      const endPage = Math.floor((footerBottom - 1) / pageHeightPx);
+      if (endPage > startPage) {
+        const nextPageStart = (startPage + 1) * pageHeightPx;
+        const extraPx = nextPageStart - footerTop + 8;
+        footer.style.marginTop = `${extraPx + 32}px`;
+      }
+    }
+
     const canvas = await html2canvas(target, {
       scale: 2,
       useCORS: true,
