@@ -451,11 +451,29 @@ function buildHtml(r: AdvancedReportData): string {
 }
 
 export async function generateAdvancedReportPdf(report: AdvancedReportData): Promise<jsPDF> {
+  // Gera QR Code apontando para a URL pública de validação
+  const validationUrl = report.validationUrl
+    || `${window.location.origin}/validar-laudo/${report.integrityHash}`;
+  let qrCodeDataUrl = report.qrCodeDataUrl;
+  if (!qrCodeDataUrl) {
+    try {
+      qrCodeDataUrl = await QRCode.toDataURL(validationUrl, {
+        margin: 1,
+        width: 220,
+        errorCorrectionLevel: 'M',
+        color: { dark: '#1e3a8a', light: '#ffffff' },
+      });
+    } catch (e) {
+      console.error('Falha ao gerar QR Code:', e);
+    }
+  }
+  const enriched: AdvancedReportData = { ...report, qrCodeDataUrl, validationUrl };
+
   const container = document.createElement('div');
   container.style.position = 'fixed';
   container.style.left = '-10000px';
   container.style.top = '0';
-  container.innerHTML = buildHtml(report);
+  container.innerHTML = buildHtml(enriched);
   document.body.appendChild(container);
 
   try {
