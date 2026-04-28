@@ -1316,22 +1316,18 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
         </CardContent>
       </Card>
 
-      <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
-        <Button type="button" variant="outline" onClick={reset} disabled={generateMutation.isPending || saveDraftMutation.isPending}>
-          <RotateCcw className="w-4 h-4 mr-2" /> Limpar
-        </Button>
-        <Button type="button" variant="outline"
-          onClick={() => saveDraftMutation.mutate()}
-          disabled={saveDraftMutation.isPending || generateMutation.isPending}>
-          {saveDraftMutation.isPending
-            ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Salvando...</>
-            : <><Save className="w-4 h-4 mr-2" /> Salvar rascunho</>}
-        </Button>
-        <Button type="button" className="bg-blue-900 hover:bg-blue-800"
-          onClick={handleGenerate} disabled={generateMutation.isPending || saveDraftMutation.isPending}>
-          {generateMutation.isPending
-            ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Gerando...</>
-            : <><Eye className="w-4 h-4 mr-2" /> Pré-visualizar e gerar PDF</>}
+      </ReportWizardShell>
+
+      <div className="flex justify-center pt-2">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={reset}
+          disabled={generateMutation.isPending || saveDraftMutation.isPending}
+          className="text-gray-500"
+        >
+          <RotateCcw className="w-3.5 h-3.5 mr-2" /> Limpar formulário e iniciar novo laudo
         </Button>
       </div>
       <p className="text-xs text-gray-400 text-center flex items-center justify-center gap-1">
