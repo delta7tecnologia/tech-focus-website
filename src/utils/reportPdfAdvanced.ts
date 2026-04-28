@@ -1,4 +1,5 @@
 import jsPDF from 'jspdf';
+import QRCode from 'qrcode';
 import html2canvas from 'html2canvas';
 import { escapeHtml } from './reportNarrative';
 import { DELTA7_LOGO_DATA_URL } from '@/assets/delta7LogoBase64';
