@@ -1053,7 +1053,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       </Card>
 
       {/* 8. Fotos */}
-      <Card>
+      <Card style={{ display: sectionVisible(8) ? undefined : 'none' }}>
         <CardContent className="p-6 space-y-4">
           <div className="flex items-center justify-between gap-2 flex-wrap">
             <h4 className="font-semibold text-blue-900 border-l-4 border-blue-900 pl-3">8. Evidências fotográficas</h4>
