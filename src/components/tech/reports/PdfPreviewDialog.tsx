@@ -37,7 +37,7 @@ const PdfPreviewDialog: React.FC<Props> = ({ open, onOpenChange, pdf, fileName, 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-6xl w-[95vw] h-[92vh] p-0 flex flex-col gap-0">
-        <DialogHeader className="px-4 py-3 border-b flex flex-row items-center justify-between space-y-0">
+        <DialogHeader className="px-4 py-3 pr-12 border-b flex flex-row items-center justify-between space-y-0">
           <DialogTitle className="text-base">Pré-visualização do laudo — {fileName}</DialogTitle>
           <div className="flex items-center gap-2">
             <Button size="sm" variant="outline" onClick={() => setZoom((z) => Math.max(50, z - 25))} disabled={!blobUrl}>
