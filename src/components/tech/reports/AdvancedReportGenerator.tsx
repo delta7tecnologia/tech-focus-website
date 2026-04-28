@@ -722,6 +722,58 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
         </CardContent>
       </Card>
 
+      <ReportWizardShell
+        currentStep={currentStep}
+        onStepChange={setCurrentStep}
+        isLocked={isSavedReport}
+        documentVersion={documentVersion}
+        reportNumber={reportNumber}
+        autoSaveStatus={autoSaveStatus}
+        lastSavedAt={lastSavedAt}
+        finalizationPanel={
+          <ReportFinalizationPanel
+            items={[
+              { label: 'Cliente / Empresa preenchido', ok: !!s.companyName.trim(), required: true, hint: 'Volte à etapa Identificação.' },
+              { label: 'Equipamento identificado (patrimônio ou modelo)', ok: !!(s.patrimonio.trim() || s.modelo.trim()), required: true, hint: 'Informe ao menos um destes campos.' },
+              { label: 'Técnico responsável definido', ok: !!s.technicianName.trim(), required: true },
+              { label: 'Parecer conclusivo selecionado', ok: !!s.parecer, required: true, hint: 'Etapa Diagnóstico → seção Parecer.' },
+              { label: 'Justificativa do parecer descrita', ok: !!s.parecerTexto.trim(), required: false },
+              { label: 'Pelo menos uma evidência anexada', ok: photos.length > 0, required: false, hint: 'Etapa Evidências.' },
+              { label: 'Assinatura do técnico coletada', ok: hasTechnicianSignature, required: true, hint: 'Assine no painel ao lado.' },
+              { label: 'Assinatura do gestor (presencial ou link)', ok: hasManagerSignature, required: false, hint: 'Pode ser coletada após emissão pelo link remoto.' },
+              { label: 'Assinatura do cliente (presencial ou link)', ok: hasUserSignature, required: false, hint: 'Pode ser coletada após emissão pelo link remoto.' },
+            ]}
+            isLocked={isSavedReport}
+            isGenerating={generateMutation.isPending}
+            isSavingDraft={saveDraftMutation.isPending}
+            canFinalize={
+              !!s.companyName.trim() &&
+              !!(s.patrimonio.trim() || s.modelo.trim()) &&
+              !!s.technicianName.trim() &&
+              !!s.parecer &&
+              hasTechnicianSignature
+            }
+            onSaveDraft={() => saveDraftMutation.mutate()}
+            onFinalize={handleGenerate}
+            reportNumber={reportNumber}
+          />
+        }
+        bottomActions={
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => saveDraftMutation.mutate()}
+            disabled={isSavedReport || saveDraftMutation.isPending || generateMutation.isPending}
+            className="hidden sm:inline-flex"
+          >
+            {saveDraftMutation.isPending ? (
+              <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Salvando...</>
+            ) : (
+              <><Save className="w-4 h-4 mr-2" /> Salvar rascunho</>
+            )}
+          </Button>
+        }
+      >
       <fieldset disabled={isSavedReport} className={isSavedReport ? 'space-y-6 opacity-75' : 'space-y-6'}>
       {/* 1. Identificação */}
       <Card style={{ display: sectionVisible(1) ? undefined : 'none' }}>
