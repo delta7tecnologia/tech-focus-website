@@ -180,6 +180,16 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
   const remoteSignaturesComplete = hasManagerSignature && hasUserSignature;
   const allSignaturesNotifiedRef = useRef(false);
 
+  // ===== Wizard / auto-save / checklist =====
+  const [currentStep, setCurrentStep] = useState<number>(1);
+  const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
+  const dirtyRef = useRef(false);
+  const lastSerializedRef = useRef<string>('');
+
+  const sectionVisible = (section: number) =>
+    REPORT_STEPS[currentStep - 1]?.sections.includes(section) ?? false;
+
   useEffect(() => {
     // Notifica uma única vez quando todas as 3 assinaturas estiverem prontas
     if (allSignaturesComplete && !allSignaturesNotifiedRef.current && isSavedReport) {
