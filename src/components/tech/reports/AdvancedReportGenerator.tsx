@@ -204,6 +204,15 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
     }
   }, [allSignaturesComplete, isSavedReport, reportNumber]);
 
+  // Marca como "sujo" quando o estado muda
+  useEffect(() => {
+    const serialized = JSON.stringify(s);
+    if (lastSerializedRef.current && lastSerializedRef.current !== serialized) {
+      dirtyRef.current = true;
+    }
+    lastSerializedRef.current = serialized;
+  }, [s]);
+
   useEffect(() => {
     const load = async () => {
       if (!draft) return;
