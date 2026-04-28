@@ -180,16 +180,26 @@ function buildHtml(r: ReportData): string {
   </div>
   ` : ''}
 
-  <!-- Rodapé com hash -->
+  <!-- Rodapé com hash + QR Code -->
   <div style="margin-top: 32px; padding-top: 12px; border-top: 2px solid #1e3a8a;">
-    <div style="font-size: 9px; color: #64748b; margin-bottom: 4px;">
-      <strong>Hash de integridade SHA-256:</strong>
-    </div>
-    <div style="font-family: 'Courier New', monospace; font-size: 9px; color: #1e3a8a; word-break: break-all; background: #f1f5f9; padding: 6px; border-radius: 3px;">
-      ${r.integrityHash}
-    </div>
-    <div style="font-size: 9px; color: #94a3b8; text-align: center; margin-top: 8px; font-style: italic;">
-      Este documento possui integridade garantida pela hash de segurança da plataforma Delta7.
+    <div style="display: flex; gap: 16px; align-items: flex-start;">
+      <div style="flex-shrink: 0; text-align: center;">
+        ${r.qrCodeDataUrl ? `<img src="${r.qrCodeDataUrl}" alt="QR Validação" style="width: 110px; height: 110px; display: block; border: 1px solid #cbd5e1; padding: 4px; background: white;" />` : ''}
+        <div style="font-size: 8px; color: #1e3a8a; font-weight: 700; margin-top: 4px;">VALIDAR DOCUMENTO</div>
+        <div style="font-size: 7px; color: #64748b; max-width: 110px;">Escaneie para verificar autenticidade</div>
+      </div>
+      <div style="flex: 1; min-width: 0;">
+        <div style="font-size: 9px; color: #64748b; margin-bottom: 4px;">
+          <strong>Hash de integridade SHA-256:</strong>
+        </div>
+        <div style="font-family: 'Courier New', monospace; font-size: 9px; color: #1e3a8a; word-break: break-all; background: #f1f5f9; padding: 6px; border-radius: 3px;">
+          ${r.integrityHash}
+        </div>
+        ${r.validationUrl ? `<div style="font-size: 8px; color: #475569; margin-top: 6px; word-break: break-all;"><strong>Link de validação:</strong> ${r.validationUrl}</div>` : ''}
+        <div style="font-size: 9px; color: #94a3b8; margin-top: 8px; font-style: italic;">
+          Documento com integridade garantida pela plataforma Delta7. Verifique pelo QR Code ou link acima.
+        </div>
+      </div>
     </div>
   </div>
 </div>`;
