@@ -21,14 +21,35 @@ const ValidateReport = () => {
   const { data: report, isLoading, error } = useQuery({
     queryKey: ['validate-report', hash],
     queryFn: async () => {
-      if (!hash) throw new Error('Hash não informado');
-      const { data, error } = await supabase
+      if (!hash) throw new Error('Hash não informada');
+      const cleanHash = hash.trim().toLowerCase().replace(/[^a-f0-9]/g, '');
+      if (cleanHash.length < 16) {
+        throw new Error('Hash inválida ou muito curta. Verifique o link recebido.');
+      }
+
+      // 1) Tenta correspondência exata
+      let { data, error } = await supabase
         .from('technical_reports')
         .select('*')
-        .eq('integrity_hash', hash)
+        .eq('integrity_hash', cleanHash)
         .maybeSingle();
       if (error) throw error;
-      if (!data) throw new Error('Laudo não encontrado para esta hash');
+
+      // 2) Se vier truncada (ex.: link cortado no PDF/QR), busca por prefixo
+      if (!data && cleanHash.length < 64) {
+        const { data: rows, error: e2 } = await supabase
+          .from('technical_reports')
+          .select('*')
+          .like('integrity_hash', `${cleanHash}%`)
+          .limit(2);
+        if (e2) throw e2;
+        if (rows && rows.length === 1) data = rows[0];
+        else if (rows && rows.length > 1) {
+          throw new Error('Hash parcial corresponde a múltiplos laudos. Use o link completo.');
+        }
+      }
+
+      if (!data) throw new Error('Nenhum laudo encontrado para esta hash de validação.');
       return data;
     },
     enabled: !!hash,
