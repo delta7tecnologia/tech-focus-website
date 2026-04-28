@@ -603,6 +603,8 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
     return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSavedReport, s.companyName, s.patrimonio, s.modelo]);
+
+  const generateMutation = useMutation({
     mutationFn: async () => {
       if (!s.companyName.trim()) throw new Error('Informe o cliente / empresa.');
       if (!s.patrimonio.trim() && !s.modelo.trim()) throw new Error('Informe ao menos patrimônio/Nº de série ou modelo.');
