@@ -56,6 +56,7 @@ const App = () => (
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/assinar/:token" element={<SignReport />} />
             <Route path="/assinar-os/:token" element={<SignServiceOrder />} />
+            <Route path="/validar-laudo/:hash" element={<ValidateReport />} />
             
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
