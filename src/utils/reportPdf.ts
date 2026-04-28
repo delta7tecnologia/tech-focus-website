@@ -206,11 +206,24 @@ function buildHtml(r: ReportData): string {
 }
 
 export async function generateReportPdf(report: ReportData): Promise<jsPDF> {
+  const validationUrl = report.validationUrl
+    || `${window.location.origin}/validar-laudo/${report.integrityHash}`;
+  let qrCodeDataUrl = report.qrCodeDataUrl;
+  if (!qrCodeDataUrl) {
+    try {
+      qrCodeDataUrl = await QRCode.toDataURL(validationUrl, {
+        margin: 1, width: 220, errorCorrectionLevel: 'M',
+        color: { dark: '#1e3a8a', light: '#ffffff' },
+      });
+    } catch (e) { console.error('QR error', e); }
+  }
+  const enriched: ReportData = { ...report, qrCodeDataUrl, validationUrl };
+
   const container = document.createElement('div');
   container.style.position = 'fixed';
   container.style.left = '-10000px';
   container.style.top = '0';
-  container.innerHTML = buildHtml(report);
+  container.innerHTML = buildHtml(enriched);
   document.body.appendChild(container);
 
   try {
