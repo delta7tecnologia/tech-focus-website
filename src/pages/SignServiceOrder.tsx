@@ -189,4 +189,14 @@ const SignServiceOrder = () => {
   );
 };
 
+const QRBadge: React.FC<{ url: string }> = ({ url }) => {
+  const [src, setSrc] = useState('');
+  useEffect(() => {
+    QRCode.toDataURL(url, { margin: 1, width: 120, color: { dark: '#1e3a8a', light: '#ffffff' } })
+      .then(setSrc).catch(() => {});
+  }, [url]);
+  if (!src) return null;
+  return <img src={src} alt="QR validação" className="w-16 h-16 border border-blue-200 rounded bg-white p-1" />;
+};
+
 export default SignServiceOrder;
