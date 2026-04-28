@@ -76,6 +76,9 @@ export interface AdvancedReportData {
   usuarioMatricula: string;
   // Hash
   integrityHash: string;
+  // Validação por QR Code
+  qrCodeDataUrl?: string;
+  validationUrl?: string;
 }
 
 const fmtDateTime = (iso: string) =>
