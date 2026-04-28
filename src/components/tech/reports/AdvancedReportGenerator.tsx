@@ -990,7 +990,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       </Card>
 
       {/* 6. Parecer */}
-      <Card>
+      <Card style={{ display: sectionVisible(6) ? undefined : 'none' }}>
         <CardContent className="p-6 space-y-4">
           <h4 className="font-semibold text-blue-900 border-l-4 border-blue-900 pl-3">6. Parecer conclusivo</h4>
           <div>
