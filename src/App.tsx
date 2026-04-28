@@ -16,6 +16,7 @@ import AreaTecnica from "./pages/AreaTecnica";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
 import SignReport from "./pages/SignReport";
+import ValidateReport from "./pages/ValidateReport";
 import SignServiceOrder from "./pages/SignServiceOrder";
 
 import AdminLogin from "./pages/admin/AdminLogin";
@@ -55,6 +56,7 @@ const App = () => (
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/assinar/:token" element={<SignReport />} />
             <Route path="/assinar-os/:token" element={<SignServiceOrder />} />
+            <Route path="/validar-laudo/:hash" element={<ValidateReport />} />
             
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
