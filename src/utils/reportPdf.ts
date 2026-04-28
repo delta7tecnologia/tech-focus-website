@@ -39,6 +39,8 @@ export interface ReportData {
   };
   photos: ReportPhoto[];
   integrityHash: string;
+  qrCodeDataUrl?: string;
+  validationUrl?: string;
 }
 
 const formatDateTime = (iso: string) =>
