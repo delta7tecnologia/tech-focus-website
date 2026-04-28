@@ -1017,7 +1017,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       </Card>
 
       {/* 7. Recomendações */}
-      <Card>
+      <Card style={{ display: sectionVisible(7) ? undefined : 'none' }}>
         <CardContent className="p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h4 className="font-semibold text-blue-900 border-l-4 border-blue-900 pl-3">7. Recomendações e providências</h4>
