@@ -22,6 +22,8 @@ import type { SituacaoHW } from '@/utils/reportNarrativeAdvanced';
 import SignaturePad from './SignaturePad';
 import SignatureLinksManager from './SignatureLinksManager';
 import PdfPreviewDialog from './PdfPreviewDialog';
+import ReportWizardShell, { REPORT_STEPS } from './ReportWizardShell';
+import ReportFinalizationPanel, { type ChecklistItem } from './ReportFinalizationPanel';
 import type jsPDF from 'jspdf';
 import delta7Logo from '@/assets/delta7-logo.png';
 import { detectExternalProvider } from '../UploadOrLinkInput';
