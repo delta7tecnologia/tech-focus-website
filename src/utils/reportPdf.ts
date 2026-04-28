@@ -180,8 +180,8 @@ function buildHtml(r: ReportData): string {
   </div>
   ` : ''}
 
-  <!-- Rodapé com hash + QR Code -->
-  <div style="margin-top: 32px; padding-top: 12px; border-top: 2px solid #1e3a8a;">
+  <!-- Rodapé com hash + QR Code (não pode quebrar entre páginas) -->
+  <div id="report-footer-block" style="margin-top: 32px; padding-top: 12px; border-top: 2px solid #1e3a8a; break-inside: avoid; page-break-inside: avoid; -webkit-column-break-inside: avoid;">
     <div style="display: flex; gap: 16px; align-items: flex-start;">
       <div style="flex-shrink: 0; text-align: center;">
         ${r.qrCodeDataUrl ? `<img src="${r.qrCodeDataUrl}" alt="QR Validação" style="width: 110px; height: 110px; display: block; border: 1px solid #cbd5e1; padding: 4px; background: white;" />` : ''}
@@ -228,6 +228,25 @@ export async function generateReportPdf(report: ReportData): Promise<jsPDF> {
 
   try {
     const target = container.firstElementChild as HTMLElement;
+
+    // Anti-quebra do rodapé com QR Code: empurra para a próxima página se for cortado
+    const pageWidthMM = 210;
+    const pageHeightMM = 297;
+    const pxPerMM = target.offsetWidth / pageWidthMM;
+    const pageHeightPx = pageHeightMM * pxPerMM;
+    const footer = target.querySelector('#report-footer-block') as HTMLElement | null;
+    if (footer) {
+      const footerTop = footer.offsetTop;
+      const footerBottom = footerTop + footer.offsetHeight;
+      const startPage = Math.floor(footerTop / pageHeightPx);
+      const endPage = Math.floor((footerBottom - 1) / pageHeightPx);
+      if (endPage > startPage) {
+        const nextPageStart = (startPage + 1) * pageHeightPx;
+        const extraPx = nextPageStart - footerTop + 8;
+        footer.style.marginTop = `${extraPx + 32}px`;
+      }
+    }
+
     const canvas = await html2canvas(target, {
       scale: 2,
       useCORS: true,
