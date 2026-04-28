@@ -50,9 +50,6 @@ const PdfPreviewDialog: React.FC<Props> = ({ open, onOpenChange, pdf, fileName, 
             <Button size="sm" className="bg-blue-900 hover:bg-blue-800" onClick={handleDownload} disabled={!blobUrl}>
               <Download className="w-4 h-4 mr-1" /> Baixar PDF
             </Button>
-            <Button size="sm" variant="ghost" onClick={() => onOpenChange(false)}>
-              <X className="w-4 h-4" />
-            </Button>
           </div>
         </DialogHeader>
         <div className="flex-1 bg-gray-200 overflow-hidden">
@@ -62,12 +59,25 @@ const PdfPreviewDialog: React.FC<Props> = ({ open, onOpenChange, pdf, fileName, 
               <p className="text-sm">Gerando pré-visualização...</p>
             </div>
           ) : (
-            <iframe
+            <object
               key={`${blobUrl}-${zoom}`}
-              src={iframeSrc}
-              title="Preview PDF"
-              className="w-full h-full border-0"
-            />
+              data={iframeSrc}
+              type="application/pdf"
+              className="w-full h-full"
+              aria-label="Pré-visualização do PDF"
+            >
+              <div className="h-full flex flex-col items-center justify-center gap-3 text-gray-600 p-6 text-center">
+                <p className="text-sm">Seu navegador não conseguiu exibir o PDF embutido.</p>
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline" asChild>
+                    <a href={blobUrl} target="_blank" rel="noopener noreferrer">Abrir em nova aba</a>
+                  </Button>
+                  <Button size="sm" className="bg-blue-900 hover:bg-blue-800" onClick={handleDownload}>
+                    <Download className="w-4 h-4 mr-1" /> Baixar PDF
+                  </Button>
+                </div>
+              </div>
+            </object>
           )}
         </div>
         <p className="text-xs text-gray-500 text-center py-2 border-t bg-white">
