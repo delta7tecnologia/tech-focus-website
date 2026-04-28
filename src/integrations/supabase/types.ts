@@ -415,6 +415,7 @@ export type Database = {
       }
       service_orders: {
         Row: {
+          audit_log: Json
           checkin_accuracy: number | null
           checkin_at: string | null
           checkin_lat: number | null
@@ -435,8 +436,10 @@ export type Database = {
           id: string
           integrity_hash: string | null
           is_draft: boolean
+          locked: boolean
           materials: Json
           os_number: string
+          os_seq: number | null
           requested_by: string | null
           requested_by_role: string | null
           scheduled_at: string | null
@@ -455,6 +458,7 @@ export type Database = {
           visit_type: string
         }
         Insert: {
+          audit_log?: Json
           checkin_accuracy?: number | null
           checkin_at?: string | null
           checkin_lat?: number | null
@@ -475,8 +479,10 @@ export type Database = {
           id?: string
           integrity_hash?: string | null
           is_draft?: boolean
+          locked?: boolean
           materials?: Json
           os_number: string
+          os_seq?: number | null
           requested_by?: string | null
           requested_by_role?: string | null
           scheduled_at?: string | null
@@ -495,6 +501,7 @@ export type Database = {
           visit_type?: string
         }
         Update: {
+          audit_log?: Json
           checkin_accuracy?: number | null
           checkin_at?: string | null
           checkin_lat?: number | null
@@ -515,8 +522,10 @@ export type Database = {
           id?: string
           integrity_hash?: string | null
           is_draft?: boolean
+          locked?: boolean
           materials?: Json
           os_number?: string
+          os_seq?: number | null
           requested_by?: string | null
           requested_by_role?: string | null
           scheduled_at?: string | null

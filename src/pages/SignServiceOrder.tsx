@@ -9,6 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Loader2, FileSignature, CheckCircle2, XCircle, ShieldCheck, MapPin } from 'lucide-react';
 import SignaturePad from '@/components/tech/reports/SignaturePad';
 import delta7Logo from '@/assets/delta7-logo.png';
+import QRCode from 'qrcode';
 
 const ROLE_LABEL: Record<string, string> = {
   responsavel: 'Responsável no local',
@@ -128,9 +129,16 @@ const SignServiceOrder = () => {
                 <MapPin className="w-3 h-3" /> Check-in {new Date(os.checkin_at).toLocaleString('pt-BR')}
               </div>
             )}
-            <div className="bg-blue-50 border border-blue-200 rounded p-3 text-xs text-blue-900 flex items-start gap-2">
+            <div className="bg-blue-50 border border-blue-200 rounded p-3 text-xs text-blue-900 flex items-start gap-3">
               <ShieldCheck className="w-4 h-4 flex-shrink-0 mt-0.5" />
-              <div><strong>Documento autêntico.</strong> Hash: <code className="break-all">{os.integrity_hash}</code></div>
+              <div className="flex-1">
+                <strong>Documento autêntico.</strong>
+                <div className="mt-1">Hash: <code className="break-all">{os.integrity_hash}</code></div>
+                <a href={`/validar-os/${os.integrity_hash}`} target="_blank" rel="noopener noreferrer" className="underline mt-1 inline-block">
+                  Verificar autenticidade →
+                </a>
+              </div>
+              <QRBadge url={`${window.location.origin}/validar-os/${os.integrity_hash}`} />
             </div>
           </CardContent>
         </Card>
@@ -179,6 +187,16 @@ const SignServiceOrder = () => {
       </div>
     </div>
   );
+};
+
+const QRBadge: React.FC<{ url: string }> = ({ url }) => {
+  const [src, setSrc] = useState('');
+  useEffect(() => {
+    QRCode.toDataURL(url, { margin: 1, width: 120, color: { dark: '#1e3a8a', light: '#ffffff' } })
+      .then(setSrc).catch(() => {});
+  }, [url]);
+  if (!src) return null;
+  return <img src={src} alt="QR validação" className="w-16 h-16 border border-blue-200 rounded bg-white p-1" />;
 };
 
 export default SignServiceOrder;

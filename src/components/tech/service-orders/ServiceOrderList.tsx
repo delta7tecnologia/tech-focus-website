@@ -78,6 +78,11 @@ const ServiceOrderList: React.FC<Props> = ({ onEdit }) => {
     try {
       const evs: SOEvidence[] = [];
       for (const ev of (o.evidences || [])) {
+        if (ev.kind && ev.kind !== 'image') {
+          const { data: signed } = await supabase.storage.from('service-order-photos').createSignedUrl(ev.path, 60 * 60 * 24 * 7);
+          evs.push({ dataUrl: '', caption: ev.caption || '', external: true, externalUrl: signed?.signedUrl, kind: ev.kind, fileName: ev.fileName });
+          continue;
+        }
         const { data } = await supabase.storage.from('service-order-photos').download(ev.path);
         if (data) {
           const dataUrl = await new Promise<string>((res, rej) => {
@@ -115,6 +120,7 @@ const ServiceOrderList: React.FC<Props> = ({ onEdit }) => {
         signatureData: o.signature_data || '',
         signedAt: o.signed_at || '',
         integrityHash: o.integrity_hash || '',
+        auditLog: o.audit_log || [],
       });
     } catch (e: any) {
       toast({ title: 'Erro ao baixar', description: e.message, variant: 'destructive' });

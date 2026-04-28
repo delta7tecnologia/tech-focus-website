@@ -1,40 +1,108 @@
-## Problema
 
-A seção **"9. Assinaturas digitais"** do formulário do laudo mostra hoje os 3 campos de assinatura (Técnico, Gestor, Usuário/Cliente) lado a lado dentro do gerador. Isso está errado porque:
+# Implementação completa das melhorias de Ordem de Serviço
 
-- Gestor e Usuário (cliente) **não estão presentes** no momento em que o técnico preenche o laudo.
-- Eles devem assinar **remotamente, pelo link** gerado em "SignatureLinksManager".
-- Manter os pads visíveis no formulário do técnico confunde (parece que ele precisa coletar assinatura na hora) e ainda permite que ele assine no lugar do cliente.
+Vou implementar todos os 10 itens em uma única entrega, organizados por área técnica.
 
-## Solução
+## 1. Banco de dados (migration)
 
-Reorganizar a seção 9 para deixar claro o fluxo:
+- Adicionar coluna `os_seq bigserial` em `service_orders` para numeração sequencial (`OS-2026-000123`)
+- Adicionar coluna `audit_log jsonb default '[]'` para log de reaberturas/edições pós-emissão
+- Adicionar coluna `locked boolean default false` (true após emissão; só admin pode destravar)
+- Nova RLS pública por `integrity_hash` (anon SELECT quando hash não-nulo) — espelho de `technical_reports`
+- Ajustar RLS de UPDATE: bloquear edição quando `locked=true` exceto admin
+- Trigger `service_orders_set_seq` para preencher `os_seq` antes do insert
+- Trigger `service_orders_lock_on_finalize` que seta `locked=true` quando `is_draft` muda para false e injeta entrada no `audit_log`
 
-1. **Apenas o Técnico assina no formulário** (presencial, ele é quem está usando o sistema).
-2. **Gestor e Usuário/Cliente** aparecem como **cards informativos** mostrando:
-   - Nome/cargo (campos de texto continuam, para identificação)
-   - Status: "Aguardando assinatura via link" / "Assinado em DD/MM/AAAA"
-   - Sem `SignaturePad` visível.
-3. O bloco **"Enviar links de assinatura"** (`SignatureLinksManager`) ganha destaque logo abaixo, com instrução clara: *"Copie e envie o link para Gestor e Cliente assinarem remotamente."*
-4. Após todos assinarem (técnico + links), o laudo é travado (lógica já existente é mantida).
+## 2. Página pública de validação por QR Code
 
-## Mudanças
+- Nova rota `/validar-os/:hash` em `App.tsx`
+- Nova página `src/pages/ValidateServiceOrder.tsx`:
+  - Busca por hash exato e fallback para hash parcial (≥16 chars)
+  - Mostra: nº OS, cliente, técnico, datas, check-in/out (com link Maps), status, resumo, assinaturas (presencial + remotas), hash, audit log
+  - Botão "Baixar PDF original" reusando `downloadServiceOrderPdf`
+  - Aviso destacado se houver entradas no `audit_log` (documento foi reaberto/editado após emissão)
 
-### `src/components/tech/reports/AdvancedReportGenerator.tsx`
-- Na seção 9, manter apenas o `SignaturePad` do **Técnico Responsável**.
-- Substituir os pads de Gestor e Usuário por **cards de status** com:
-  - Inputs de nome/cargo/matrícula (mantidos para identificação).
-  - Badge de status puxado de `signatureHistory` (Pendente / Assinado).
-  - Texto: "A assinatura será coletada pelo link enviado."
-- Reposicionar `SignatureLinksManager` dentro da própria seção 9, com título "Enviar para assinatura remota".
+## 3. PDF aprimorado (`serviceOrderPdf.ts`)
 
-### Sem mudanças em
-- `SignReport.tsx` (página pública do link continua igual).
-- Banco de dados / migrations.
-- `SignaturePad.tsx`.
+- Gerar QR Code com lib `qrcode` (já instalada) apontando para `/validar-os/{hash}`
+- Inserir QR + hash + assinaturas dentro de `<div id="so-footer-block">` com lógica anti-quebra de página (idêntica ao `reportPdfAdvanced.ts`)
+- Renderizar evidências em chunks (máx 6 por "página lógica") com `page-break-before` entre elas
+- Substituir link de Maps por QR Code menor que aponta para o Maps do check-in
 
-## Resultado para o usuário
+## 4. Validação visual antes de finalizar (`ServiceOrderForm.tsx`)
 
-- Técnico vê apenas o pad dele para assinar.
-- Para Gestor e Cliente, ele apenas confere o nome e copia/envia o link.
-- Quando os assinantes terminam pelo link, o status atualiza nos cards e o laudo trava automaticamente.
+- Bloco "Checklist para finalizar" sempre visível com ícones ✅/⬜:
+  - Cliente, Endereço, Resumo, ≥1 evidência, Check-in registrado, Assinatura (presencial OU link remoto assinado)
+- Botão "Finalizar OS" mostra tooltip com itens pendentes quando desabilitado
+- Ao clicar em Finalizar sem check-out, captura check-out automaticamente
+
+## 5. UX em campo (mobile-first)
+
+- Wizard de 5 etapas com tabs: Identificação → Visita (check-in/out) → Atendimento → Evidências → Assinatura
+- Botões grandes "🟢 Iniciar visita" / "🔴 Encerrar visita" no topo de cada etapa
+- **Auto-save** a cada 30s do rascunho via `useEffect` + debounce
+- `<input multiple>` para enviar várias fotos de uma vez
+- Compressão client-side (canvas → JPEG 0.85, max 1600px) antes do upload — utilitário novo `src/utils/compressImage.ts`
+
+## 6. Numeração sequencial
+
+- Função client `nextOsNumber()` removida; o backend gera via trigger usando `os_seq`
+- Form mostra `OS-AAAA-NNNNNN` baseado na sequência (após primeiro save)
+- Compatibilidade: OS antigas mantêm seu `os_number` original
+
+## 7. Anexos além de fotos
+
+- Input aceita `image/*,application/pdf,video/mp4` até 20MB
+- Estrutura `evidences` ganha `kind: 'image' | 'file' | 'video'`
+- Thumbnail genérica para PDFs/vídeos com nome do arquivo
+- No PDF: anexos não-imagem aparecem como "📎 [nome] — link assinado de 7 dias"
+
+## 8. Notificações por e-mail
+
+- Botão "Enviar por e-mail" no `SOSignatureLinksManager` (quando `signer_email` preenchido)
+- Nova edge function `send-os-signature-link/index.ts` (template pt-BR, usa `notify.delta7tecnologia.com.br`)
+- Trigger pós-assinatura: edge function `notify-os-signed` envia e-mail ao técnico criador com link do PDF
+- Validação CORS, JWT em código, rate limit simples por IP
+
+## 9. Filtros e métricas no Admin
+
+- `AdminServiceOrders.tsx` ganha:
+  - 4 cards no topo: OS em aberto, Emitidas no mês, KM total, Tempo médio (h)
+  - Filtros: técnico (select), período (date range), status, tipo de visita
+  - Botão "Exportar CSV" (gera no client com `papaparse` ou string manual)
+
+## 10. Correções de lógica
+
+- `signed_at` setado **apenas uma vez** na primeira assinatura (verificar `draft?.signed_at`)
+- Status `concluido` mantido quando re-salvando OS já finalizada (não voltar para `em_andamento`)
+- `SignServiceOrder.tsx` ganha QR Code do hash logo abaixo do "Documento autêntico"
+- Evidence cleanup ao deletar OS (já existe, validar)
+
+---
+
+## Estrutura de arquivos
+
+**Novos:**
+- `src/pages/ValidateServiceOrder.tsx`
+- `src/utils/compressImage.ts`
+- `src/components/tech/service-orders/ServiceOrderWizard.tsx` (wrapper de etapas)
+- `src/components/tech/service-orders/ServiceOrderFinalizeChecklist.tsx`
+- `src/components/admin/ServiceOrdersMetrics.tsx`
+- `supabase/functions/send-os-signature-link/index.ts`
+- `supabase/functions/notify-os-signed/index.ts`
+- `supabase/migrations/<timestamp>_so_improvements.sql`
+
+**Editados:**
+- `src/App.tsx` — nova rota `/validar-os/:hash`
+- `src/components/tech/service-orders/ServiceOrderForm.tsx` — wizard, auto-save, compressão, validação
+- `src/components/tech/service-orders/ServiceOrderList.tsx` — multi-anexo
+- `src/components/tech/service-orders/SOSignatureLinksManager.tsx` — botão envio e-mail
+- `src/pages/SignServiceOrder.tsx` — QR Code do hash
+- `src/pages/admin/AdminServiceOrders.tsx` — métricas e filtros
+- `src/utils/serviceOrderPdf.ts` — QR Code, anti-quebra, anexos, chunks de evidências
+
+---
+
+## Confirmação
+
+Vou executar tudo numa única passada. A migration vai pedir sua aprovação automaticamente quando rodar (esse é o fluxo padrão da Lovable Cloud). Pode aprovar para eu seguir.

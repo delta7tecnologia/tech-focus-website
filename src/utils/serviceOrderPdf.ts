@@ -1,13 +1,16 @@
 import jsPDF from 'jspdf';
+import QRCode from 'qrcode';
 import html2canvas from 'html2canvas';
 import { escapeHtml } from './reportNarrative';
 import { DELTA7_LOGO_DATA_URL } from '@/assets/delta7LogoBase64';
 
 export interface SOEvidence {
-  dataUrl: string; // pode ser vazio se externo
+  dataUrl: string; // pode ser vazio se externo/não-imagem
   caption: string;
   external?: boolean;
   externalUrl?: string;
+  kind?: 'image' | 'file' | 'video';
+  fileName?: string;
 }
 
 export interface ServiceOrderPdfData {
@@ -36,6 +39,10 @@ export interface ServiceOrderPdfData {
   signatureData: string;
   signedAt: string;
   integrityHash: string;
+  // Computados
+  qrCodeDataUrl?: string;
+  validationUrl?: string;
+  auditLog?: Array<{ event: string; at: string }>;
 }
 
 const fmtDateTime = (iso?: string) =>
@@ -55,6 +62,34 @@ const sectionTitle = (n: string, t: string) => `
 
 const mapsLink = (lat?: number, lng?: number) =>
   lat && lng ? `https://www.google.com/maps?q=${lat},${lng}` : '';
+
+function evidenceCard(p: SOEvidence): string {
+  // Anexo externo / não-imagem
+  if (p.external || (p.kind && p.kind !== 'image')) {
+    const label = p.kind === 'video' ? '🎥 Vídeo' : '📎 Anexo';
+    const link = p.externalUrl || '';
+    return `
+      <div style="break-inside:avoid;page-break-inside:avoid;width:48%;margin-bottom:14px;">
+        <div style="width:100%;height:170px;border:1px dashed #94a3b8;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;background:#f1f5f9;box-sizing:border-box;">
+          <div style="font-size:11px;font-weight:700;color:#475569;">${label}</div>
+          ${p.fileName ? `<div style="font-size:10px;color:#1e3a8a;margin-top:6px;text-align:center;font-weight:600;">${escapeHtml(p.fileName)}</div>` : ''}
+          ${link ? `<div style="font-size:8px;color:#64748b;margin-top:6px;word-break:break-all;text-align:center;">${escapeHtml(link)}</div>` : ''}
+        </div>
+        <div style="font-size:10px;color:#475569;margin-top:4px;text-align:center;font-style:italic;">${escapeHtml(p.caption || '')}</div>
+      </div>`;
+  }
+  return `
+    <div style="break-inside:avoid;page-break-inside:avoid;width:48%;margin-bottom:14px;">
+      <img src="${p.dataUrl}" style="width:100%;height:170px;object-fit:cover;border:1px solid #cbd5e1;border-radius:4px;" />
+      <div style="font-size:10px;color:#475569;margin-top:4px;text-align:center;font-style:italic;">${escapeHtml(p.caption || '')}</div>
+    </div>`;
+}
+
+function chunkEvidences(evs: SOEvidence[], size = 6): SOEvidence[][] {
+  const out: SOEvidence[][] = [];
+  for (let i = 0; i < evs.length; i += size) out.push(evs.slice(i, i + size));
+  return out;
+}
 
 function buildHtml(r: ServiceOrderPdfData): string {
   const checklist = r.checklist
@@ -82,25 +117,19 @@ function buildHtml(r: ServiceOrderPdfData): string {
     )
     .join('');
 
-  const evidences = r.evidences
-    .map((p) => {
-      if (p.external) {
-        return `
-          <div style="break-inside:avoid;page-break-inside:avoid;width:48%;margin-bottom:14px;">
-            <div style="width:100%;height:170px;border:1px dashed #94a3b8;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;background:#f1f5f9;box-sizing:border-box;">
-              <div style="font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;">📎 Anexo externo</div>
-              <div style="font-size:9px;color:#64748b;margin-top:6px;word-break:break-all;text-align:center;">${escapeHtml(p.externalUrl || '')}</div>
-            </div>
-            <div style="font-size:10px;color:#475569;margin-top:4px;text-align:center;font-style:italic;">${escapeHtml(p.caption || '')}</div>
-          </div>`;
-      }
-      return `
-        <div style="break-inside:avoid;page-break-inside:avoid;width:48%;margin-bottom:14px;">
-          <img src="${p.dataUrl}" style="width:100%;height:170px;object-fit:cover;border:1px solid #cbd5e1;border-radius:4px;" />
-          <div style="font-size:10px;color:#475569;margin-top:4px;text-align:center;font-style:italic;">${escapeHtml(p.caption || '')}</div>
-        </div>`;
-    })
+  const evChunks = chunkEvidences(r.evidences || []);
+  const evidencesHtml = evChunks
+    .map((chunk, idx) => `
+      <div style="display:flex;flex-wrap:wrap;gap:2%;${idx > 0 ? 'page-break-before:always;break-before:page;margin-top:12px;' : ''}">
+        ${chunk.map(evidenceCard).join('')}
+      </div>`)
     .join('');
+
+  const auditAlert = r.auditLog && r.auditLog.some((e) => e.event === 'edited_after_emission')
+    ? `<div style="background:#fef3c7;border:1px solid #f59e0b;color:#92400e;padding:8px 12px;border-radius:4px;font-size:10px;margin-top:10px;">
+        ⚠️ Este documento foi editado após a emissão original. Consulte o log de auditoria via QR Code.
+       </div>`
+    : '';
 
   return `
 <div style="width:794px;padding:36px 44px;font-family:'Helvetica',Arial,sans-serif;color:#1e293b;background:white;box-sizing:border-box;font-size:11px;">
@@ -151,6 +180,7 @@ function buildHtml(r: ServiceOrderPdfData): string {
       <td style="padding:5px 8px;border:1px solid #cbd5e1;">${fmtDateTime(r.finishedAt || r.checkout.at)}</td>
     </tr>
   </table>
+  ${auditAlert}
 
   ${sectionTitle('2', 'GEOLOCALIZAÇÃO (CHECK-IN / CHECK-OUT)')}
   <table style="width:100%;border-collapse:collapse;font-size:11px;">
@@ -177,7 +207,7 @@ function buildHtml(r: ServiceOrderPdfData): string {
       </tr>
     </tbody>
   </table>
-  ${mapsLink(r.checkin.lat, r.checkin.lng) ? `<p style="font-size:10px;color:#1e3a8a;margin-top:4px;">📍 Ver no mapa: ${mapsLink(r.checkin.lat, r.checkin.lng)}</p>` : ''}
+  ${mapsLink(r.checkin.lat, r.checkin.lng) ? `<p style="font-size:10px;color:#1e3a8a;margin-top:4px;">📍 Ver no mapa: <a href="${mapsLink(r.checkin.lat, r.checkin.lng)}" style="color:#1e3a8a;">${mapsLink(r.checkin.lat, r.checkin.lng)}</a></p>` : ''}
 
   ${sectionTitle('3', 'RESUMO DO ATENDIMENTO')}
   <p style="margin:0;padding:10px 12px;background:#f8fafc;border-left:3px solid #1e3a8a;font-size:11px;line-height:1.6;text-align:justify;">
@@ -223,47 +253,80 @@ function buildHtml(r: ServiceOrderPdfData): string {
     ${r.travel.observacao ? `<tr><td colspan="4" style="padding:5px 8px;border:1px solid #cbd5e1;font-size:10px;">${escapeHtml(r.travel.observacao)}</td></tr>` : ''}
   </table>` : ''}
 
-  ${evidences ? `
+  ${evidencesHtml ? `
   ${sectionTitle('7', 'EVIDÊNCIAS DA VISITA')}
-  <div style="display:flex;flex-wrap:wrap;gap:2%;">${evidences}</div>` : ''}
+  ${evidencesHtml}` : ''}
 
-  ${sectionTitle('8', 'ACEITE DO RESPONSÁVEL NO LOCAL')}
-  <table style="width:100%;border-collapse:collapse;font-size:11px;margin-bottom:10px;">
-    <tr>
-      <td style="padding:5px 8px;border:1px solid #cbd5e1;background:#f1f5f9;font-weight:600;width:25%;">Nome</td>
-      <td style="padding:5px 8px;border:1px solid #cbd5e1;">${escapeHtml(r.signerName || '—')}</td>
-    </tr>
-    <tr>
-      <td style="padding:5px 8px;border:1px solid #cbd5e1;background:#f1f5f9;font-weight:600;">Cargo / Setor</td>
-      <td style="padding:5px 8px;border:1px solid #cbd5e1;">${escapeHtml(r.signerRole || '—')}</td>
-    </tr>
-    ${r.signerDocument ? `<tr><td style="padding:5px 8px;border:1px solid #cbd5e1;background:#f1f5f9;font-weight:600;">Documento</td><td style="padding:5px 8px;border:1px solid #cbd5e1;">${escapeHtml(r.signerDocument)}</td></tr>` : ''}
-    <tr>
-      <td style="padding:5px 8px;border:1px solid #cbd5e1;background:#f1f5f9;font-weight:600;">Data/Hora do aceite</td>
-      <td style="padding:5px 8px;border:1px solid #cbd5e1;">${fmtDateTime(r.signedAt)}</td>
-    </tr>
-  </table>
+  <div id="so-aceite-block" style="break-inside:avoid;page-break-inside:avoid;">
+    ${sectionTitle('8', 'ACEITE DO RESPONSÁVEL NO LOCAL')}
+    <table style="width:100%;border-collapse:collapse;font-size:11px;margin-bottom:10px;">
+      <tr>
+        <td style="padding:5px 8px;border:1px solid #cbd5e1;background:#f1f5f9;font-weight:600;width:25%;">Nome</td>
+        <td style="padding:5px 8px;border:1px solid #cbd5e1;">${escapeHtml(r.signerName || '—')}</td>
+      </tr>
+      <tr>
+        <td style="padding:5px 8px;border:1px solid #cbd5e1;background:#f1f5f9;font-weight:600;">Cargo / Setor</td>
+        <td style="padding:5px 8px;border:1px solid #cbd5e1;">${escapeHtml(r.signerRole || '—')}</td>
+      </tr>
+      ${r.signerDocument ? `<tr><td style="padding:5px 8px;border:1px solid #cbd5e1;background:#f1f5f9;font-weight:600;">Documento</td><td style="padding:5px 8px;border:1px solid #cbd5e1;">${escapeHtml(r.signerDocument)}</td></tr>` : ''}
+      <tr>
+        <td style="padding:5px 8px;border:1px solid #cbd5e1;background:#f1f5f9;font-weight:600;">Data/Hora do aceite</td>
+        <td style="padding:5px 8px;border:1px solid #cbd5e1;">${fmtDateTime(r.signedAt)}</td>
+      </tr>
+    </table>
 
-  <div style="border:1px solid #cbd5e1;border-radius:4px;padding:12px;text-align:center;background:#fff;min-height:120px;">
-    ${r.signatureData
-      ? `<img src="${r.signatureData}" style="max-height:100px;" />`
-      : `<div style="height:100px;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-style:italic;font-size:11px;">Aguardando assinatura digital</div>`}
-    <div style="border-top:1px solid #1e293b;margin-top:8px;padding-top:4px;font-size:11px;font-weight:600;">
-      ${escapeHtml(r.signerName || 'Responsável no local')}
+    <div style="border:1px solid #cbd5e1;border-radius:4px;padding:12px;text-align:center;background:#fff;min-height:120px;">
+      ${r.signatureData
+        ? `<img src="${r.signatureData}" style="max-height:100px;" />`
+        : `<div style="height:100px;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-style:italic;font-size:11px;">Aguardando assinatura digital</div>`}
+      <div style="border-top:1px solid #1e293b;margin-top:8px;padding-top:4px;font-size:11px;font-weight:600;">
+        ${escapeHtml(r.signerName || 'Responsável no local')}
+      </div>
     </div>
   </div>
 
-  <div style="margin-top:14px;font-size:10px;color:#64748b;">
-    <strong>Hash de integridade:</strong> <code>${escapeHtml(r.integrityHash)}</code>
-  </div>
-  <div style="margin-top:6px;font-size:10px;color:#64748b;text-align:center;">
-    Documento gerado eletronicamente pela plataforma Delta7 Soluções em Tecnologia.
+  <!-- Rodapé com hash + QR Code (não pode quebrar entre páginas) -->
+  <div id="so-footer-block" style="margin-top:24px;padding-top:12px;border-top:2px solid #1e3a8a;break-inside:avoid;page-break-inside:avoid;-webkit-column-break-inside:avoid;">
+    <div style="display:flex;gap:16px;align-items:flex-start;">
+      <div style="flex-shrink:0;text-align:center;">
+        ${r.qrCodeDataUrl ? `<img src="${r.qrCodeDataUrl}" alt="QR Validação" style="width:110px;height:110px;display:block;border:1px solid #cbd5e1;padding:4px;background:white;" />` : ''}
+        <div style="font-size:8px;color:#1e3a8a;font-weight:700;margin-top:4px;">VALIDAR DOCUMENTO</div>
+        <div style="font-size:7px;color:#64748b;max-width:110px;">Escaneie para verificar autenticidade</div>
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:9px;color:#64748b;margin-bottom:4px;"><strong>Hash de Legitimidade SHA-256:</strong></div>
+        <div style="font-family:'Courier New',monospace;font-size:9px;color:#1e3a8a;word-break:break-all;background:#f1f5f9;padding:6px;border-radius:3px;">
+          ${escapeHtml(r.integrityHash)}
+        </div>
+        ${r.validationUrl ? `<div style="font-size:8px;color:#475569;margin-top:6px;word-break:break-all;"><strong>Link de validação:</strong> ${escapeHtml(r.validationUrl)}</div>` : ''}
+        <div style="font-size:9px;color:#94a3b8;margin-top:8px;font-style:italic;">
+          Documento gerado eletronicamente pela plataforma Delta7. A autenticidade pode ser verificada pelo QR Code ou link acima.
+        </div>
+      </div>
+    </div>
   </div>
 </div>`;
 }
 
 export async function downloadServiceOrderPdf(data: ServiceOrderPdfData) {
-  const html = buildHtml(data);
+  // Gera QR Code apontando para a URL pública de validação
+  const validationUrl = data.validationUrl
+    || `${window.location.origin}/validar-os/${data.integrityHash}`;
+  let qrCodeDataUrl = data.qrCodeDataUrl;
+  if (!qrCodeDataUrl) {
+    try {
+      qrCodeDataUrl = await QRCode.toDataURL(validationUrl, {
+        margin: 1,
+        width: 220,
+        errorCorrectionLevel: 'M',
+        color: { dark: '#1e3a8a', light: '#ffffff' },
+      });
+    } catch (e) {
+      console.error('Falha ao gerar QR Code:', e);
+    }
+  }
+
+  const html = buildHtml({ ...data, qrCodeDataUrl, validationUrl });
   const wrap = document.createElement('div');
   wrap.style.position = 'fixed';
   wrap.style.left = '-10000px';
@@ -273,6 +336,29 @@ export async function downloadServiceOrderPdf(data: ServiceOrderPdfData) {
 
   try {
     const node = wrap.firstElementChild as HTMLElement;
+
+    // Anti-quebra do rodapé (mesma lógica do reportPdfAdvanced)
+    const pageWidthMM = 210;
+    const pageHeightMM = 297;
+    const pxPerMM = node.offsetWidth / pageWidthMM;
+    const pageHeightPx = pageHeightMM * pxPerMM;
+
+    const tryPushAcross = (id: string, baseMargin = 24) => {
+      const el = node.querySelector(`#${id}`) as HTMLElement | null;
+      if (!el) return;
+      const top = el.offsetTop;
+      const bottom = top + el.offsetHeight;
+      const startPage = Math.floor(top / pageHeightPx);
+      const endPage = Math.floor((bottom - 1) / pageHeightPx);
+      if (endPage > startPage) {
+        const nextPageStart = (startPage + 1) * pageHeightPx;
+        const extraPx = nextPageStart - top + 8;
+        el.style.marginTop = `${extraPx + baseMargin}px`;
+      }
+    };
+    tryPushAcross('so-aceite-block', 8);
+    tryPushAcross('so-footer-block', 24);
+
     const canvas = await html2canvas(node, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
     const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
     const pageW = pdf.internal.pageSize.getWidth();

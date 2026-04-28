@@ -17,6 +17,7 @@ import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
 import SignReport from "./pages/SignReport";
 import ValidateReport from "./pages/ValidateReport";
+import ValidateServiceOrder from "./pages/ValidateServiceOrder";
 import SignServiceOrder from "./pages/SignServiceOrder";
 
 import AdminLogin from "./pages/admin/AdminLogin";
@@ -57,6 +58,7 @@ const App = () => (
             <Route path="/assinar/:token" element={<SignReport />} />
             <Route path="/assinar-os/:token" element={<SignServiceOrder />} />
             <Route path="/validar-laudo/:hash" element={<ValidateReport />} />
+            <Route path="/validar-os/:hash" element={<ValidateServiceOrder />} />
             
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
