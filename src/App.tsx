@@ -16,6 +16,7 @@ import AreaTecnica from "./pages/AreaTecnica";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
 import SignReport from "./pages/SignReport";
+import ValidateReport from "./pages/ValidateReport";
 import SignServiceOrder from "./pages/SignServiceOrder";
 
 import AdminLogin from "./pages/admin/AdminLogin";
