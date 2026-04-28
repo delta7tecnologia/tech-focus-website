@@ -22,6 +22,8 @@ import type { SituacaoHW } from '@/utils/reportNarrativeAdvanced';
 import SignaturePad from './SignaturePad';
 import SignatureLinksManager from './SignatureLinksManager';
 import PdfPreviewDialog from './PdfPreviewDialog';
+import ReportWizardShell, { REPORT_STEPS } from './ReportWizardShell';
+import ReportFinalizationPanel, { type ChecklistItem } from './ReportFinalizationPanel';
 import type jsPDF from 'jspdf';
 import delta7Logo from '@/assets/delta7-logo.png';
 import { detectExternalProvider } from '../UploadOrLinkInput';
@@ -178,6 +180,16 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
   const remoteSignaturesComplete = hasManagerSignature && hasUserSignature;
   const allSignaturesNotifiedRef = useRef(false);
 
+  // ===== Wizard / auto-save / checklist =====
+  const [currentStep, setCurrentStep] = useState<number>(1);
+  const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
+  const dirtyRef = useRef(false);
+  const lastSerializedRef = useRef<string>('');
+
+  const sectionVisible = (section: number) =>
+    REPORT_STEPS[currentStep - 1]?.sections.includes(section) ?? false;
+
   useEffect(() => {
     // Notifica uma única vez quando todas as 3 assinaturas estiverem prontas
     if (allSignaturesComplete && !allSignaturesNotifiedRef.current && isSavedReport) {
@@ -191,6 +203,15 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       allSignaturesNotifiedRef.current = false;
     }
   }, [allSignaturesComplete, isSavedReport, reportNumber]);
+
+  // Marca como "sujo" quando o estado muda
+  useEffect(() => {
+    const serialized = JSON.stringify(s);
+    if (lastSerializedRef.current && lastSerializedRef.current !== serialized) {
+      dirtyRef.current = true;
+    }
+    lastSerializedRef.current = serialized;
+  }, [s]);
 
   useEffect(() => {
     const load = async () => {
@@ -563,6 +584,26 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
     },
   });
 
+  // Auto-save: a cada 30s salva rascunho silenciosamente se houve mudanças
+  useEffect(() => {
+    if (isSavedReport) return; // não auto-salva laudo emitido
+    if (!s.companyName.trim() && !s.patrimonio.trim() && !s.modelo.trim()) return;
+    const interval = setInterval(async () => {
+      if (!dirtyRef.current || saveDraftMutation.isPending) return;
+      try {
+        setAutoSaveStatus('saving');
+        await saveDraftMutation.mutateAsync();
+        dirtyRef.current = false;
+        setAutoSaveStatus('saved');
+        setLastSavedAt(new Date());
+      } catch {
+        setAutoSaveStatus('error');
+      }
+    }, 30000);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSavedReport, s.companyName, s.patrimonio, s.modelo]);
+
   const generateMutation = useMutation({
     mutationFn: async () => {
       if (!s.companyName.trim()) throw new Error('Informe o cliente / empresa.');
@@ -681,9 +722,61 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
         </CardContent>
       </Card>
 
+      <ReportWizardShell
+        currentStep={currentStep}
+        onStepChange={setCurrentStep}
+        isLocked={isSavedReport}
+        documentVersion={documentVersion}
+        reportNumber={reportNumber}
+        autoSaveStatus={autoSaveStatus}
+        lastSavedAt={lastSavedAt}
+        finalizationPanel={
+          <ReportFinalizationPanel
+            items={[
+              { label: 'Cliente / Empresa preenchido', ok: !!s.companyName.trim(), required: true, hint: 'Volte à etapa Identificação.' },
+              { label: 'Equipamento identificado (patrimônio ou modelo)', ok: !!(s.patrimonio.trim() || s.modelo.trim()), required: true, hint: 'Informe ao menos um destes campos.' },
+              { label: 'Técnico responsável definido', ok: !!s.technicianName.trim(), required: true },
+              { label: 'Parecer conclusivo selecionado', ok: !!s.parecer, required: true, hint: 'Etapa Diagnóstico → seção Parecer.' },
+              { label: 'Justificativa do parecer descrita', ok: !!s.parecerTexto.trim(), required: false },
+              { label: 'Pelo menos uma evidência anexada', ok: photos.length > 0, required: false, hint: 'Etapa Evidências.' },
+              { label: 'Assinatura do técnico coletada', ok: hasTechnicianSignature, required: true, hint: 'Assine no painel ao lado.' },
+              { label: 'Assinatura do gestor (presencial ou link)', ok: hasManagerSignature, required: false, hint: 'Pode ser coletada após emissão pelo link remoto.' },
+              { label: 'Assinatura do cliente (presencial ou link)', ok: hasUserSignature, required: false, hint: 'Pode ser coletada após emissão pelo link remoto.' },
+            ]}
+            isLocked={isSavedReport}
+            isGenerating={generateMutation.isPending}
+            isSavingDraft={saveDraftMutation.isPending}
+            canFinalize={
+              !!s.companyName.trim() &&
+              !!(s.patrimonio.trim() || s.modelo.trim()) &&
+              !!s.technicianName.trim() &&
+              !!s.parecer &&
+              hasTechnicianSignature
+            }
+            onSaveDraft={() => saveDraftMutation.mutate()}
+            onFinalize={handleGenerate}
+            reportNumber={reportNumber}
+          />
+        }
+        bottomActions={
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => saveDraftMutation.mutate()}
+            disabled={isSavedReport || saveDraftMutation.isPending || generateMutation.isPending}
+            className="hidden sm:inline-flex"
+          >
+            {saveDraftMutation.isPending ? (
+              <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Salvando...</>
+            ) : (
+              <><Save className="w-4 h-4 mr-2" /> Salvar rascunho</>
+            )}
+          </Button>
+        }
+      >
       <fieldset disabled={isSavedReport} className={isSavedReport ? 'space-y-6 opacity-75' : 'space-y-6'}>
       {/* 1. Identificação */}
-      <Card>
+      <Card style={{ display: sectionVisible(1) ? undefined : 'none' }}>
         <CardContent className="p-6 space-y-4">
           <h4 className="font-semibold text-blue-900 border-l-4 border-blue-900 pl-3">1. Identificação do equipamento</h4>
           <div className="grid sm:grid-cols-2 gap-4">
@@ -798,7 +891,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       </Card>
 
       {/* 2. Hardware */}
-      <Card>
+      <Card style={{ display: sectionVisible(2) ? undefined : 'none' }}>
         <CardContent className="p-6 space-y-4">
           <h4 className="font-semibold text-blue-900 border-l-4 border-blue-900 pl-3">2. Inspeção de hardware</h4>
           <div className="overflow-x-auto">
@@ -840,7 +933,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       </Card>
 
       {/* 3. Software */}
-      <Card>
+      <Card style={{ display: sectionVisible(3) ? undefined : 'none' }}>
         <CardContent className="p-6 space-y-4">
           <h4 className="font-semibold text-blue-900 border-l-4 border-blue-900 pl-3">3. Configuração de software</h4>
           {([
@@ -876,7 +969,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       </Card>
 
       {/* 4. Diagnóstico de problemas */}
-      <Card>
+      <Card style={{ display: sectionVisible(4) ? undefined : 'none' }}>
         <CardContent className="p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h4 className="font-semibold text-blue-900 border-l-4 border-blue-900 pl-3">4. Diagnóstico de problemas</h4>
@@ -924,7 +1017,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       </Card>
 
       {/* 5. Estado geral */}
-      <Card>
+      <Card style={{ display: sectionVisible(5) ? undefined : 'none' }}>
         <CardContent className="p-6 space-y-4">
           <h4 className="font-semibold text-blue-900 border-l-4 border-blue-900 pl-3">5. Estado geral do equipamento</h4>
           <div className="grid sm:grid-cols-2 gap-4">
@@ -949,7 +1042,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       </Card>
 
       {/* 6. Parecer */}
-      <Card>
+      <Card style={{ display: sectionVisible(6) ? undefined : 'none' }}>
         <CardContent className="p-6 space-y-4">
           <h4 className="font-semibold text-blue-900 border-l-4 border-blue-900 pl-3">6. Parecer conclusivo</h4>
           <div>
@@ -976,7 +1069,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       </Card>
 
       {/* 7. Recomendações */}
-      <Card>
+      <Card style={{ display: sectionVisible(7) ? undefined : 'none' }}>
         <CardContent className="p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h4 className="font-semibold text-blue-900 border-l-4 border-blue-900 pl-3">7. Recomendações e providências</h4>
@@ -1012,7 +1105,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       </Card>
 
       {/* 8. Fotos */}
-      <Card>
+      <Card style={{ display: sectionVisible(8) ? undefined : 'none' }}>
         <CardContent className="p-6 space-y-4">
           <div className="flex items-center justify-between gap-2 flex-wrap">
             <h4 className="font-semibold text-blue-900 border-l-4 border-blue-900 pl-3">8. Evidências fotográficas</h4>
@@ -1062,7 +1155,7 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
       </fieldset>
 
       {/* 9. Assinaturas */}
-      <Card>
+      <Card style={{ display: sectionVisible(9) ? undefined : 'none' }}>
         <CardContent className="p-6 space-y-4">
           <h4 className="font-semibold text-blue-900 border-l-4 border-blue-900 pl-3">9. Assinaturas digitais</h4>
           {allSignaturesComplete && (
@@ -1223,22 +1316,18 @@ const AdvancedReportGenerator: React.FC<Props> = ({ onSaved, draft }) => {
         </CardContent>
       </Card>
 
-      <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
-        <Button type="button" variant="outline" onClick={reset} disabled={generateMutation.isPending || saveDraftMutation.isPending}>
-          <RotateCcw className="w-4 h-4 mr-2" /> Limpar
-        </Button>
-        <Button type="button" variant="outline"
-          onClick={() => saveDraftMutation.mutate()}
-          disabled={saveDraftMutation.isPending || generateMutation.isPending}>
-          {saveDraftMutation.isPending
-            ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Salvando...</>
-            : <><Save className="w-4 h-4 mr-2" /> Salvar rascunho</>}
-        </Button>
-        <Button type="button" className="bg-blue-900 hover:bg-blue-800"
-          onClick={handleGenerate} disabled={generateMutation.isPending || saveDraftMutation.isPending}>
-          {generateMutation.isPending
-            ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Gerando...</>
-            : <><Eye className="w-4 h-4 mr-2" /> Pré-visualizar e gerar PDF</>}
+      </ReportWizardShell>
+
+      <div className="flex justify-center pt-2">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={reset}
+          disabled={generateMutation.isPending || saveDraftMutation.isPending}
+          className="text-gray-500"
+        >
+          <RotateCcw className="w-3.5 h-3.5 mr-2" /> Limpar formulário e iniciar novo laudo
         </Button>
       </div>
       <p className="text-xs text-gray-400 text-center flex items-center justify-center gap-1">
