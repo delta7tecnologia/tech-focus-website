@@ -1,6 +1,7 @@
 import { fetchAssetLicenses } from '@/lib/assetLicenses';
 import { formatLicenseTitle, getCategoryLabel, type AssetLicense, LICENSE_CATALOG } from '@/lib/licenseCatalog';
 import { DELTA7_LOGO_DATA_URL, DELTA7_LOGO_DARK_DATA_URL } from '@/assets/delta7LogoBase64';
+import { getProductLogo } from '@/assets/productLogos';
 
 interface AssetForReport {
   id: string;
