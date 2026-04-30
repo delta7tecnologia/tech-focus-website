@@ -9,6 +9,13 @@ interface AssetForReport {
   notes: string | null;
 }
 
+export interface ReportClientInfo {
+  company_name: string;
+  document?: string;
+  contact_person?: string;
+  address?: string;
+}
+
 const formatDate = (d: string | null) => {
   if (!d) return '—';
   return new Date(d + 'T00:00:00').toLocaleDateString('pt-BR');
@@ -61,7 +68,12 @@ const renderAssetCard = (
   </section>
 `;
 
-export const printAssetReport = async (assets: AssetForReport[], companyName: string) => {
+export const printAssetReport = async (
+  assets: AssetForReport[],
+  companyName: string,
+  clientInfo?: ReportClientInfo,
+) => {
+  const client: ReportClientInfo = clientInfo || { company_name: companyName };
   const grouped = await fetchAssetLicenses(assets.map((a) => a.id));
 
   // Resumo executivo: contagem por categoria
@@ -123,7 +135,13 @@ export const printAssetReport = async (assets: AssetForReport[], companyName: st
       page-break-after: always;
     }
     .cover-top { display: flex; justify-content: space-between; align-items: flex-start; }
-    .cover-logo { height: 70px; filter: brightness(0) invert(1); }
+    .cover-logo {
+      height: 90px;
+      background: white;
+      padding: 10px 18px;
+      border-radius: 8px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    }
     .cover-id {
       font-size: 10px;
       letter-spacing: 2px;
@@ -189,13 +207,58 @@ export const printAssetReport = async (assets: AssetForReport[], companyName: st
       border-bottom: 2px solid var(--primary);
       margin-bottom: 20px;
     }
-    .page-header img { height: 28px; }
+    .page-header img { height: 36px; }
     .page-header .ph-info {
       text-align: right;
       font-size: 10px;
       color: var(--muted);
     }
     .page-header .ph-info strong { color: var(--text); display: block; font-size: 11px; }
+
+    /* ===== AVISO LEGAL (CAPA) ===== */
+    .legal-cover {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin-top: 24px;
+      font-size: 9.5px;
+      line-height: 1.55;
+      color: rgba(255,255,255,0.85);
+    }
+    .legal-cover strong { color: white; letter-spacing: 1px; font-size: 9px; text-transform: uppercase; display: block; margin-bottom: 4px; }
+
+    /* ===== AVISO LEGAL (RODAPÉ) ===== */
+    .legal-footer {
+      margin-top: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--primary);
+      background: var(--bg-soft);
+      font-size: 9px;
+      line-height: 1.5;
+      color: var(--muted);
+      border-radius: 4px;
+    }
+    .legal-footer strong { color: var(--text); display: block; margin-bottom: 3px; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* ===== CARTÃO DE DADOS DO CLIENTE (CAPA) ===== */
+    .client-card {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 8px;
+      padding: 18px 22px;
+      margin-top: 28px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px 24px;
+    }
+    .client-card .field .lbl {
+      font-size: 9px; letter-spacing: 1.5px; opacity: 0.55;
+      text-transform: uppercase; margin-bottom: 3px;
+    }
+    .client-card .field .val { font-size: 13px; font-weight: 600; word-wrap: break-word; }
+    .client-card .field.full { grid-column: 1 / -1; }
 
     /* ===== RESUMO ===== */
     .section-title {
@@ -387,23 +450,38 @@ export const printAssetReport = async (assets: AssetForReport[], companyName: st
       <div class="cover-divider"></div>
       <div class="cover-subtitle">Documento técnico contendo o levantamento completo de ativos, licenças de software e configurações dos equipamentos sob gestão.</div>
 
-      <div class="cover-meta">
-        <div class="cover-meta-item">
-          <div class="label">Cliente</div>
-          <div class="value">${escapeHtml(companyName)}</div>
+      <div class="client-card">
+        <div class="field full">
+          <div class="lbl">Cliente</div>
+          <div class="val">${escapeHtml(client.company_name || companyName)}</div>
         </div>
+        ${client.document ? `<div class="field"><div class="lbl">CNPJ / CPF</div><div class="val">${escapeHtml(client.document)}</div></div>` : ''}
+        ${client.contact_person ? `<div class="field"><div class="lbl">Responsável</div><div class="val">${escapeHtml(client.contact_person)}</div></div>` : ''}
+        ${client.address ? `<div class="field full"><div class="lbl">Endereço</div><div class="val">${escapeHtml(client.address)}</div></div>` : ''}
+      </div>
+
+      <div class="cover-meta">
         <div class="cover-meta-item">
           <div class="label">Equipamentos</div>
           <div class="value">${assets.length}</div>
+        </div>
+        <div class="cover-meta-item">
+          <div class="label">Licenças</div>
+          <div class="value">${totalLicenses}</div>
         </div>
         <div class="cover-meta-item">
           <div class="label">Emissão</div>
           <div class="value">${dateStr} · ${timeStr}</div>
         </div>
       </div>
+
+      <div class="legal-cover">
+        <strong>Aviso legal · Confidencialidade</strong>
+        Este documento é de propriedade da <b>Delta7 Tecnologia</b> e contém informações técnicas e licenças de software vinculadas ao cliente identificado acima. Sua reprodução, divulgação, transferência a terceiros ou utilização para fins distintos da gestão de TI contratada é expressamente proibida sem autorização formal por escrito. Os dados aqui registrados refletem o levantamento na data de emissão e podem sofrer alterações.
+      </div>
     </div>
 
-    <div class="cover-footer">DELTA7 TECNOLOGIA · GESTÃO DE TI E INFRAESTRUTURA</div>
+    <div class="cover-footer">DELTA7 TECNOLOGIA · GESTÃO DE TI E INFRAESTRUTURA · DOCUMENTO CONFIDENCIAL</div>
   </div>
 
   <!-- ========= CORPO ========= -->
@@ -411,8 +489,8 @@ export const printAssetReport = async (assets: AssetForReport[], companyName: st
     <div class="page-header">
       <img src="${DELTA7_LOGO_DATA_URL}" alt="Delta7">
       <div class="ph-info">
-        <strong>${escapeHtml(companyName)}</strong>
-        Inventário de TI · ${dateStr}
+        <strong>${escapeHtml(client.company_name || companyName)}</strong>
+        Inventário de TI · ${dateStr} · ${reportId}
       </div>
     </div>
 
@@ -448,9 +526,14 @@ export const printAssetReport = async (assets: AssetForReport[], companyName: st
     <div class="section-title">Detalhamento por Equipamento</div>
     ${cards}
 
+    <div class="legal-footer">
+      <strong>Aviso legal e política de uso</strong>
+      As informações contidas neste relatório, incluindo chaves de licença, dados de equipamentos e identificação do cliente, são <b>confidenciais</b> e de uso restrito. Os softwares listados foram comercializados/instalados pela Delta7 Tecnologia conforme contrato de prestação de serviços de TI vigente. O cliente é responsável pela guarda das licenças, pelo uso em conformidade com os termos dos respectivos fabricantes (Microsoft EULA, Kaspersky, etc.) e pelo cumprimento da Lei de Software (Lei nº 9.609/98) e da LGPD (Lei nº 13.709/18). A Delta7 Tecnologia não se responsabiliza por uso indevido, transferências não autorizadas ou alterações realizadas após a emissão deste documento.
+    </div>
+
     <div class="doc-footer">
-      <strong>Delta7 Tecnologia</strong> · Documento confidencial gerado automaticamente em ${dateStr} às ${timeStr}<br>
-      Este relatório contém informações sensíveis. Distribuição restrita ao cliente.
+      <strong>Delta7 Tecnologia</strong> · Documento confidencial gerado automaticamente em ${dateStr} às ${timeStr} · ID ${reportId}<br>
+      Distribuição restrita ao cliente identificado na capa.
     </div>
   </div>
 

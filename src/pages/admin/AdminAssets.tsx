@@ -18,6 +18,7 @@ import {
 import { Plus, Pencil, Trash2, Monitor, Eye, Search, Printer } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { printAssetReport } from '@/utils/printAssetReport';
+import ReportClientInfoDialog from '@/components/tech/assets/ReportClientInfoDialog';
 import LicenseListEditor from '@/components/tech/assets/LicenseListEditor';
 import { fetchAssetLicenses, licensesToDrafts, syncAssetLicenses } from '@/lib/assetLicenses';
 import { formatLicenseTitle, getCategoryLabel, type LicenseDraft } from '@/lib/licenseCatalog';
@@ -61,6 +62,7 @@ const AdminAssets = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [companyFilter, setCompanyFilter] = useState('');
   const [hiddenLicenses, setHiddenLicenses] = useState<Record<string, boolean>>({});
+  const [reportInfoOpen, setReportInfoOpen] = useState(false);
 
   const toggleLicense = (key: string) => {
     setHiddenLicenses(prev => ({ ...prev, [key]: !prev[key] }));
@@ -245,10 +247,7 @@ const AdminAssets = () => {
             variant="outline"
             className="gap-2"
             disabled={filteredAssets.length === 0}
-            onClick={() => {
-              const company = companyFilter || 'Todas as empresas';
-              printAssetReport(filteredAssets, company);
-            }}
+            onClick={() => setReportInfoOpen(true)}
           >
             <Printer className="w-4 h-4" /> Imprimir Relatório
           </Button>
@@ -444,6 +443,15 @@ const AdminAssets = () => {
           {viewImage && <img src={viewImage} alt="Evidência" className="w-full rounded-lg" />}
         </DialogContent>
       </Dialog>
+
+      <ReportClientInfoDialog
+        open={reportInfoOpen}
+        onOpenChange={setReportInfoOpen}
+        defaultCompany={companyFilter || undefined}
+        onConfirm={(info) => {
+          printAssetReport(filteredAssets, info.company_name || companyFilter || 'Todas as empresas', info);
+        }}
+      />
     </div>
   );
 };

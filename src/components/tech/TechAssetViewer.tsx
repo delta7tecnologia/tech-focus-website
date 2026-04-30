@@ -11,6 +11,7 @@ import { Search, Monitor, Eye, Copy, Plus, Pencil, Upload, Printer, Trash2, Exte
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { printAssetReport } from '@/utils/printAssetReport';
+import ReportClientInfoDialog, { type ReportClientInfo } from './assets/ReportClientInfoDialog';
 import UploadOrLinkInput, { type SourceMode } from './UploadOrLinkInput';
 import LicenseListEditor from './assets/LicenseListEditor';
 import { fetchAssetLicenses, licensesToDrafts, syncAssetLicenses } from '@/lib/assetLicenses';
@@ -45,6 +46,7 @@ const TechAssetViewer = () => {
   const [saving, setSaving] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [showCompanyDropdown, setShowCompanyDropdown] = useState(false);
+  const [reportInfoOpen, setReportInfoOpen] = useState(false);
 
   const toggleLicense = (key: string) => {
     setVisibleLicenses(prev => ({ ...prev, [key]: !prev[key] }));
@@ -267,10 +269,7 @@ const TechAssetViewer = () => {
           variant="outline"
           className="gap-2"
           disabled={filtered.length === 0}
-          onClick={() => {
-            const company = companyFilter || 'Todas as empresas';
-            printAssetReport(filtered, company);
-          }}
+          onClick={() => setReportInfoOpen(true)}
         >
           <Printer className="w-4 h-4" /> Imprimir
         </Button>
@@ -477,6 +476,15 @@ const TechAssetViewer = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <ReportClientInfoDialog
+        open={reportInfoOpen}
+        onOpenChange={setReportInfoOpen}
+        defaultCompany={companyFilter || undefined}
+        onConfirm={(info) => {
+          printAssetReport(filtered, info.company_name || companyFilter || 'Todas as empresas', info);
+        }}
+      />
     </div>
   );
 };
