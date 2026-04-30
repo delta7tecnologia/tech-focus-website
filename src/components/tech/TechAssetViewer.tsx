@@ -12,14 +12,14 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { printAssetReport } from '@/utils/printAssetReport';
 import UploadOrLinkInput, { type SourceMode } from './UploadOrLinkInput';
+import LicenseListEditor from './assets/LicenseListEditor';
+import { fetchAssetLicenses, licensesToDrafts, syncAssetLicenses } from '@/lib/assetLicenses';
+import { formatLicenseTitle, getCategoryLabel, type LicenseDraft, type AssetLicense } from '@/lib/licenseCatalog';
+import { Badge } from '@/components/ui/badge';
 
 const emptyForm = {
   machine_name: '',
   company_name: '',
-  windows_activation_date: '',
-  office_activation_date: '',
-  windows_license: '',
-  office_license: '',
   notes: '',
 };
 
