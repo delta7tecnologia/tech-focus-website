@@ -522,7 +522,7 @@ export const printAssetReport = async (
         ? `<table class="cat-table">
             <thead><tr><th>Categoria</th><th style="text-align:right">Quantidade</th></tr></thead>
             <tbody>
-              ${summaryRows.map((r) => `<tr><td>${escapeHtml(r.label)}</td><td>${r.count}</td></tr>`).join('')}
+              ${summaryRows.map((r) => `<tr><td><div class="prod-cell"><img src="${getProductLogo(r.value)}" class="prod-logo" alt="">${escapeHtml(r.label)}</div></td><td>${r.count}</td></tr>`).join('')}
             </tbody>
           </table>`
         : ''
