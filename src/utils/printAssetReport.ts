@@ -489,8 +489,8 @@ export const printAssetReport = async (
     <div class="page-header">
       <img src="${DELTA7_LOGO_DATA_URL}" alt="Delta7">
       <div class="ph-info">
-        <strong>${escapeHtml(companyName)}</strong>
-        Inventário de TI · ${dateStr}
+        <strong>${escapeHtml(client.company_name || companyName)}</strong>
+        Inventário de TI · ${dateStr} · ${reportId}
       </div>
     </div>
 
