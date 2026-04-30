@@ -49,13 +49,16 @@ const AdminAssets = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [licenses, setLicenses] = useState<LicenseDraft[]>([]);
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
+  const [screenshotMode, setScreenshotMode] = useState<SourceMode>('upload');
+  const [externalScreenshotUrl, setExternalScreenshotUrl] = useState('');
   const [deleteAsset, setDeleteAsset] = useState<Asset | null>(null);
   const [viewImage, setViewImage] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
-const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   const [companyFilter, setCompanyFilter] = useState('');
   const [hiddenLicenses, setHiddenLicenses] = useState<Record<string, boolean>>({});
 
@@ -73,6 +76,12 @@ const [searchTerm, setSearchTerm] = useState('');
       if (error) throw error;
       return data as Asset[];
     },
+  });
+
+  const { data: licensesByAsset = {} } = useQuery({
+    queryKey: ['admin-asset-licenses', assets.map(a => a.id).join(',')],
+    queryFn: () => fetchAssetLicenses(assets.map(a => a.id)),
+    enabled: assets.length > 0,
   });
 
   const companies = [...new Set(assets.map(a => a.company_name))].sort();
