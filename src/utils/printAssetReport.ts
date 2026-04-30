@@ -526,9 +526,14 @@ export const printAssetReport = async (
     <div class="section-title">Detalhamento por Equipamento</div>
     ${cards}
 
+    <div class="legal-footer">
+      <strong>Aviso legal e política de uso</strong>
+      As informações contidas neste relatório, incluindo chaves de licença, dados de equipamentos e identificação do cliente, são <b>confidenciais</b> e de uso restrito. Os softwares listados foram comercializados/instalados pela Delta7 Tecnologia conforme contrato de prestação de serviços de TI vigente. O cliente é responsável pela guarda das licenças, pelo uso em conformidade com os termos dos respectivos fabricantes (Microsoft EULA, Kaspersky, etc.) e pelo cumprimento da Lei de Software (Lei nº 9.609/98) e da LGPD (Lei nº 13.709/18). A Delta7 Tecnologia não se responsabiliza por uso indevido, transferências não autorizadas ou alterações realizadas após a emissão deste documento.
+    </div>
+
     <div class="doc-footer">
-      <strong>Delta7 Tecnologia</strong> · Documento confidencial gerado automaticamente em ${dateStr} às ${timeStr}<br>
-      Este relatório contém informações sensíveis. Distribuição restrita ao cliente.
+      <strong>Delta7 Tecnologia</strong> · Documento confidencial gerado automaticamente em ${dateStr} às ${timeStr} · ID ${reportId}<br>
+      Distribuição restrita ao cliente identificado na capa.
     </div>
   </div>
 
