@@ -136,11 +136,9 @@ export const printAssetReport = async (
     }
     .cover-top { display: flex; justify-content: space-between; align-items: flex-start; }
     .cover-logo {
-      height: 90px;
-      background: white;
-      padding: 10px 18px;
-      border-radius: 8px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+      height: 80px;
+      width: auto;
+      object-fit: contain;
     }
     .cover-id {
       font-size: 10px;
