@@ -1,6 +1,6 @@
 import { fetchAssetLicenses } from '@/lib/assetLicenses';
 import { formatLicenseTitle, getCategoryLabel, type AssetLicense, LICENSE_CATALOG } from '@/lib/licenseCatalog';
-import { DELTA7_LOGO_DATA_URL } from '@/assets/delta7LogoBase64';
+import { DELTA7_LOGO_DATA_URL, DELTA7_LOGO_DARK_DATA_URL } from '@/assets/delta7LogoBase64';
 
 interface AssetForReport {
   id: string;
@@ -205,7 +205,7 @@ export const printAssetReport = async (
       border-bottom: 2px solid var(--primary);
       margin-bottom: 20px;
     }
-    .page-header img { height: 36px; }
+    .page-header img { height: 44px; width: auto; object-fit: contain; }
     .page-header .ph-info {
       text-align: right;
       font-size: 10px;
@@ -485,7 +485,7 @@ export const printAssetReport = async (
   <!-- ========= CORPO ========= -->
   <div class="page">
     <div class="page-header">
-      <img src="${DELTA7_LOGO_DATA_URL}" alt="Delta7">
+      <img src="${DELTA7_LOGO_DARK_DATA_URL}" alt="Delta7">
       <div class="ph-info">
         <strong>${escapeHtml(client.company_name || companyName)}</strong>
         Inventário de TI · ${dateStr} · ${reportId}
