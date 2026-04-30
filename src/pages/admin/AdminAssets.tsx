@@ -18,6 +18,7 @@ import {
 import { Plus, Pencil, Trash2, Monitor, Eye, Search, Printer } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { printAssetReport } from '@/utils/printAssetReport';
+import ReportClientInfoDialog from '@/components/tech/assets/ReportClientInfoDialog';
 import LicenseListEditor from '@/components/tech/assets/LicenseListEditor';
 import { fetchAssetLicenses, licensesToDrafts, syncAssetLicenses } from '@/lib/assetLicenses';
 import { formatLicenseTitle, getCategoryLabel, type LicenseDraft } from '@/lib/licenseCatalog';
