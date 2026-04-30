@@ -275,7 +275,7 @@ const AdminClients = () => {
                 <Button type="button" variant="outline" onClick={resetForm} className="flex-1">
                   Cancelar
                 </Button>
-                <Button type="submit" className="flex-1">
+                <Button type="submit" className="flex-1" disabled={!docValidation.empty && !docValidation.valid}>
                   {editingClient ? 'Salvar' : 'Adicionar'}
                 </Button>
               </div>
