@@ -92,7 +92,7 @@ export const printAssetReport = async (
     }
   }
   const summaryRows = LICENSE_CATALOG
-    .map((c) => ({ label: c.label, count: categoryCounts.get(c.value) || 0 }))
+    .map((c) => ({ value: c.value, label: c.label, count: categoryCounts.get(c.value) || 0 }))
     .filter((r) => r.count > 0);
 
   const today = new Date();
