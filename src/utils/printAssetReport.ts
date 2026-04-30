@@ -73,7 +73,7 @@ export const printAssetReport = async (assets: AssetForReport[], companyName: st
       totalLicenses++;
     }
   }
-  const summaryRows = LICENSE_CATEGORIES
+  const summaryRows = LICENSE_CATALOG
     .map((c) => ({ label: c.label, count: categoryCounts.get(c.value) || 0 }))
     .filter((r) => r.count > 0);
 
