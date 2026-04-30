@@ -408,24 +408,7 @@ const TechAssetViewer = () => {
                 </div>
               )}
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium">Ativação Windows</label>
-                <Input type="date" value={form.windows_activation_date} onChange={e => setForm(f => ({ ...f, windows_activation_date: e.target.value }))} />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Ativação Office</label>
-                <Input type="date" value={form.office_activation_date} onChange={e => setForm(f => ({ ...f, office_activation_date: e.target.value }))} />
-              </div>
-            </div>
-            <div>
-              <label className="text-sm font-medium">Licença Windows</label>
-              <Input value={form.windows_license} onChange={e => setForm(f => ({ ...f, windows_license: e.target.value }))} placeholder="XXXXX-XXXXX-XXXXX-XXXXX-XXXXX" />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Licença Office</label>
-              <Input value={form.office_license} onChange={e => setForm(f => ({ ...f, office_license: e.target.value }))} placeholder="XXXXX-XXXXX-XXXXX-XXXXX-XXXXX" />
-            </div>
+            <LicenseListEditor value={licenses} onChange={setLicenses} />
             <div>
               <label className="text-sm font-medium">Evidência (Print Screen)</label>
               <div className="mt-1">
