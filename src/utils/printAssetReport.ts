@@ -28,7 +28,12 @@ const escapeHtml = (s: string) =>
 const renderLicenseRow = (l: AssetLicense) => `
   <tr>
     <td class="lic-cat">${escapeHtml(getCategoryLabel(l.category))}</td>
-    <td class="lic-prod">${escapeHtml(formatLicenseTitle(l))}</td>
+    <td class="lic-prod">
+      <div class="prod-cell">
+        <img src="${getProductLogo(l.category, l.product)}" class="prod-logo" alt="">
+        <span>${escapeHtml(formatLicenseTitle(l))}</span>
+      </div>
+    </td>
     <td class="lic-date">${l.activation_date ? formatDate(l.activation_date) : '—'}</td>
     <td class="lic-key">${l.license_key ? `<code>${escapeHtml(l.license_key)}</code>` : '—'}</td>
   </tr>
