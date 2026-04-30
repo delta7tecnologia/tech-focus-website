@@ -443,6 +443,15 @@ const AdminAssets = () => {
           {viewImage && <img src={viewImage} alt="Evidência" className="w-full rounded-lg" />}
         </DialogContent>
       </Dialog>
+
+      <ReportClientInfoDialog
+        open={reportInfoOpen}
+        onOpenChange={setReportInfoOpen}
+        defaultCompany={companyFilter || undefined}
+        onConfirm={(info) => {
+          printAssetReport(filteredAssets, info.company_name || companyFilter || 'Todas as empresas', info);
+        }}
+      />
     </div>
   );
 };
