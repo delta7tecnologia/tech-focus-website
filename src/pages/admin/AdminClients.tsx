@@ -31,6 +31,9 @@ interface Client {
   website_url: string | null;
   is_active: boolean;
   order_index: number;
+  document: string | null;
+  contact_person: string | null;
+  address: string | null;
 }
 
 const AdminClients = () => {
@@ -42,6 +45,9 @@ const AdminClients = () => {
     website_url: '',
     is_active: true,
     order_index: 0,
+    document: '',
+    contact_person: '',
+    address: '',
   });
 
   const { toast } = useToast();
@@ -105,7 +111,10 @@ const AdminClients = () => {
   });
 
   const resetForm = () => {
-    setFormData({ name: '', logo_url: '', website_url: '', is_active: true, order_index: 0 });
+    setFormData({
+      name: '', logo_url: '', website_url: '', is_active: true, order_index: 0,
+      document: '', contact_person: '', address: '',
+    });
     setEditingClient(null);
     setIsDialogOpen(false);
   };
@@ -118,6 +127,9 @@ const AdminClients = () => {
       website_url: client.website_url || '',
       is_active: client.is_active,
       order_index: client.order_index,
+      document: client.document || '',
+      contact_person: client.contact_person || '',
+      address: client.address || '',
     });
     setIsDialogOpen(true);
   };
@@ -128,6 +140,9 @@ const AdminClients = () => {
       ...formData,
       logo_url: formData.logo_url || null,
       website_url: formData.website_url || null,
+      document: formData.document || null,
+      contact_person: formData.contact_person || null,
+      address: formData.address || null,
     };
 
     if (editingClient) {
