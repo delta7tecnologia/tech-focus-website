@@ -207,13 +207,58 @@ export const printAssetReport = async (
       border-bottom: 2px solid var(--primary);
       margin-bottom: 20px;
     }
-    .page-header img { height: 28px; }
+    .page-header img { height: 36px; }
     .page-header .ph-info {
       text-align: right;
       font-size: 10px;
       color: var(--muted);
     }
     .page-header .ph-info strong { color: var(--text); display: block; font-size: 11px; }
+
+    /* ===== AVISO LEGAL (CAPA) ===== */
+    .legal-cover {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin-top: 24px;
+      font-size: 9.5px;
+      line-height: 1.55;
+      color: rgba(255,255,255,0.85);
+    }
+    .legal-cover strong { color: white; letter-spacing: 1px; font-size: 9px; text-transform: uppercase; display: block; margin-bottom: 4px; }
+
+    /* ===== AVISO LEGAL (RODAPÉ) ===== */
+    .legal-footer {
+      margin-top: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--primary);
+      background: var(--bg-soft);
+      font-size: 9px;
+      line-height: 1.5;
+      color: var(--muted);
+      border-radius: 4px;
+    }
+    .legal-footer strong { color: var(--text); display: block; margin-bottom: 3px; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* ===== CARTÃO DE DADOS DO CLIENTE (CAPA) ===== */
+    .client-card {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 8px;
+      padding: 18px 22px;
+      margin-top: 28px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px 24px;
+    }
+    .client-card .field .lbl {
+      font-size: 9px; letter-spacing: 1.5px; opacity: 0.55;
+      text-transform: uppercase; margin-bottom: 3px;
+    }
+    .client-card .field .val { font-size: 13px; font-weight: 600; word-wrap: break-word; }
+    .client-card .field.full { grid-column: 1 / -1; }
 
     /* ===== RESUMO ===== */
     .section-title {
