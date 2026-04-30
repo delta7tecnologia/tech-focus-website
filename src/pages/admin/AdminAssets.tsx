@@ -96,8 +96,11 @@ const AdminAssets = () => {
   const openNew = () => {
     setEditingId(null);
     setForm(emptyForm);
+    setLicenses([]);
     setScreenshotFile(null);
     setScreenshotPreview(null);
+    setScreenshotMode('upload');
+    setExternalScreenshotUrl('');
     setDialogOpen(true);
   };
 
@@ -106,22 +109,20 @@ const AdminAssets = () => {
     setForm({
       machine_name: asset.machine_name,
       company_name: asset.company_name,
-      windows_activation_date: asset.windows_activation_date || '',
-      office_activation_date: asset.office_activation_date || '',
-      windows_license: asset.windows_license || '',
-      office_license: asset.office_license || '',
       notes: asset.notes || '',
     });
+    setLicenses(licensesToDrafts(licensesByAsset[asset.id] || []));
     setScreenshotFile(null);
-    setScreenshotPreview(asset.screenshot_url || null);
+    if (asset.is_external_screenshot && asset.screenshot_url) {
+      setScreenshotMode('external');
+      setExternalScreenshotUrl(asset.screenshot_url);
+      setScreenshotPreview(null);
+    } else {
+      setScreenshotMode('upload');
+      setExternalScreenshotUrl('');
+      setScreenshotPreview(null);
+    }
     setDialogOpen(true);
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setScreenshotFile(file);
-    setScreenshotPreview(URL.createObjectURL(file));
   };
 
   const uploadScreenshot = async (file: File): Promise<string> => {
@@ -156,12 +157,22 @@ const AdminAssets = () => {
     }
     setSaving(true);
     try {
-      let screenshot_url = editingId
-        ? assets.find(a => a.id === editingId)?.screenshot_url || null
-        : null;
+      const existing = editingId ? assets.find(a => a.id === editingId) : null;
+      let screenshot_url: string | null = existing?.screenshot_url || null;
+      let is_external_screenshot = existing?.is_external_screenshot || false;
 
-      if (screenshotFile) {
+      if (screenshotMode === 'external') {
+        const url = externalScreenshotUrl.trim();
+        if (url) {
+          if (!/^https?:\/\//i.test(url)) {
+            throw new Error('A URL da evidência deve começar com http:// ou https://');
+          }
+          screenshot_url = url;
+          is_external_screenshot = true;
+        }
+      } else if (screenshotFile) {
         screenshot_url = await uploadScreenshot(screenshotFile);
+        is_external_screenshot = false;
       }
 
       const { data: { user } } = await supabase.auth.getUser();
@@ -169,25 +180,30 @@ const AdminAssets = () => {
       const payload = {
         machine_name: form.machine_name.trim(),
         company_name: form.company_name.trim(),
-        windows_activation_date: form.windows_activation_date || null,
-        office_activation_date: form.office_activation_date || null,
-        windows_license: form.windows_license.trim() || null,
-        office_license: form.office_license.trim() || null,
         notes: form.notes.trim() || null,
         screenshot_url,
+        is_external_screenshot,
       };
 
+      let assetId = editingId;
       if (editingId) {
         const { error } = await supabase.from('assets').update(payload).eq('id', editingId);
         if (error) throw error;
-        toast({ title: 'Patrimônio atualizado!' });
       } else {
-        const { error } = await supabase.from('assets').insert({ ...payload, created_by: user!.id });
+        const { data: inserted, error } = await supabase
+          .from('assets')
+          .insert({ ...payload, created_by: user!.id })
+          .select('id')
+          .single();
         if (error) throw error;
-        toast({ title: 'Patrimônio cadastrado!' });
+        assetId = inserted.id;
       }
 
+      await syncAssetLicenses(assetId!, licenses, user!.id);
+      toast({ title: editingId ? 'Patrimônio atualizado!' : 'Patrimônio cadastrado!' });
+
       queryClient.invalidateQueries({ queryKey: ['admin-assets'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-asset-licenses'] });
       setDialogOpen(false);
     } catch (err: any) {
       toast({ title: 'Erro', description: err.message, variant: 'destructive' });
