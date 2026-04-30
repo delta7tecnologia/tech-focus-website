@@ -14,6 +14,56 @@ export type Database = {
   }
   public: {
     Tables: {
+      asset_licenses: {
+        Row: {
+          activation_date: string | null
+          asset_id: string
+          category: string
+          created_at: string
+          created_by: string | null
+          edition: string | null
+          id: string
+          license_key: string | null
+          notes: string | null
+          product: string
+          updated_at: string
+        }
+        Insert: {
+          activation_date?: string | null
+          asset_id: string
+          category: string
+          created_at?: string
+          created_by?: string | null
+          edition?: string | null
+          id?: string
+          license_key?: string | null
+          notes?: string | null
+          product: string
+          updated_at?: string
+        }
+        Update: {
+          activation_date?: string | null
+          asset_id?: string
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          edition?: string | null
+          id?: string
+          license_key?: string | null
+          notes?: string | null
+          product?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asset_licenses_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       assets: {
         Row: {
           company_name: string
