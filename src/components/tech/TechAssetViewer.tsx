@@ -11,6 +11,7 @@ import { Search, Monitor, Eye, Copy, Plus, Pencil, Upload, Printer, Trash2, Exte
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { printAssetReport } from '@/utils/printAssetReport';
+import ReportClientInfoDialog, { type ReportClientInfo } from './assets/ReportClientInfoDialog';
 import UploadOrLinkInput, { type SourceMode } from './UploadOrLinkInput';
 import LicenseListEditor from './assets/LicenseListEditor';
 import { fetchAssetLicenses, licensesToDrafts, syncAssetLicenses } from '@/lib/assetLicenses';
