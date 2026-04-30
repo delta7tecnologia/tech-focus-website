@@ -1,6 +1,7 @@
 import { fetchAssetLicenses } from '@/lib/assetLicenses';
 import { formatLicenseTitle, getCategoryLabel, type AssetLicense, LICENSE_CATALOG } from '@/lib/licenseCatalog';
 import { DELTA7_LOGO_DATA_URL, DELTA7_LOGO_DARK_DATA_URL } from '@/assets/delta7LogoBase64';
+import { getProductLogo } from '@/assets/productLogos';
 
 interface AssetForReport {
   id: string;
@@ -27,7 +28,12 @@ const escapeHtml = (s: string) =>
 const renderLicenseRow = (l: AssetLicense) => `
   <tr>
     <td class="lic-cat">${escapeHtml(getCategoryLabel(l.category))}</td>
-    <td class="lic-prod">${escapeHtml(formatLicenseTitle(l))}</td>
+    <td class="lic-prod">
+      <div class="prod-cell">
+        <img src="${getProductLogo(l.category, l.product)}" class="prod-logo" alt="">
+        <span>${escapeHtml(formatLicenseTitle(l))}</span>
+      </div>
+    </td>
     <td class="lic-date">${l.activation_date ? formatDate(l.activation_date) : '—'}</td>
     <td class="lic-key">${l.license_key ? `<code>${escapeHtml(l.license_key)}</code>` : '—'}</td>
   </tr>
@@ -86,7 +92,7 @@ export const printAssetReport = async (
     }
   }
   const summaryRows = LICENSE_CATALOG
-    .map((c) => ({ label: c.label, count: categoryCounts.get(c.value) || 0 }))
+    .map((c) => ({ value: c.value, label: c.label, count: categoryCounts.get(c.value) || 0 }))
     .filter((r) => r.count > 0);
 
   const today = new Date();
@@ -378,6 +384,8 @@ export const printAssetReport = async (
     .lic-table tr:last-child td { border-bottom: none; }
     .lic-cat { color: var(--muted); white-space: nowrap; width: 110px; }
     .lic-prod { font-weight: 600; color: var(--text); }
+    .prod-cell { display: flex; align-items: center; gap: 8px; }
+    .prod-logo { width: 18px; height: 18px; object-fit: contain; flex-shrink: 0; }
     .lic-date { color: var(--muted); white-space: nowrap; width: 80px; }
     .lic-key code {
       font-family: 'Courier New', monospace;
@@ -514,7 +522,7 @@ export const printAssetReport = async (
         ? `<table class="cat-table">
             <thead><tr><th>Categoria</th><th style="text-align:right">Quantidade</th></tr></thead>
             <tbody>
-              ${summaryRows.map((r) => `<tr><td>${escapeHtml(r.label)}</td><td>${r.count}</td></tr>`).join('')}
+              ${summaryRows.map((r) => `<tr><td><div class="prod-cell"><img src="${getProductLogo(r.value)}" class="prod-logo" alt="">${escapeHtml(r.label)}</div></td><td>${r.count}</td></tr>`).join('')}
             </tbody>
           </table>`
         : ''
