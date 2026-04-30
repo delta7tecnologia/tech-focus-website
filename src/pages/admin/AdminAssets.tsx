@@ -379,35 +379,29 @@ const AdminAssets = () => {
               <label className="text-sm font-medium">Empresa *</label>
               <Input value={form.company_name} onChange={e => setForm(f => ({ ...f, company_name: e.target.value }))} placeholder="Nome da empresa" />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium">Ativação Windows</label>
-                <Input type="date" value={form.windows_activation_date} onChange={e => setForm(f => ({ ...f, windows_activation_date: e.target.value }))} />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Ativação Office</label>
-                <Input type="date" value={form.office_activation_date} onChange={e => setForm(f => ({ ...f, office_activation_date: e.target.value }))} />
-              </div>
-            </div>
-            <div>
-              <label className="text-sm font-medium">Licença Windows</label>
-              <Input value={form.windows_license} onChange={e => setForm(f => ({ ...f, windows_license: e.target.value }))} placeholder="XXXXX-XXXXX-XXXXX-XXXXX-XXXXX" />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Licença Office</label>
-              <Input value={form.office_license} onChange={e => setForm(f => ({ ...f, office_license: e.target.value }))} placeholder="XXXXX-XXXXX-XXXXX-XXXXX-XXXXX" />
-            </div>
+            <LicenseListEditor value={licenses} onChange={setLicenses} />
             <div>
               <label className="text-sm font-medium">Evidência (Print Screen)</label>
               <div className="mt-1">
-                <input type="file" ref={fileInputRef} accept="image/*" onChange={handleFileChange} className="hidden" />
-                <Button type="button" variant="outline" className="gap-2" onClick={() => fileInputRef.current?.click()}>
-                  <Upload className="w-4 h-4" /> Selecionar imagem
-                </Button>
+                <UploadOrLinkInput
+                  mode={screenshotMode}
+                  onModeChange={(m) => {
+                    setScreenshotMode(m);
+                    if (m === 'external') { setScreenshotFile(null); setScreenshotPreview(null); }
+                  }}
+                  externalUrl={externalScreenshotUrl}
+                  onExternalUrlChange={setExternalScreenshotUrl}
+                  onFileChange={(f) => {
+                    setScreenshotFile(f);
+                    setScreenshotPreview(f ? URL.createObjectURL(f) : null);
+                  }}
+                  selectedFileName={screenshotFile?.name}
+                  fileLabel="Selecionar imagem"
+                  accept="image/*"
+                  preview={screenshotPreview}
+                  helpText="Cole o link compartilhável (OneDrive, Google Drive...) para evitar uso do armazenamento interno."
+                />
               </div>
-              {screenshotPreview && (
-                <img src={screenshotPreview} alt="Preview" className="mt-2 rounded-lg border max-h-48 object-contain w-full" />
-              )}
             </div>
             <div>
               <label className="text-sm font-medium">Observações</label>
