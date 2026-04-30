@@ -15,19 +15,21 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Plus, Pencil, Trash2, Monitor, Upload, Eye, Search, Printer } from 'lucide-react';
+import { Plus, Pencil, Trash2, Monitor, Eye, Search, Printer } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { printAssetReport } from '@/utils/printAssetReport';
+import LicenseListEditor from '@/components/tech/assets/LicenseListEditor';
+import { fetchAssetLicenses, licensesToDrafts, syncAssetLicenses } from '@/lib/assetLicenses';
+import { formatLicenseTitle, getCategoryLabel, type LicenseDraft } from '@/lib/licenseCatalog';
+import UploadOrLinkInput, { type SourceMode } from '@/components/tech/UploadOrLinkInput';
 
 interface Asset {
   id: string;
   machine_name: string;
   company_name: string;
-  windows_activation_date: string | null;
-  office_activation_date: string | null;
-  windows_license: string | null;
-  office_license: string | null;
   notes: string | null;
   screenshot_url: string | null;
+  is_external_screenshot?: boolean;
   created_by: string;
   created_at: string;
   updated_at: string;
@@ -36,10 +38,6 @@ interface Asset {
 const emptyForm = {
   machine_name: '',
   company_name: '',
-  windows_activation_date: '',
-  office_activation_date: '',
-  windows_license: '',
-  office_license: '',
   notes: '',
 };
 
