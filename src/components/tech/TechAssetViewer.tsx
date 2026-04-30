@@ -106,18 +106,7 @@ const TechAssetViewer = () => {
       notes: asset.notes || '',
     });
     setLicenses(licensesToDrafts(licensesByAsset[asset.id] || []));
-
-  const openEdit = async (asset: any) => {
-    setEditingId(asset.id);
-    setForm({
-      machine_name: asset.machine_name,
-      company_name: asset.company_name,
-      windows_activation_date: asset.windows_activation_date || '',
-      office_activation_date: asset.office_activation_date || '',
-      windows_license: asset.windows_license || '',
-      office_license: asset.office_license || '',
-      notes: asset.notes || '',
-    });
+    setScreenshotFile(null);
     setScreenshotFile(null);
     if (asset.is_external_screenshot && asset.screenshot_url) {
       setScreenshotMode('external');
