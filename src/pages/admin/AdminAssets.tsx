@@ -62,6 +62,7 @@ const AdminAssets = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [companyFilter, setCompanyFilter] = useState('');
   const [hiddenLicenses, setHiddenLicenses] = useState<Record<string, boolean>>({});
+  const [reportInfoOpen, setReportInfoOpen] = useState(false);
 
   const toggleLicense = (key: string) => {
     setHiddenLicenses(prev => ({ ...prev, [key]: !prev[key] }));
