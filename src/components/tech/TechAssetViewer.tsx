@@ -313,50 +313,55 @@ const TechAssetViewer = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div>
-                    <p className="text-xs font-medium text-gray-500 mb-1">Windows</p>
-                    <p className="text-xs text-gray-400">Ativação: {formatDate(asset.windows_activation_date)}</p>
-                    {asset.windows_license ? (
-                      <div className="flex items-center gap-1 mt-1">
-                        <button
-                          onClick={() => toggleLicense(`win-${asset.id}`)}
-                          className="text-xs font-mono bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 transition-colors break-all text-left"
-                        >
-                          {visibleLicenses[`win-${asset.id}`] ? asset.windows_license : '••••••••••••••'}
-                        </button>
-                        {visibleLicenses[`win-${asset.id}`] && (
-                          <button onClick={() => copyToClipboard(asset.windows_license!)} className="text-gray-400 hover:text-gray-600">
-                            <Copy className="w-3 h-3" />
-                          </button>
-                        )}
-                      </div>
-                    ) : (
-                      <span className="text-xs text-gray-400">Sem licença</span>
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-gray-500 mb-1">Office</p>
-                    <p className="text-xs text-gray-400">Ativação: {formatDate(asset.office_activation_date)}</p>
-                    {asset.office_license ? (
-                      <div className="flex items-center gap-1 mt-1">
-                        <button
-                          onClick={() => toggleLicense(`off-${asset.id}`)}
-                          className="text-xs font-mono bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 transition-colors break-all text-left"
-                        >
-                          {visibleLicenses[`off-${asset.id}`] ? asset.office_license : '••••••••••••••'}
-                        </button>
-                        {visibleLicenses[`off-${asset.id}`] && (
-                          <button onClick={() => copyToClipboard(asset.office_license!)} className="text-gray-400 hover:text-gray-600">
-                            <Copy className="w-3 h-3" />
-                          </button>
-                        )}
-                      </div>
-                    ) : (
-                      <span className="text-xs text-gray-400">Sem licença</span>
-                    )}
-                  </div>
-                </div>
+                {(() => {
+                  const list = licensesByAsset[asset.id] || [];
+                  if (list.length === 0) {
+                    return <p className="text-xs text-gray-400 italic">Nenhuma licença cadastrada.</p>;
+                  }
+                  return (
+                    <div className="space-y-2">
+                      {list.map((lic) => {
+                        const key = `lic-${lic.id}`;
+                        const isVisible = visibleLicenses[key];
+                        return (
+                          <div key={lic.id} className="border-l-2 border-blue-200 pl-2">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                                {getCategoryLabel(lic.category)}
+                              </Badge>
+                              <span className="text-xs font-medium text-gray-800">
+                                {formatLicenseTitle(lic)}
+                              </span>
+                              {lic.activation_date && (
+                                <span className="text-[10px] text-gray-400">
+                                  · ativ. {formatDate(lic.activation_date)}
+                                </span>
+                              )}
+                            </div>
+                            {lic.license_key && (
+                              <div className="flex items-center gap-1 mt-1">
+                                <button
+                                  onClick={() => toggleLicense(key)}
+                                  className="text-xs font-mono bg-gray-100 px-2 py-0.5 rounded hover:bg-gray-200 transition-colors break-all text-left"
+                                >
+                                  {isVisible ? lic.license_key : '••••••••••••••'}
+                                </button>
+                                {isVisible && (
+                                  <button onClick={() => copyToClipboard(lic.license_key!)} className="text-gray-400 hover:text-gray-600">
+                                    <Copy className="w-3 h-3" />
+                                  </button>
+                                )}
+                              </div>
+                            )}
+                            {lic.notes && (
+                              <p className="text-[10px] text-gray-500 mt-0.5">{lic.notes}</p>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
 
                 {asset.notes && (
                   <p className="text-xs text-gray-500 border-t pt-2">{asset.notes}</p>
