@@ -476,6 +476,15 @@ const TechAssetViewer = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <ReportClientInfoDialog
+        open={reportInfoOpen}
+        onOpenChange={setReportInfoOpen}
+        defaultCompany={companyFilter || undefined}
+        onConfirm={(info) => {
+          printAssetReport(filtered, info.company_name || companyFilter || 'Todas as empresas', info);
+        }}
+      />
     </div>
   );
 };
