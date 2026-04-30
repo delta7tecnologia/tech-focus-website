@@ -62,6 +62,12 @@ const TechAssetViewer = () => {
     },
   });
 
+  const { data: licensesByAsset = {} } = useQuery({
+    queryKey: ['tech-asset-licenses', assets.map((a: any) => a.id).join(',')],
+    queryFn: () => fetchAssetLicenses(assets.map((a: any) => a.id)),
+    enabled: assets.length > 0,
+  });
+
   const companies = [...new Set(assets.map(a => a.company_name))].sort();
 
   const filtered = assets.filter(a => {
