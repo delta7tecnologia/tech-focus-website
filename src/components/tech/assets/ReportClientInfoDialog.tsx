@@ -155,32 +155,44 @@ const ReportClientInfoDialog = ({ open, onOpenChange, defaultCompany, onConfirm 
               </div>
             )}
             {source === 'not-found' && (
-              <div className="space-y-2">
-                <div className="flex items-start gap-2 text-xs bg-amber-50 text-amber-700 border border-amber-200 rounded p-2">
-                  <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span>Não encontrado pelo nome. Tente buscar por CNPJ/CPF:</span>
-                </div>
-                <div className="flex gap-2">
-                  <Input
-                    value={docLookup}
-                    onChange={(e) => setDocLookup(e.target.value)}
-                    placeholder="00.000.000/0001-00 ou 000.000.000-00"
-                    className={!lookupValidation.empty && !lookupValidation.valid ? 'border-destructive' : ''}
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleDocLookup}
-                    disabled={!lookupValidation.valid || lookupValidation.empty}
-                  >
-                    <Search className="w-4 h-4" />
-                  </Button>
-                </div>
-                {!lookupValidation.empty && !lookupValidation.valid && (
-                  <p className="text-xs text-destructive">{lookupValidation.message}</p>
-                )}
+              <div className="flex items-start gap-2 text-xs bg-amber-50 text-amber-700 border border-amber-200 rounded p-2">
+                <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                <span>Não encontrado pelo nome. Use a busca por CNPJ/CPF abaixo ou preencha manualmente.</span>
               </div>
             )}
+
+            {/* Busca por CNPJ/CPF — sempre visível */}
+            <div className="space-y-1 border rounded-md p-2 bg-muted/30">
+              <Label className="text-xs font-semibold">Buscar cliente por CNPJ/CPF</Label>
+              <div className="flex gap-2">
+                <Input
+                  value={docLookup}
+                  onChange={(e) => setDocLookup(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && lookupValidation.valid && !lookupValidation.empty) {
+                      e.preventDefault();
+                      handleDocLookup();
+                    }
+                  }}
+                  placeholder="00.000.000/0001-00 ou 000.000.000-00"
+                  className={!lookupValidation.empty && !lookupValidation.valid ? 'border-destructive' : ''}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleDocLookup}
+                  disabled={!lookupValidation.valid || lookupValidation.empty}
+                >
+                  <Search className="w-4 h-4" />
+                </Button>
+              </div>
+              {!lookupValidation.empty && !lookupValidation.valid && (
+                <p className="text-xs text-destructive">{lookupValidation.message}</p>
+              )}
+              {lookupValidation.empty && (
+                <p className="text-xs text-muted-foreground">Digite o documento e clique na lupa (ou pressione Enter).</p>
+              )}
+            </div>
 
             <div className="space-y-3 py-2">
               <div>
