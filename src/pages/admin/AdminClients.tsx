@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -31,6 +32,9 @@ interface Client {
   website_url: string | null;
   is_active: boolean;
   order_index: number;
+  document: string | null;
+  contact_person: string | null;
+  address: string | null;
 }
 
 const AdminClients = () => {
@@ -42,6 +46,9 @@ const AdminClients = () => {
     website_url: '',
     is_active: true,
     order_index: 0,
+    document: '',
+    contact_person: '',
+    address: '',
   });
 
   const { toast } = useToast();
@@ -105,7 +112,10 @@ const AdminClients = () => {
   });
 
   const resetForm = () => {
-    setFormData({ name: '', logo_url: '', website_url: '', is_active: true, order_index: 0 });
+    setFormData({
+      name: '', logo_url: '', website_url: '', is_active: true, order_index: 0,
+      document: '', contact_person: '', address: '',
+    });
     setEditingClient(null);
     setIsDialogOpen(false);
   };
@@ -118,6 +128,9 @@ const AdminClients = () => {
       website_url: client.website_url || '',
       is_active: client.is_active,
       order_index: client.order_index,
+      document: client.document || '',
+      contact_person: client.contact_person || '',
+      address: client.address || '',
     });
     setIsDialogOpen(true);
   };
@@ -128,6 +141,9 @@ const AdminClients = () => {
       ...formData,
       logo_url: formData.logo_url || null,
       website_url: formData.website_url || null,
+      document: formData.document || null,
+      contact_person: formData.contact_person || null,
+      address: formData.address || null,
     };
 
     if (editingClient) {
@@ -183,6 +199,40 @@ const AdminClients = () => {
                   value={formData.website_url}
                   onChange={(e) => setFormData({ ...formData, website_url: e.target.value })}
                   placeholder="https://exemplo.com"
+                />
+              </div>
+
+              <div className="border-t pt-4">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+                  Dados para relatórios técnicos
+                </p>
+              </div>
+              <div>
+                <Label htmlFor="document">CNPJ / CPF</Label>
+                <Input
+                  id="document"
+                  value={formData.document}
+                  onChange={(e) => setFormData({ ...formData, document: e.target.value })}
+                  placeholder="00.000.000/0001-00"
+                />
+              </div>
+              <div>
+                <Label htmlFor="contact_person">Responsável</Label>
+                <Input
+                  id="contact_person"
+                  value={formData.contact_person}
+                  onChange={(e) => setFormData({ ...formData, contact_person: e.target.value })}
+                  placeholder="Nome do contato"
+                />
+              </div>
+              <div>
+                <Label htmlFor="address">Endereço</Label>
+                <Textarea
+                  id="address"
+                  value={formData.address}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  placeholder="Rua, nº, bairro, cidade/UF"
+                  rows={2}
                 />
               </div>
               <div>
