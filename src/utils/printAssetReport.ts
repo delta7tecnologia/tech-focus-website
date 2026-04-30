@@ -1,10 +1,10 @@
+import { fetchAssetLicenses } from '@/lib/assetLicenses';
+import { formatLicenseTitle, getCategoryLabel, type AssetLicense } from '@/lib/licenseCatalog';
+
 interface AssetForReport {
+  id: string;
   machine_name: string;
   company_name: string;
-  windows_activation_date: string | null;
-  office_activation_date: string | null;
-  windows_license: string | null;
-  office_license: string | null;
   notes: string | null;
 }
 
@@ -13,18 +13,33 @@ const formatDate = (d: string | null) => {
   return new Date(d + 'T00:00:00').toLocaleDateString('pt-BR');
 };
 
-export const printAssetReport = (assets: AssetForReport[], companyName: string) => {
+const renderLicenses = (licenses: AssetLicense[]) => {
+  if (!licenses.length) return '<span style="color:#9ca3af;font-style:italic">Sem licenças</span>';
+  return licenses
+    .map(
+      (l) => `
+        <div style="margin-bottom:4px;padding-left:4px;border-left:2px solid #2563eb">
+          <div style="font-size:11px"><strong>${getCategoryLabel(l.category)}:</strong> ${formatLicenseTitle(l)}</div>
+          ${l.activation_date ? `<div style="font-size:10px;color:#6b7280">Ativação: ${formatDate(l.activation_date)}</div>` : ''}
+          ${l.license_key ? `<div style="font-family:monospace;font-size:10px;word-break:break-all">${l.license_key}</div>` : ''}
+          ${l.notes ? `<div style="font-size:10px;color:#6b7280">${l.notes}</div>` : ''}
+        </div>`
+    )
+    .join('');
+};
+
+export const printAssetReport = async (assets: AssetForReport[], companyName: string) => {
+  const grouped = await fetchAssetLicenses(assets.map((a) => a.id));
+
   const rows = assets
     .map(
       (a, i) => `
       <tr>
-        <td>${i + 1}</td>
-        <td>${a.machine_name}</td>
-        <td>${formatDate(a.windows_activation_date)}</td>
-        <td style="font-family:monospace;font-size:11px;word-break:break-all">${a.windows_license || '—'}</td>
-        <td>${formatDate(a.office_activation_date)}</td>
-        <td style="font-family:monospace;font-size:11px;word-break:break-all">${a.office_license || '—'}</td>
-        <td>${a.notes || '—'}</td>
+        <td style="vertical-align:top">${i + 1}</td>
+        <td style="vertical-align:top"><strong>${a.machine_name}</strong></td>
+        <td style="vertical-align:top">${a.company_name}</td>
+        <td style="vertical-align:top">${renderLicenses(grouped[a.id] || [])}</td>
+        <td style="vertical-align:top">${a.notes || '—'}</td>
       </tr>`
     )
     .join('');
@@ -46,7 +61,7 @@ export const printAssetReport = (assets: AssetForReport[], companyName: string) 
     .meta { display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 12px; color: #6b7280; }
     table { width: 100%; border-collapse: collapse; }
     th { background: #2563eb; color: white; padding: 8px 6px; text-align: left; font-size: 11px; }
-    td { padding: 6px; border-bottom: 1px solid #e5e7eb; font-size: 11px; vertical-align: top; }
+    td { padding: 8px 6px; border-bottom: 1px solid #e5e7eb; font-size: 11px; }
     tr:nth-child(even) { background: #f9fafb; }
     .footer { margin-top: 24px; text-align: center; font-size: 10px; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 8px; }
     @media print {
@@ -67,12 +82,10 @@ export const printAssetReport = (assets: AssetForReport[], companyName: string) 
   <table>
     <thead>
       <tr>
-        <th>#</th>
+        <th style="width:30px">#</th>
         <th>Máquina</th>
-        <th>Ativação Windows</th>
-        <th>Licença Windows</th>
-        <th>Ativação Office</th>
-        <th>Licença Office</th>
+        <th>Empresa</th>
+        <th>Licenças</th>
         <th>Observações</th>
       </tr>
     </thead>
