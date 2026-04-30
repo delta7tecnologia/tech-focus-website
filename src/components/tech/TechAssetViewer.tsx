@@ -37,6 +37,7 @@ const TechAssetViewer = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [licenses, setLicenses] = useState<LicenseDraft[]>([]);
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
   const [screenshotMode, setScreenshotMode] = useState<SourceMode>('upload');
