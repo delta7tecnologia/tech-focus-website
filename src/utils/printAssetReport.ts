@@ -450,23 +450,38 @@ export const printAssetReport = async (
       <div class="cover-divider"></div>
       <div class="cover-subtitle">Documento técnico contendo o levantamento completo de ativos, licenças de software e configurações dos equipamentos sob gestão.</div>
 
-      <div class="cover-meta">
-        <div class="cover-meta-item">
-          <div class="label">Cliente</div>
-          <div class="value">${escapeHtml(companyName)}</div>
+      <div class="client-card">
+        <div class="field full">
+          <div class="lbl">Cliente</div>
+          <div class="val">${escapeHtml(client.company_name || companyName)}</div>
         </div>
+        ${client.document ? `<div class="field"><div class="lbl">CNPJ / CPF</div><div class="val">${escapeHtml(client.document)}</div></div>` : ''}
+        ${client.contact_person ? `<div class="field"><div class="lbl">Responsável</div><div class="val">${escapeHtml(client.contact_person)}</div></div>` : ''}
+        ${client.address ? `<div class="field full"><div class="lbl">Endereço</div><div class="val">${escapeHtml(client.address)}</div></div>` : ''}
+      </div>
+
+      <div class="cover-meta">
         <div class="cover-meta-item">
           <div class="label">Equipamentos</div>
           <div class="value">${assets.length}</div>
+        </div>
+        <div class="cover-meta-item">
+          <div class="label">Licenças</div>
+          <div class="value">${totalLicenses}</div>
         </div>
         <div class="cover-meta-item">
           <div class="label">Emissão</div>
           <div class="value">${dateStr} · ${timeStr}</div>
         </div>
       </div>
+
+      <div class="legal-cover">
+        <strong>Aviso legal · Confidencialidade</strong>
+        Este documento é de propriedade da <b>Delta7 Tecnologia</b> e contém informações técnicas e licenças de software vinculadas ao cliente identificado acima. Sua reprodução, divulgação, transferência a terceiros ou utilização para fins distintos da gestão de TI contratada é expressamente proibida sem autorização formal por escrito. Os dados aqui registrados refletem o levantamento na data de emissão e podem sofrer alterações.
+      </div>
     </div>
 
-    <div class="cover-footer">DELTA7 TECNOLOGIA · GESTÃO DE TI E INFRAESTRUTURA</div>
+    <div class="cover-footer">DELTA7 TECNOLOGIA · GESTÃO DE TI E INFRAESTRUTURA · DOCUMENTO CONFIDENCIAL</div>
   </div>
 
   <!-- ========= CORPO ========= -->
