@@ -384,6 +384,8 @@ export const printAssetReport = async (
     .lic-table tr:last-child td { border-bottom: none; }
     .lic-cat { color: var(--muted); white-space: nowrap; width: 110px; }
     .lic-prod { font-weight: 600; color: var(--text); }
+    .prod-cell { display: flex; align-items: center; gap: 8px; }
+    .prod-logo { width: 18px; height: 18px; object-fit: contain; flex-shrink: 0; }
     .lic-date { color: var(--muted); white-space: nowrap; width: 80px; }
     .lic-key code {
       font-family: 'Courier New', monospace;
