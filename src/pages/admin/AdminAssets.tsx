@@ -247,10 +247,7 @@ const AdminAssets = () => {
             variant="outline"
             className="gap-2"
             disabled={filteredAssets.length === 0}
-            onClick={() => {
-              const company = companyFilter || 'Todas as empresas';
-              printAssetReport(filteredAssets, company);
-            }}
+            onClick={() => setReportInfoOpen(true)}
           >
             <Printer className="w-4 h-4" /> Imprimir Relatório
           </Button>
