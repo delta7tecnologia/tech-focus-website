@@ -191,26 +191,30 @@ const TechAssetViewer = () => {
       const payload = {
         machine_name: form.machine_name.trim(),
         company_name: form.company_name.trim(),
-        windows_activation_date: form.windows_activation_date || null,
-        office_activation_date: form.office_activation_date || null,
-        windows_license: form.windows_license.trim() || null,
-        office_license: form.office_license.trim() || null,
         notes: form.notes.trim() || null,
         screenshot_url,
         is_external_screenshot,
       };
 
+      let assetId = editingId;
       if (editingId) {
         const { error } = await supabase.from('assets').update(payload).eq('id', editingId);
         if (error) throw error;
-        toast({ title: 'Patrimônio atualizado!' });
       } else {
-        const { error } = await supabase.from('assets').insert({ ...payload, created_by: user!.id });
+        const { data: inserted, error } = await supabase
+          .from('assets')
+          .insert({ ...payload, created_by: user!.id })
+          .select('id')
+          .single();
         if (error) throw error;
-        toast({ title: 'Patrimônio cadastrado!' });
+        assetId = inserted.id;
       }
 
+      await syncAssetLicenses(assetId!, licenses, user!.id);
+      toast({ title: editingId ? 'Patrimônio atualizado!' : 'Patrimônio cadastrado!' });
+
       queryClient.invalidateQueries({ queryKey: ['tech-assets'] });
+      queryClient.invalidateQueries({ queryKey: ['tech-asset-licenses'] });
       setDialogOpen(false);
     } catch (err: any) {
       toast({ title: 'Erro', description: err.message, variant: 'destructive' });
