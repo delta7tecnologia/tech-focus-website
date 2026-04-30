@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Pencil, Trash2, Building2 } from 'lucide-react';
+import { validateDocument, formatDocument } from '@/lib/validators/document';
 
 interface Client {
   id: string;
@@ -135,13 +136,23 @@ const AdminClients = () => {
     setIsDialogOpen(true);
   };
 
+  const docValidation = validateDocument(formData.document);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!docValidation.empty && !docValidation.valid) {
+      toast({
+        title: 'Documento inválido',
+        description: docValidation.message || 'Verifique o CNPJ/CPF informado.',
+        variant: 'destructive',
+      });
+      return;
+    }
     const data = {
       ...formData,
       logo_url: formData.logo_url || null,
       website_url: formData.website_url || null,
-      document: formData.document || null,
+      document: docValidation.empty ? null : formatDocument(formData.document),
       contact_person: formData.contact_person || null,
       address: formData.address || null,
     };
@@ -213,8 +224,16 @@ const AdminClients = () => {
                   id="document"
                   value={formData.document}
                   onChange={(e) => setFormData({ ...formData, document: e.target.value })}
+                  onBlur={() => {
+                    const v = validateDocument(formData.document);
+                    if (v.valid && !v.empty) setFormData({ ...formData, document: formatDocument(formData.document) });
+                  }}
                   placeholder="00.000.000/0001-00"
+                  className={!docValidation.empty && !docValidation.valid ? 'border-destructive focus-visible:ring-destructive' : ''}
                 />
+                {!docValidation.empty && !docValidation.valid && (
+                  <p className="text-xs text-destructive mt-1">{docValidation.message}</p>
+                )}
               </div>
               <div>
                 <Label htmlFor="contact_person">Responsável</Label>
@@ -256,7 +275,7 @@ const AdminClients = () => {
                 <Button type="button" variant="outline" onClick={resetForm} className="flex-1">
                   Cancelar
                 </Button>
-                <Button type="submit" className="flex-1">
+                <Button type="submit" className="flex-1" disabled={!docValidation.empty && !docValidation.valid}>
                   {editingClient ? 'Salvar' : 'Adicionar'}
                 </Button>
               </div>

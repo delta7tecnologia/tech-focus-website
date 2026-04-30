@@ -4,13 +4,14 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { FileText, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { FileText, CheckCircle2, AlertCircle, Loader2, Search } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { validateDocument, formatDocument, onlyDigits } from '@/lib/validators/document';
 
 export interface ReportClientInfo {
   company_name: string;
-  document: string;       // CNPJ/CPF
-  contact_person: string; // Responsável
+  document: string;
+  contact_person: string;
   address: string;
 }
 
@@ -29,12 +30,42 @@ const ReportClientInfoDialog = ({ open, onOpenChange, defaultCompany, onConfirm 
     address: '',
   });
   const [loading, setLoading] = useState(false);
-  const [source, setSource] = useState<'registry' | 'manual' | 'not-found' | null>(null);
+  const [source, setSource] = useState<'name-exact' | 'document' | 'manual' | 'not-found' | null>(null);
+  const [docLookup, setDocLookup] = useState('');
 
-  // Sempre que abre o diálogo, tenta buscar do cadastro
+  // Busca um cliente por nome exato (case-insensitive). Sem ilike fuzzy.
+  const fetchByName = async (name: string) => {
+    const trimmed = name.trim();
+    if (!trimmed) return null;
+    const { data } = await supabase
+      .from('clients')
+      .select('name, document, contact_person, address')
+      // ilike sem wildcards = comparação exata case-insensitive
+      .ilike('name', trimmed)
+      .limit(1)
+      .maybeSingle();
+    return data;
+  };
+
+  // Busca por documento normalizado (somente dígitos).
+  // Tenta tanto a forma normalizada quanto pelo dígito puro armazenado.
+  const fetchByDocument = async (rawDoc: string) => {
+    const digits = onlyDigits(rawDoc);
+    if (!digits) return null;
+    // RPC simples: pega todos clientes não nulos e compara por dígitos no client-side
+    // (volume baixo de clientes — solução mais robusta sem precisar de índice).
+    const { data } = await supabase
+      .from('clients')
+      .select('name, document, contact_person, address')
+      .not('document', 'is', null);
+    return (data || []).find((c) => onlyDigits(c.document || '') === digits) || null;
+  };
+
   useEffect(() => {
     if (!open) return;
     const company = defaultCompany?.trim();
+    setDocLookup('');
+
     if (!company) {
       setInfo({ company_name: '', document: '', contact_person: '', address: '' });
       setSource(null);
@@ -43,43 +74,65 @@ const ReportClientInfoDialog = ({ open, onOpenChange, defaultCompany, onConfirm 
 
     setLoading(true);
     setSource(null);
-    supabase
-      .from('clients')
-      .select('name, document, contact_person, address')
-      .ilike('name', company)
-      .maybeSingle()
-      .then(({ data }) => {
+    fetchByName(company)
+      .then((data) => {
         if (data) {
           setInfo({
             company_name: data.name,
-            document: data.document || '',
+            document: data.document ? formatDocument(data.document) : '',
             contact_person: data.contact_person || '',
             address: data.address || '',
           });
-          setSource('registry');
+          setSource('name-exact');
         } else {
           setInfo({ company_name: company, document: '', contact_person: '', address: '' });
           setSource('not-found');
         }
       })
-      .then(() => setLoading(false));
+      .finally(() => setLoading(false));
   }, [open, defaultCompany]);
 
+  const handleDocLookup = async () => {
+    if (!docLookup.trim()) return;
+    const v = validateDocument(docLookup);
+    if (!v.valid) return;
+    setLoading(true);
+    const data = await fetchByDocument(docLookup);
+    setLoading(false);
+    if (data) {
+      setInfo({
+        company_name: data.name,
+        document: data.document ? formatDocument(data.document) : formatDocument(docLookup),
+        contact_person: data.contact_person || '',
+        address: data.address || '',
+      });
+      setSource('document');
+    } else {
+      setSource('not-found');
+      setInfo((s) => ({ ...s, document: formatDocument(docLookup) }));
+    }
+  };
+
+  const docValidation = validateDocument(info.document);
+  const lookupValidation = validateDocument(docLookup);
+  const canConfirm = !!info.company_name.trim() && !loading && (docValidation.empty || docValidation.valid);
+
   const handleConfirm = () => {
-    onConfirm(info);
+    if (!canConfirm) return;
+    onConfirm({ ...info, document: docValidation.empty ? '' : formatDocument(info.document) });
     onOpenChange(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileText className="w-5 h-5 text-primary" />
             Dados do cliente para o relatório
           </DialogTitle>
           <DialogDescription>
-            As informações são puxadas automaticamente do cadastro de clientes. Edite no painel "Clientes" para alterar permanentemente.
+            Buscamos no cadastro pelo nome exato. Se não encontrar, busque pelo CNPJ/CPF abaixo ou cadastre em <b>Admin → Clientes</b>.
           </DialogDescription>
         </DialogHeader>
 
@@ -89,18 +142,43 @@ const ReportClientInfoDialog = ({ open, onOpenChange, defaultCompany, onConfirm 
           </div>
         ) : (
           <>
-            {source === 'registry' && (
+            {source === 'name-exact' && (
               <div className="flex items-start gap-2 text-xs bg-green-50 text-green-700 border border-green-200 rounded p-2">
                 <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                <span>Dados carregados do cadastro de clientes.</span>
+                <span>Cliente localizado pelo nome cadastrado.</span>
+              </div>
+            )}
+            {source === 'document' && (
+              <div className="flex items-start gap-2 text-xs bg-green-50 text-green-700 border border-green-200 rounded p-2">
+                <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+                <span>Cliente localizado pelo documento (CNPJ/CPF).</span>
               </div>
             )}
             {source === 'not-found' && (
-              <div className="flex items-start gap-2 text-xs bg-amber-50 text-amber-700 border border-amber-200 rounded p-2">
-                <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
-                <span>
-                  Cliente não encontrado no cadastro. Preencha os dados abaixo manualmente ou cadastre-o em <b>Admin → Clientes</b> para reuso futuro.
-                </span>
+              <div className="space-y-2">
+                <div className="flex items-start gap-2 text-xs bg-amber-50 text-amber-700 border border-amber-200 rounded p-2">
+                  <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                  <span>Não encontrado pelo nome. Tente buscar por CNPJ/CPF:</span>
+                </div>
+                <div className="flex gap-2">
+                  <Input
+                    value={docLookup}
+                    onChange={(e) => setDocLookup(e.target.value)}
+                    placeholder="00.000.000/0001-00 ou 000.000.000-00"
+                    className={!lookupValidation.empty && !lookupValidation.valid ? 'border-destructive' : ''}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleDocLookup}
+                    disabled={!lookupValidation.valid || lookupValidation.empty}
+                  >
+                    <Search className="w-4 h-4" />
+                  </Button>
+                </div>
+                {!lookupValidation.empty && !lookupValidation.valid && (
+                  <p className="text-xs text-destructive">{lookupValidation.message}</p>
+                )}
               </div>
             )}
 
@@ -120,8 +198,16 @@ const ReportClientInfoDialog = ({ open, onOpenChange, defaultCompany, onConfirm 
                   id="rc-doc"
                   value={info.document}
                   onChange={(e) => setInfo((s) => ({ ...s, document: e.target.value }))}
+                  onBlur={() => {
+                    const v = validateDocument(info.document);
+                    if (v.valid && !v.empty) setInfo((s) => ({ ...s, document: formatDocument(s.document) }));
+                  }}
                   placeholder="00.000.000/0001-00"
+                  className={!docValidation.empty && !docValidation.valid ? 'border-destructive focus-visible:ring-destructive' : ''}
                 />
+                {!docValidation.empty && !docValidation.valid && (
+                  <p className="text-xs text-destructive mt-1">{docValidation.message}</p>
+                )}
               </div>
               <div>
                 <Label htmlFor="rc-resp">Responsável</Label>
@@ -148,7 +234,7 @@ const ReportClientInfoDialog = ({ open, onOpenChange, defaultCompany, onConfirm 
 
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-          <Button onClick={handleConfirm} disabled={!info.company_name.trim() || loading}>
+          <Button onClick={handleConfirm} disabled={!canConfirm}>
             Gerar relatório
           </Button>
         </div>
