@@ -296,46 +296,45 @@ const AdminAssets = () => {
               <TableRow>
                 <TableHead>Máquina</TableHead>
                 <TableHead>Empresa</TableHead>
-                <TableHead>Windows</TableHead>
-                <TableHead>Office</TableHead>
+                <TableHead>Licenças</TableHead>
                 <TableHead>Evidência</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredAssets.map((asset) => (
+              {filteredAssets.map((asset) => {
+                const list = licensesByAsset[asset.id] || [];
+                return (
                 <TableRow key={asset.id}>
                   <TableCell className="font-medium">{asset.machine_name}</TableCell>
                   <TableCell>{asset.company_name}</TableCell>
                   <TableCell>
-                    <div className="space-y-1">
-                      <p className="text-xs text-gray-500">Ativação: {formatDate(asset.windows_activation_date)}</p>
-                      {asset.windows_license ? (
-                        <button
-                          onClick={() => toggleLicense(`win-${asset.id}`)}
-                          className="text-xs bg-gray-100 px-1.5 py-0.5 rounded font-mono break-all cursor-pointer hover:bg-gray-200 transition-colors"
-                        >
-                          {hiddenLicenses[`win-${asset.id}`] ? asset.windows_license : '••••••••••••••••••••'}
-                        </button>
-                      ) : (
-                        <span className="text-xs text-gray-400">Sem licença</span>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      <p className="text-xs text-gray-500">Ativação: {formatDate(asset.office_activation_date)}</p>
-                      {asset.office_license ? (
-                        <button
-                          onClick={() => toggleLicense(`off-${asset.id}`)}
-                          className="text-xs bg-gray-100 px-1.5 py-0.5 rounded font-mono break-all cursor-pointer hover:bg-gray-200 transition-colors"
-                        >
-                          {hiddenLicenses[`off-${asset.id}`] ? asset.office_license : '••••••••••••••••••••'}
-                        </button>
-                      ) : (
-                        <span className="text-xs text-gray-400">Sem licença</span>
-                      )}
-                    </div>
+                    {list.length === 0 ? (
+                      <span className="text-xs text-gray-400 italic">Nenhuma</span>
+                    ) : (
+                      <div className="space-y-1 max-w-xs">
+                        {list.map((lic) => {
+                          const key = `lic-${lic.id}`;
+                          const isVisible = hiddenLicenses[key];
+                          return (
+                            <div key={lic.id} className="flex items-center gap-1 flex-wrap">
+                              <Badge variant="outline" className="text-[10px] px-1 py-0">
+                                {getCategoryLabel(lic.category)}
+                              </Badge>
+                              <span className="text-xs">{formatLicenseTitle(lic)}</span>
+                              {lic.license_key && (
+                                <button
+                                  onClick={() => toggleLicense(key)}
+                                  className="text-[10px] bg-gray-100 px-1 py-0 rounded font-mono hover:bg-gray-200"
+                                >
+                                  {isVisible ? lic.license_key : '••••••'}
+                                </button>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell>
                     {asset.screenshot_url ? (
