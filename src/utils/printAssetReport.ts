@@ -68,7 +68,12 @@ const renderAssetCard = (
   </section>
 `;
 
-export const printAssetReport = async (assets: AssetForReport[], companyName: string) => {
+export const printAssetReport = async (
+  assets: AssetForReport[],
+  companyName: string,
+  clientInfo?: ReportClientInfo,
+) => {
+  const client: ReportClientInfo = clientInfo || { company_name: companyName };
   const grouped = await fetchAssetLicenses(assets.map((a) => a.id));
 
   // Resumo executivo: contagem por categoria
