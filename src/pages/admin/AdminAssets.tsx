@@ -357,7 +357,8 @@ const AdminAssets = () => {
                     </div>
                   </TableCell>
                 </TableRow>
-              ))}
+                );
+              })}
             </TableBody>
           </Table>
         </div>
