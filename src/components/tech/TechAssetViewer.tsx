@@ -90,12 +90,22 @@ const TechAssetViewer = () => {
   const openNew = () => {
     setEditingId(null);
     setForm(emptyForm);
+    setLicenses([]);
     setScreenshotFile(null);
     setScreenshotPreview(null);
     setScreenshotMode('upload');
     setExternalScreenshotUrl('');
     setDialogOpen(true);
   };
+
+  const openEdit = async (asset: any) => {
+    setEditingId(asset.id);
+    setForm({
+      machine_name: asset.machine_name,
+      company_name: asset.company_name,
+      notes: asset.notes || '',
+    });
+    setLicenses(licensesToDrafts(licensesByAsset[asset.id] || []));
 
   const openEdit = async (asset: any) => {
     setEditingId(asset.id);
