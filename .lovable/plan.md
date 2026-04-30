@@ -1,108 +1,81 @@
+## Objetivo
 
-# Implementação completa das melhorias de Ordem de Serviço
+Hoje o cadastro de patrimônio só tem dois campos genéricos: "Licença Windows" e "Licença Office". Não dá pra registrar **qual produto exatamente** está instalado (ex.: Office 2021 vs 365 Business, Windows Server 2022 Standard, CAL RDS, Kaspersky). Vamos ampliar para suportar todo o catálogo Delta7.
 
-Vou implementar todos os 10 itens em uma única entrega, organizados por área técnica.
+## Catálogo de produtos a suportar
 
-## 1. Banco de dados (migration)
+**Sistemas Operacionais (cliente)**
+- Windows 10 Pro / Home
+- Windows 11 Pro / Home
 
-- Adicionar coluna `os_seq bigserial` em `service_orders` para numeração sequencial (`OS-2026-000123`)
-- Adicionar coluna `audit_log jsonb default '[]'` para log de reaberturas/edições pós-emissão
-- Adicionar coluna `locked boolean default false` (true após emissão; só admin pode destravar)
-- Nova RLS pública por `integrity_hash` (anon SELECT quando hash não-nulo) — espelho de `technical_reports`
-- Ajustar RLS de UPDATE: bloquear edição quando `locked=true` exceto admin
-- Trigger `service_orders_set_seq` para preencher `os_seq` antes do insert
-- Trigger `service_orders_lock_on_finalize` que seta `locked=true` quando `is_draft` muda para false e injeta entrada no `audit_log`
+**Windows Server**
+- Server 2019 Standard / Essentials
+- Server 2022 Standard / Essentials
+- Server 2025 Standard / Essentials
 
-## 2. Página pública de validação por QR Code
+**Licenças CAL**
+- CAL RDS por Dispositivo
+- CAL RDS por Usuário
 
-- Nova rota `/validar-os/:hash` em `App.tsx`
-- Nova página `src/pages/ValidateServiceOrder.tsx`:
-  - Busca por hash exato e fallback para hash parcial (≥16 chars)
-  - Mostra: nº OS, cliente, técnico, datas, check-in/out (com link Maps), status, resumo, assinaturas (presencial + remotas), hash, audit log
-  - Botão "Baixar PDF original" reusando `downloadServiceOrderPdf`
-  - Aviso destacado se houver entradas no `audit_log` (documento foi reaberto/editado após emissão)
+**Microsoft Office (perpétuo)**
+- Office 2021
+- Office 2024
 
-## 3. PDF aprimorado (`serviceOrderPdf.ts`)
+**Microsoft 365 (assinatura)**
+- 365 Business Basic / Standard / Premium
+- 365 Personal
+- 365 Family
 
-- Gerar QR Code com lib `qrcode` (já instalada) apontando para `/validar-os/{hash}`
-- Inserir QR + hash + assinaturas dentro de `<div id="so-footer-block">` com lógica anti-quebra de página (idêntica ao `reportPdfAdvanced.ts`)
-- Renderizar evidências em chunks (máx 6 por "página lógica") com `page-break-before` entre elas
-- Substituir link de Maps por QR Code menor que aponta para o Maps do check-in
+**Antivírus**
+- Kaspersky (com variação livre — Standard, Plus, Premium, Endpoint…)
 
-## 4. Validação visual antes de finalizar (`ServiceOrderForm.tsx`)
+## O que muda na interface (área técnica e admin)
 
-- Bloco "Checklist para finalizar" sempre visível com ícones ✅/⬜:
-  - Cliente, Endereço, Resumo, ≥1 evidência, Check-in registrado, Assinatura (presencial OU link remoto assinado)
-- Botão "Finalizar OS" mostra tooltip com itens pendentes quando desabilitado
-- Ao clicar em Finalizar sem check-out, captura check-out automaticamente
+Em vez de dois campos fixos, o formulário passa a ter uma **lista dinâmica de licenças** por máquina. Cada linha contém:
 
-## 5. UX em campo (mobile-first)
+1. **Categoria** (select): Sistema Operacional / Windows Server / CAL RDS / Office / Microsoft 365 / Antivírus / Outro
+2. **Produto** (select dependente da categoria) — ex.: ao escolher "Office", aparecem 2021 e 2024
+3. **Edição/Variante** (select ou texto, quando se aplica) — ex.: Pro/Home, Standard/Essentials, Business Basic/Standard/Premium
+4. **Chave de licença** (texto, com toggle mostrar/ocultar e botão copiar — igual ao atual)
+5. **Data de ativação** (date)
+6. **Observações da licença** (texto curto, opcional — útil para nº de assento, conta vinculada, expiração)
+7. Botão **remover linha** + botão **+ Adicionar licença** no fim da lista
 
-- Wizard de 5 etapas com tabs: Identificação → Visita (check-in/out) → Atendimento → Evidências → Assinatura
-- Botões grandes "🟢 Iniciar visita" / "🔴 Encerrar visita" no topo de cada etapa
-- **Auto-save** a cada 30s do rascunho via `useEffect` + debounce
-- `<input multiple>` para enviar várias fotos de uma vez
-- Compressão client-side (canvas → JPEG 0.85, max 1600px) antes do upload — utilitário novo `src/utils/compressImage.ts`
+Visualmente, cada licença vira um "chip/card" dentro do formulário e na visualização da máquina (TechAssetViewer), substituindo as duas seções fixas Windows/Office.
 
-## 6. Numeração sequencial
+## Mudanças no banco
 
-- Função client `nextOsNumber()` removida; o backend gera via trigger usando `os_seq`
-- Form mostra `OS-AAAA-NNNNNN` baseado na sequência (após primeiro save)
-- Compatibilidade: OS antigas mantêm seu `os_number` original
+Como a estrutura vira N licenças por máquina, precisamos de uma tabela nova:
 
-## 7. Anexos além de fotos
+```text
+asset_licenses
+├── id (uuid)
+├── asset_id (uuid, FK assets)
+├── category (text)        -- 'windows' | 'windows_server' | 'cal_rds' | 'office' | 'm365' | 'antivirus' | 'outro'
+├── product (text)         -- 'Windows 11', 'Server 2022', 'Office 2024', '365 Business Standard', 'Kaspersky'…
+├── edition (text, null)   -- 'Pro', 'Standard', 'Essentials', 'Por Dispositivo', 'Premium'…
+├── license_key (text, null)
+├── activation_date (date, null)
+├── notes (text, null)
+├── created_at / updated_at
+```
 
-- Input aceita `image/*,application/pdf,video/mp4` até 20MB
-- Estrutura `evidences` ganha `kind: 'image' | 'file' | 'video'`
-- Thumbnail genérica para PDFs/vídeos com nome do arquivo
-- No PDF: anexos não-imagem aparecem como "📎 [nome] — link assinado de 7 dias"
+**RLS** segue o mesmo padrão de `assets` (técnicos aprovados leem/escrevem licenças de patrimônios visíveis a eles; admins gerenciam tudo).
 
-## 8. Notificações por e-mail
+**Compatibilidade com dados existentes**: uma migração popula `asset_licenses` a partir dos campos atuais `windows_license` / `office_license` / `*_activation_date`. Os campos antigos ficam na tabela `assets` por enquanto (deprecated) para não quebrar nada, mas o app passa a ler/gravar só na tabela nova.
 
-- Botão "Enviar por e-mail" no `SOSignatureLinksManager` (quando `signer_email` preenchido)
-- Nova edge function `send-os-signature-link/index.ts` (template pt-BR, usa `notify.delta7tecnologia.com.br`)
-- Trigger pós-assinatura: edge function `notify-os-signed` envia e-mail ao técnico criador com link do PDF
-- Validação CORS, JWT em código, rate limit simples por IP
+## Mudanças nos componentes
 
-## 9. Filtros e métricas no Admin
+- `src/components/tech/TechAssetViewer.tsx` — substitui blocos fixos Windows/Office por lista dinâmica de licenças; formulário usa novo seletor categoria→produto→edição.
+- `src/pages/admin/AdminAssets.tsx` — mesmas mudanças de formulário e exibição na tabela (coluna "Licenças" mostrando contagem + tooltip com lista resumida).
+- `src/utils/printAssetReport.ts` — relatório PDF passa a listar todas as licenças por máquina (Categoria · Produto · Edição · Ativação · Chave) em vez das colunas fixas.
+- Novo arquivo `src/lib/licenseCatalog.ts` — fonte única do catálogo (categorias, produtos, edições) para alimentar os selects.
 
-- `AdminServiceOrders.tsx` ganha:
-  - 4 cards no topo: OS em aberto, Emitidas no mês, KM total, Tempo médio (h)
-  - Filtros: técnico (select), período (date range), status, tipo de visita
-  - Botão "Exportar CSV" (gera no client com `papaparse` ou string manual)
+## Resumo do fluxo final
 
-## 10. Correções de lógica
+1. Técnico abre "Novo Patrimônio" → preenche máquina/empresa → clica em **+ Adicionar licença**.
+2. Escolhe Categoria (ex.: Microsoft 365) → Produto (365 Business) → Edição (Standard) → cola a chave → data de ativação.
+3. Pode adicionar quantas licenças quiser (ex.: Windows 11 Pro + Office 2024 + Kaspersky na mesma máquina).
+4. Visualização e relatório imprimem todas as licenças agrupadas por máquina.
 
-- `signed_at` setado **apenas uma vez** na primeira assinatura (verificar `draft?.signed_at`)
-- Status `concluido` mantido quando re-salvando OS já finalizada (não voltar para `em_andamento`)
-- `SignServiceOrder.tsx` ganha QR Code do hash logo abaixo do "Documento autêntico"
-- Evidence cleanup ao deletar OS (já existe, validar)
-
----
-
-## Estrutura de arquivos
-
-**Novos:**
-- `src/pages/ValidateServiceOrder.tsx`
-- `src/utils/compressImage.ts`
-- `src/components/tech/service-orders/ServiceOrderWizard.tsx` (wrapper de etapas)
-- `src/components/tech/service-orders/ServiceOrderFinalizeChecklist.tsx`
-- `src/components/admin/ServiceOrdersMetrics.tsx`
-- `supabase/functions/send-os-signature-link/index.ts`
-- `supabase/functions/notify-os-signed/index.ts`
-- `supabase/migrations/<timestamp>_so_improvements.sql`
-
-**Editados:**
-- `src/App.tsx` — nova rota `/validar-os/:hash`
-- `src/components/tech/service-orders/ServiceOrderForm.tsx` — wizard, auto-save, compressão, validação
-- `src/components/tech/service-orders/ServiceOrderList.tsx` — multi-anexo
-- `src/components/tech/service-orders/SOSignatureLinksManager.tsx` — botão envio e-mail
-- `src/pages/SignServiceOrder.tsx` — QR Code do hash
-- `src/pages/admin/AdminServiceOrders.tsx` — métricas e filtros
-- `src/utils/serviceOrderPdf.ts` — QR Code, anti-quebra, anexos, chunks de evidências
-
----
-
-## Confirmação
-
-Vou executar tudo numa única passada. A migration vai pedir sua aprovação automaticamente quando rodar (esse é o fluxo padrão da Lovable Cloud). Pode aprovar para eu seguir.
+Posso seguir com a implementação?

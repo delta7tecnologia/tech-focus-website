@@ -12,14 +12,14 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { printAssetReport } from '@/utils/printAssetReport';
 import UploadOrLinkInput, { type SourceMode } from './UploadOrLinkInput';
+import LicenseListEditor from './assets/LicenseListEditor';
+import { fetchAssetLicenses, licensesToDrafts, syncAssetLicenses } from '@/lib/assetLicenses';
+import { formatLicenseTitle, getCategoryLabel, type LicenseDraft, type AssetLicense } from '@/lib/licenseCatalog';
+import { Badge } from '@/components/ui/badge';
 
 const emptyForm = {
   machine_name: '',
   company_name: '',
-  windows_activation_date: '',
-  office_activation_date: '',
-  windows_license: '',
-  office_license: '',
   notes: '',
 };
 
@@ -37,6 +37,7 @@ const TechAssetViewer = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [licenses, setLicenses] = useState<LicenseDraft[]>([]);
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
   const [screenshotMode, setScreenshotMode] = useState<SourceMode>('upload');
@@ -61,6 +62,12 @@ const TechAssetViewer = () => {
     },
   });
 
+  const { data: licensesByAsset = {} } = useQuery({
+    queryKey: ['tech-asset-licenses', assets.map((a: any) => a.id).join(',')],
+    queryFn: () => fetchAssetLicenses(assets.map((a: any) => a.id)),
+    enabled: assets.length > 0,
+  });
+
   const companies = [...new Set(assets.map(a => a.company_name))].sort();
 
   const filtered = assets.filter(a => {
@@ -83,6 +90,7 @@ const TechAssetViewer = () => {
   const openNew = () => {
     setEditingId(null);
     setForm(emptyForm);
+    setLicenses([]);
     setScreenshotFile(null);
     setScreenshotPreview(null);
     setScreenshotMode('upload');
@@ -95,12 +103,10 @@ const TechAssetViewer = () => {
     setForm({
       machine_name: asset.machine_name,
       company_name: asset.company_name,
-      windows_activation_date: asset.windows_activation_date || '',
-      office_activation_date: asset.office_activation_date || '',
-      windows_license: asset.windows_license || '',
-      office_license: asset.office_license || '',
       notes: asset.notes || '',
     });
+    setLicenses(licensesToDrafts(licensesByAsset[asset.id] || []));
+    setScreenshotFile(null);
     setScreenshotFile(null);
     if (asset.is_external_screenshot && asset.screenshot_url) {
       setScreenshotMode('external');
@@ -185,26 +191,30 @@ const TechAssetViewer = () => {
       const payload = {
         machine_name: form.machine_name.trim(),
         company_name: form.company_name.trim(),
-        windows_activation_date: form.windows_activation_date || null,
-        office_activation_date: form.office_activation_date || null,
-        windows_license: form.windows_license.trim() || null,
-        office_license: form.office_license.trim() || null,
         notes: form.notes.trim() || null,
         screenshot_url,
         is_external_screenshot,
       };
 
+      let assetId = editingId;
       if (editingId) {
         const { error } = await supabase.from('assets').update(payload).eq('id', editingId);
         if (error) throw error;
-        toast({ title: 'Patrimônio atualizado!' });
       } else {
-        const { error } = await supabase.from('assets').insert({ ...payload, created_by: user!.id });
+        const { data: inserted, error } = await supabase
+          .from('assets')
+          .insert({ ...payload, created_by: user!.id })
+          .select('id')
+          .single();
         if (error) throw error;
-        toast({ title: 'Patrimônio cadastrado!' });
+        assetId = inserted.id;
       }
 
+      await syncAssetLicenses(assetId!, licenses, user!.id);
+      toast({ title: editingId ? 'Patrimônio atualizado!' : 'Patrimônio cadastrado!' });
+
       queryClient.invalidateQueries({ queryKey: ['tech-assets'] });
+      queryClient.invalidateQueries({ queryKey: ['tech-asset-licenses'] });
       setDialogOpen(false);
     } catch (err: any) {
       toast({ title: 'Erro', description: err.message, variant: 'destructive' });
@@ -303,50 +313,55 @@ const TechAssetViewer = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div>
-                    <p className="text-xs font-medium text-gray-500 mb-1">Windows</p>
-                    <p className="text-xs text-gray-400">Ativação: {formatDate(asset.windows_activation_date)}</p>
-                    {asset.windows_license ? (
-                      <div className="flex items-center gap-1 mt-1">
-                        <button
-                          onClick={() => toggleLicense(`win-${asset.id}`)}
-                          className="text-xs font-mono bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 transition-colors break-all text-left"
-                        >
-                          {visibleLicenses[`win-${asset.id}`] ? asset.windows_license : '••••••••••••••'}
-                        </button>
-                        {visibleLicenses[`win-${asset.id}`] && (
-                          <button onClick={() => copyToClipboard(asset.windows_license!)} className="text-gray-400 hover:text-gray-600">
-                            <Copy className="w-3 h-3" />
-                          </button>
-                        )}
-                      </div>
-                    ) : (
-                      <span className="text-xs text-gray-400">Sem licença</span>
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-gray-500 mb-1">Office</p>
-                    <p className="text-xs text-gray-400">Ativação: {formatDate(asset.office_activation_date)}</p>
-                    {asset.office_license ? (
-                      <div className="flex items-center gap-1 mt-1">
-                        <button
-                          onClick={() => toggleLicense(`off-${asset.id}`)}
-                          className="text-xs font-mono bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 transition-colors break-all text-left"
-                        >
-                          {visibleLicenses[`off-${asset.id}`] ? asset.office_license : '••••••••••••••'}
-                        </button>
-                        {visibleLicenses[`off-${asset.id}`] && (
-                          <button onClick={() => copyToClipboard(asset.office_license!)} className="text-gray-400 hover:text-gray-600">
-                            <Copy className="w-3 h-3" />
-                          </button>
-                        )}
-                      </div>
-                    ) : (
-                      <span className="text-xs text-gray-400">Sem licença</span>
-                    )}
-                  </div>
-                </div>
+                {(() => {
+                  const list = licensesByAsset[asset.id] || [];
+                  if (list.length === 0) {
+                    return <p className="text-xs text-gray-400 italic">Nenhuma licença cadastrada.</p>;
+                  }
+                  return (
+                    <div className="space-y-2">
+                      {list.map((lic) => {
+                        const key = `lic-${lic.id}`;
+                        const isVisible = visibleLicenses[key];
+                        return (
+                          <div key={lic.id} className="border-l-2 border-blue-200 pl-2">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                                {getCategoryLabel(lic.category)}
+                              </Badge>
+                              <span className="text-xs font-medium text-gray-800">
+                                {formatLicenseTitle(lic)}
+                              </span>
+                              {lic.activation_date && (
+                                <span className="text-[10px] text-gray-400">
+                                  · ativ. {formatDate(lic.activation_date)}
+                                </span>
+                              )}
+                            </div>
+                            {lic.license_key && (
+                              <div className="flex items-center gap-1 mt-1">
+                                <button
+                                  onClick={() => toggleLicense(key)}
+                                  className="text-xs font-mono bg-gray-100 px-2 py-0.5 rounded hover:bg-gray-200 transition-colors break-all text-left"
+                                >
+                                  {isVisible ? lic.license_key : '••••••••••••••'}
+                                </button>
+                                {isVisible && (
+                                  <button onClick={() => copyToClipboard(lic.license_key!)} className="text-gray-400 hover:text-gray-600">
+                                    <Copy className="w-3 h-3" />
+                                  </button>
+                                )}
+                              </div>
+                            )}
+                            {lic.notes && (
+                              <p className="text-[10px] text-gray-500 mt-0.5">{lic.notes}</p>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
 
                 {asset.notes && (
                   <p className="text-xs text-gray-500 border-t pt-2">{asset.notes}</p>
@@ -398,24 +413,7 @@ const TechAssetViewer = () => {
                 </div>
               )}
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium">Ativação Windows</label>
-                <Input type="date" value={form.windows_activation_date} onChange={e => setForm(f => ({ ...f, windows_activation_date: e.target.value }))} />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Ativação Office</label>
-                <Input type="date" value={form.office_activation_date} onChange={e => setForm(f => ({ ...f, office_activation_date: e.target.value }))} />
-              </div>
-            </div>
-            <div>
-              <label className="text-sm font-medium">Licença Windows</label>
-              <Input value={form.windows_license} onChange={e => setForm(f => ({ ...f, windows_license: e.target.value }))} placeholder="XXXXX-XXXXX-XXXXX-XXXXX-XXXXX" />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Licença Office</label>
-              <Input value={form.office_license} onChange={e => setForm(f => ({ ...f, office_license: e.target.value }))} placeholder="XXXXX-XXXXX-XXXXX-XXXXX-XXXXX" />
-            </div>
+            <LicenseListEditor value={licenses} onChange={setLicenses} />
             <div>
               <label className="text-sm font-medium">Evidência (Print Screen)</label>
               <div className="mt-1">

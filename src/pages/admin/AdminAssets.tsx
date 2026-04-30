@@ -15,19 +15,21 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Plus, Pencil, Trash2, Monitor, Upload, Eye, Search, Printer } from 'lucide-react';
+import { Plus, Pencil, Trash2, Monitor, Eye, Search, Printer } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { printAssetReport } from '@/utils/printAssetReport';
+import LicenseListEditor from '@/components/tech/assets/LicenseListEditor';
+import { fetchAssetLicenses, licensesToDrafts, syncAssetLicenses } from '@/lib/assetLicenses';
+import { formatLicenseTitle, getCategoryLabel, type LicenseDraft } from '@/lib/licenseCatalog';
+import UploadOrLinkInput, { type SourceMode } from '@/components/tech/UploadOrLinkInput';
 
 interface Asset {
   id: string;
   machine_name: string;
   company_name: string;
-  windows_activation_date: string | null;
-  office_activation_date: string | null;
-  windows_license: string | null;
-  office_license: string | null;
   notes: string | null;
   screenshot_url: string | null;
+  is_external_screenshot?: boolean;
   created_by: string;
   created_at: string;
   updated_at: string;
@@ -36,10 +38,6 @@ interface Asset {
 const emptyForm = {
   machine_name: '',
   company_name: '',
-  windows_activation_date: '',
-  office_activation_date: '',
-  windows_license: '',
-  office_license: '',
   notes: '',
 };
 
@@ -51,13 +49,16 @@ const AdminAssets = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [licenses, setLicenses] = useState<LicenseDraft[]>([]);
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
+  const [screenshotMode, setScreenshotMode] = useState<SourceMode>('upload');
+  const [externalScreenshotUrl, setExternalScreenshotUrl] = useState('');
   const [deleteAsset, setDeleteAsset] = useState<Asset | null>(null);
   const [viewImage, setViewImage] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
-const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   const [companyFilter, setCompanyFilter] = useState('');
   const [hiddenLicenses, setHiddenLicenses] = useState<Record<string, boolean>>({});
 
@@ -77,6 +78,12 @@ const [searchTerm, setSearchTerm] = useState('');
     },
   });
 
+  const { data: licensesByAsset = {} } = useQuery({
+    queryKey: ['admin-asset-licenses', assets.map(a => a.id).join(',')],
+    queryFn: () => fetchAssetLicenses(assets.map(a => a.id)),
+    enabled: assets.length > 0,
+  });
+
   const companies = [...new Set(assets.map(a => a.company_name))].sort();
 
   const filteredAssets = assets.filter(a => {
@@ -89,8 +96,11 @@ const [searchTerm, setSearchTerm] = useState('');
   const openNew = () => {
     setEditingId(null);
     setForm(emptyForm);
+    setLicenses([]);
     setScreenshotFile(null);
     setScreenshotPreview(null);
+    setScreenshotMode('upload');
+    setExternalScreenshotUrl('');
     setDialogOpen(true);
   };
 
@@ -99,22 +109,20 @@ const [searchTerm, setSearchTerm] = useState('');
     setForm({
       machine_name: asset.machine_name,
       company_name: asset.company_name,
-      windows_activation_date: asset.windows_activation_date || '',
-      office_activation_date: asset.office_activation_date || '',
-      windows_license: asset.windows_license || '',
-      office_license: asset.office_license || '',
       notes: asset.notes || '',
     });
+    setLicenses(licensesToDrafts(licensesByAsset[asset.id] || []));
     setScreenshotFile(null);
-    setScreenshotPreview(asset.screenshot_url || null);
+    if (asset.is_external_screenshot && asset.screenshot_url) {
+      setScreenshotMode('external');
+      setExternalScreenshotUrl(asset.screenshot_url);
+      setScreenshotPreview(null);
+    } else {
+      setScreenshotMode('upload');
+      setExternalScreenshotUrl('');
+      setScreenshotPreview(null);
+    }
     setDialogOpen(true);
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setScreenshotFile(file);
-    setScreenshotPreview(URL.createObjectURL(file));
   };
 
   const uploadScreenshot = async (file: File): Promise<string> => {
@@ -149,12 +157,22 @@ const [searchTerm, setSearchTerm] = useState('');
     }
     setSaving(true);
     try {
-      let screenshot_url = editingId
-        ? assets.find(a => a.id === editingId)?.screenshot_url || null
-        : null;
+      const existing = editingId ? assets.find(a => a.id === editingId) : null;
+      let screenshot_url: string | null = existing?.screenshot_url || null;
+      let is_external_screenshot = existing?.is_external_screenshot || false;
 
-      if (screenshotFile) {
+      if (screenshotMode === 'external') {
+        const url = externalScreenshotUrl.trim();
+        if (url) {
+          if (!/^https?:\/\//i.test(url)) {
+            throw new Error('A URL da evidência deve começar com http:// ou https://');
+          }
+          screenshot_url = url;
+          is_external_screenshot = true;
+        }
+      } else if (screenshotFile) {
         screenshot_url = await uploadScreenshot(screenshotFile);
+        is_external_screenshot = false;
       }
 
       const { data: { user } } = await supabase.auth.getUser();
@@ -162,25 +180,30 @@ const [searchTerm, setSearchTerm] = useState('');
       const payload = {
         machine_name: form.machine_name.trim(),
         company_name: form.company_name.trim(),
-        windows_activation_date: form.windows_activation_date || null,
-        office_activation_date: form.office_activation_date || null,
-        windows_license: form.windows_license.trim() || null,
-        office_license: form.office_license.trim() || null,
         notes: form.notes.trim() || null,
         screenshot_url,
+        is_external_screenshot,
       };
 
+      let assetId = editingId;
       if (editingId) {
         const { error } = await supabase.from('assets').update(payload).eq('id', editingId);
         if (error) throw error;
-        toast({ title: 'Patrimônio atualizado!' });
       } else {
-        const { error } = await supabase.from('assets').insert({ ...payload, created_by: user!.id });
+        const { data: inserted, error } = await supabase
+          .from('assets')
+          .insert({ ...payload, created_by: user!.id })
+          .select('id')
+          .single();
         if (error) throw error;
-        toast({ title: 'Patrimônio cadastrado!' });
+        assetId = inserted.id;
       }
 
+      await syncAssetLicenses(assetId!, licenses, user!.id);
+      toast({ title: editingId ? 'Patrimônio atualizado!' : 'Patrimônio cadastrado!' });
+
       queryClient.invalidateQueries({ queryKey: ['admin-assets'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-asset-licenses'] });
       setDialogOpen(false);
     } catch (err: any) {
       toast({ title: 'Erro', description: err.message, variant: 'destructive' });
@@ -273,46 +296,45 @@ const [searchTerm, setSearchTerm] = useState('');
               <TableRow>
                 <TableHead>Máquina</TableHead>
                 <TableHead>Empresa</TableHead>
-                <TableHead>Windows</TableHead>
-                <TableHead>Office</TableHead>
+                <TableHead>Licenças</TableHead>
                 <TableHead>Evidência</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredAssets.map((asset) => (
+              {filteredAssets.map((asset) => {
+                const list = licensesByAsset[asset.id] || [];
+                return (
                 <TableRow key={asset.id}>
                   <TableCell className="font-medium">{asset.machine_name}</TableCell>
                   <TableCell>{asset.company_name}</TableCell>
                   <TableCell>
-                    <div className="space-y-1">
-                      <p className="text-xs text-gray-500">Ativação: {formatDate(asset.windows_activation_date)}</p>
-                      {asset.windows_license ? (
-                        <button
-                          onClick={() => toggleLicense(`win-${asset.id}`)}
-                          className="text-xs bg-gray-100 px-1.5 py-0.5 rounded font-mono break-all cursor-pointer hover:bg-gray-200 transition-colors"
-                        >
-                          {hiddenLicenses[`win-${asset.id}`] ? asset.windows_license : '••••••••••••••••••••'}
-                        </button>
-                      ) : (
-                        <span className="text-xs text-gray-400">Sem licença</span>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      <p className="text-xs text-gray-500">Ativação: {formatDate(asset.office_activation_date)}</p>
-                      {asset.office_license ? (
-                        <button
-                          onClick={() => toggleLicense(`off-${asset.id}`)}
-                          className="text-xs bg-gray-100 px-1.5 py-0.5 rounded font-mono break-all cursor-pointer hover:bg-gray-200 transition-colors"
-                        >
-                          {hiddenLicenses[`off-${asset.id}`] ? asset.office_license : '••••••••••••••••••••'}
-                        </button>
-                      ) : (
-                        <span className="text-xs text-gray-400">Sem licença</span>
-                      )}
-                    </div>
+                    {list.length === 0 ? (
+                      <span className="text-xs text-gray-400 italic">Nenhuma</span>
+                    ) : (
+                      <div className="space-y-1 max-w-xs">
+                        {list.map((lic) => {
+                          const key = `lic-${lic.id}`;
+                          const isVisible = hiddenLicenses[key];
+                          return (
+                            <div key={lic.id} className="flex items-center gap-1 flex-wrap">
+                              <Badge variant="outline" className="text-[10px] px-1 py-0">
+                                {getCategoryLabel(lic.category)}
+                              </Badge>
+                              <span className="text-xs">{formatLicenseTitle(lic)}</span>
+                              {lic.license_key && (
+                                <button
+                                  onClick={() => toggleLicense(key)}
+                                  className="text-[10px] bg-gray-100 px-1 py-0 rounded font-mono hover:bg-gray-200"
+                                >
+                                  {isVisible ? lic.license_key : '••••••'}
+                                </button>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell>
                     {asset.screenshot_url ? (
@@ -335,7 +357,8 @@ const [searchTerm, setSearchTerm] = useState('');
                     </div>
                   </TableCell>
                 </TableRow>
-              ))}
+                );
+              })}
             </TableBody>
           </Table>
         </div>
@@ -356,35 +379,29 @@ const [searchTerm, setSearchTerm] = useState('');
               <label className="text-sm font-medium">Empresa *</label>
               <Input value={form.company_name} onChange={e => setForm(f => ({ ...f, company_name: e.target.value }))} placeholder="Nome da empresa" />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium">Ativação Windows</label>
-                <Input type="date" value={form.windows_activation_date} onChange={e => setForm(f => ({ ...f, windows_activation_date: e.target.value }))} />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Ativação Office</label>
-                <Input type="date" value={form.office_activation_date} onChange={e => setForm(f => ({ ...f, office_activation_date: e.target.value }))} />
-              </div>
-            </div>
-            <div>
-              <label className="text-sm font-medium">Licença Windows</label>
-              <Input value={form.windows_license} onChange={e => setForm(f => ({ ...f, windows_license: e.target.value }))} placeholder="XXXXX-XXXXX-XXXXX-XXXXX-XXXXX" />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Licença Office</label>
-              <Input value={form.office_license} onChange={e => setForm(f => ({ ...f, office_license: e.target.value }))} placeholder="XXXXX-XXXXX-XXXXX-XXXXX-XXXXX" />
-            </div>
+            <LicenseListEditor value={licenses} onChange={setLicenses} />
             <div>
               <label className="text-sm font-medium">Evidência (Print Screen)</label>
               <div className="mt-1">
-                <input type="file" ref={fileInputRef} accept="image/*" onChange={handleFileChange} className="hidden" />
-                <Button type="button" variant="outline" className="gap-2" onClick={() => fileInputRef.current?.click()}>
-                  <Upload className="w-4 h-4" /> Selecionar imagem
-                </Button>
+                <UploadOrLinkInput
+                  mode={screenshotMode}
+                  onModeChange={(m) => {
+                    setScreenshotMode(m);
+                    if (m === 'external') { setScreenshotFile(null); setScreenshotPreview(null); }
+                  }}
+                  externalUrl={externalScreenshotUrl}
+                  onExternalUrlChange={setExternalScreenshotUrl}
+                  onFileChange={(f) => {
+                    setScreenshotFile(f);
+                    setScreenshotPreview(f ? URL.createObjectURL(f) : null);
+                  }}
+                  selectedFileName={screenshotFile?.name}
+                  fileLabel="Selecionar imagem"
+                  accept="image/*"
+                  preview={screenshotPreview}
+                  helpText="Cole o link compartilhável (OneDrive, Google Drive...) para evitar uso do armazenamento interno."
+                />
               </div>
-              {screenshotPreview && (
-                <img src={screenshotPreview} alt="Preview" className="mt-2 rounded-lg border max-h-48 object-contain w-full" />
-              )}
             </div>
             <div>
               <label className="text-sm font-medium">Observações</label>
