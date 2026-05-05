@@ -170,31 +170,33 @@ function buildHtml(r: CommercialProposalPdfData): string {
       </tbody>
     </table>
 
-    ${sectionTitle('CENÁRIO COM BACKUP ONLINE — VALORES MENSAIS')}
-    <table style="width:100%;border-collapse:collapse;font-size:11px;">
-      <thead>
-        <tr style="background:#1e3a8a;color:white;">
-          <th style="padding:8px 10px;border:1px solid #1e3a8a;text-align:left;">Item</th>
-          <th style="padding:8px 10px;border:1px solid #1e3a8a;text-align:center;width:80px;">Qtd</th>
-          <th style="padding:8px 10px;border:1px solid #1e3a8a;text-align:right;width:130px;">Valor unit.</th>
-          <th style="padding:8px 10px;border:1px solid #1e3a8a;text-align:right;width:130px;">Subtotal</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${itemRows || '<tr><td colspan="4" style="padding:14px;text-align:center;border:1px solid #cbd5e1;color:#94a3b8;font-style:italic;">Nenhum item configurado</td></tr>'}
-        ${r.discount > 0 ? `<tr>
-          <td colspan="3" style="padding:6px 10px;border:1px solid #cbd5e1;text-align:right;color:#dc2626;">Desconto</td>
-          <td style="padding:6px 10px;border:1px solid #cbd5e1;text-align:right;color:#dc2626;font-weight:600;">- ${formatBRL(r.discount)}</td>
-        </tr>` : ''}
-        <tr style="background:#1e3a8a;color:white;">
-          <td colspan="3" style="padding:10px;border:1px solid #1e3a8a;text-align:right;font-weight:800;font-size:13px;">CUSTO MENSAL TOTAL</td>
-          <td style="padding:10px;border:1px solid #1e3a8a;text-align:right;font-weight:800;font-size:14px;">${formatBRL(monthlyTotal)}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div id="prop-cenario-block" style="break-inside:avoid;page-break-inside:avoid;">
+      ${sectionTitle('CENÁRIO COM BACKUP ONLINE — VALORES MENSAIS')}
+      <table style="width:100%;border-collapse:collapse;font-size:11px;">
+        <thead>
+          <tr style="background:#1e3a8a;color:white;">
+            <th style="padding:8px 10px;border:1px solid #1e3a8a;text-align:left;">Item</th>
+            <th style="padding:8px 10px;border:1px solid #1e3a8a;text-align:center;width:80px;">Qtd</th>
+            <th style="padding:8px 10px;border:1px solid #1e3a8a;text-align:right;width:130px;">Valor unit.</th>
+            <th style="padding:8px 10px;border:1px solid #1e3a8a;text-align:right;width:130px;">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${itemRows || '<tr><td colspan="4" style="padding:14px;text-align:center;border:1px solid #cbd5e1;color:#94a3b8;font-style:italic;">Nenhum item configurado</td></tr>'}
+          ${r.discount > 0 ? `<tr>
+            <td colspan="3" style="padding:6px 10px;border:1px solid #cbd5e1;text-align:right;color:#dc2626;">Desconto</td>
+            <td style="padding:6px 10px;border:1px solid #cbd5e1;text-align:right;color:#dc2626;font-weight:600;">- ${formatBRL(r.discount)}</td>
+          </tr>` : ''}
+          <tr style="background:#1e3a8a;color:white;">
+            <td colspan="3" style="padding:10px;border:1px solid #1e3a8a;text-align:right;font-weight:800;font-size:13px;">CUSTO MENSAL TOTAL</td>
+            <td style="padding:10px;border:1px solid #1e3a8a;text-align:right;font-weight:800;font-size:14px;">${formatBRL(monthlyTotal)}</td>
+          </tr>
+        </tbody>
+      </table>
 
-    <div style="margin-top:14px;padding:10px 14px;background:#fef3c7;border-left:3px solid #f59e0b;font-size:10px;color:#78350f;line-height:1.5;">
-      <strong>Não inclusos:</strong> ${escapeHtml(NOT_INCLUDED)}
+      <div style="margin-top:14px;padding:10px 14px;background:#fef3c7;border-left:3px solid #f59e0b;font-size:10px;color:#78350f;line-height:1.5;">
+        <strong>Não inclusos:</strong> ${escapeHtml(NOT_INCLUDED)}
+      </div>
     </div>
 
     ${r.notes ? `${sectionTitle('OBSERVAÇÕES')}<p style="margin:0;padding:10px 12px;background:#f8fafc;border-left:3px solid #1e3a8a;font-size:11px;line-height:1.6;text-align:justify;white-space:pre-line;">${escapeHtml(r.notes)}</p>` : ''}
