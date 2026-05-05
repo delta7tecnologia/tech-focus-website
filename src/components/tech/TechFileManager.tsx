@@ -182,6 +182,9 @@ const TechFileManager = () => {
           <TabsTrigger value="service-orders" className="gap-2">
             <ClipboardList className="w-4 h-4" /> Ordens de Serviço
           </TabsTrigger>
+          <TabsTrigger value="proposals" className="gap-2">
+            <Briefcase className="w-4 h-4" /> Propostas
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="files" className="space-y-4 mt-4">
