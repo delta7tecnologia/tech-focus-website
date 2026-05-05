@@ -312,6 +312,10 @@ const TechFileManager = () => {
         <TabsContent value="service-orders" className="mt-4">
           <ServiceOrders />
         </TabsContent>
+
+        <TabsContent value="proposals" className="mt-4">
+          <CommercialProposals />
+        </TabsContent>
       </Tabs>
     </div>
   );
