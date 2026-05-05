@@ -17,7 +17,8 @@ import {
   Users,
   Monitor,
   FileSignature,
-  ClipboardList
+  ClipboardList,
+  Briefcase
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { supabase } from '@/integrations/supabase/client';
