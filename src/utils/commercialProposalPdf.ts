@@ -106,13 +106,15 @@ function buildHtml(r: CommercialProposalPdfData): string {
   <!-- ============ CONTEÚDO ============ -->
   <div style="padding:36px 44px;box-sizing:border-box;">
 
-    <div style="border-bottom:3px solid #1e3a8a;padding-bottom:12px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:flex-end;">
-      <img src="${DELTA7_LOGO_DARK_DATA_URL}" alt="Delta7" style="height:46px;" />
-      <div style="text-align:right;font-size:11px;">
-        <div style="font-weight:700;color:#1e3a8a;font-size:13px;">Proposta ${escapeHtml(r.proposalNumber)}</div>
-        <div style="color:#64748b;margin-top:2px;">${fmtDate(r.generatedAt)}</div>
-      </div>
-    </div>
+    <table style="width:100%;border-bottom:3px solid #1e3a8a;padding-bottom:0;margin-bottom:18px;border-collapse:collapse;">
+      <tr>
+        <td style="vertical-align:bottom;padding-bottom:12px;"><img src="${DELTA7_LOGO_DARK_DATA_URL}" alt="Delta7" style="height:46px;display:block;" /></td>
+        <td style="vertical-align:bottom;padding-bottom:12px;text-align:right;font-size:11px;">
+          <div style="font-weight:700;color:#1e3a8a;font-size:13px;">Proposta ${escapeHtml(r.proposalNumber)}</div>
+          <div style="color:#64748b;margin-top:2px;">${fmtDate(r.generatedAt)}</div>
+        </td>
+      </tr>
+    </table>
 
     ${sectionTitle('SOBRE A DELTA7 TECNOLOGIA')}
     <p style="margin:0;line-height:1.7;text-align:justify;color:#334155;white-space:pre-line;">${escapeHtml(ABOUT_DELTA7)}</p>
