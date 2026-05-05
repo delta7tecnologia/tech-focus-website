@@ -1,81 +1,89 @@
 ## Objetivo
 
-Hoje o cadastro de patrimônio só tem dois campos genéricos: "Licença Windows" e "Licença Office". Não dá pra registrar **qual produto exatamente** está instalado (ex.: Office 2021 vs 365 Business, Windows Server 2022 Standard, CAL RDS, Kaspersky). Vamos ampliar para suportar todo o catálogo Delta7.
+Criar uma ferramenta interna para gerar **Propostas Comerciais de Backup Online em PDF**, eliminando a edição manual no Word. Dados institucionais da Delta7 e textos fixos ficam no código; o usuário só preenche cliente, executivo e quantidades.
 
-## Catálogo de produtos a suportar
+## Decisões confirmadas
+- Preços padrão exatamente como no modelo PDF
+- Executivo de vendas editável (preenchido com dados do perfil logado)
+- Página pública de validação por QR Code (mesmo padrão das OS)
 
-**Sistemas Operacionais (cliente)**
-- Windows 10 Pro / Home
-- Windows 11 Pro / Home
+## Estrutura do PDF (baseado no modelo)
 
-**Windows Server**
-- Server 2019 Standard / Essentials
-- Server 2022 Standard / Essentials
-- Server 2025 Standard / Essentials
+1. **Capa** — Logo Delta7 (branca sobre fundo azul `#1e3a8a`) + "BACKUP ONLINE — Sua empresa protegida de verdade" + bloco "Sobre a Delta7".
+2. **Benefícios** — Lista fixa: multiplataforma (Windows/Linux/MacOS), nuvem, dispensa hardware local, anti-ransomware, automatização, retenção, gerenciamento centralizado, notificações.
+3. **Proposta Comercial** — Cliente, executivo de vendas, e-mail e linha "Ativação do Serviço — R$ 90,00".
+4. **Cenário com Backup Online** — Tabela editável (Qtd × Unitário = Subtotal) + **Custo Mensal Total** + bloco "Não inclusos".
+5. **Suporte Técnico** — Texto fixo (corrigido para Delta7, removendo "Set Telecom"): SLA seg-sex 8h–18h, plantão sáb 8h–12h, contato via WhatsApp, contrato 12 meses, hora extra fora do horário R$ 200,00.
+6. **Assinatura + Validação** — Linhas Cliente/Delta7, data, número da proposta `PROP-AAAA-NNNN`, hash SHA-256 e QR para `/validar-proposta/:hash`.
 
-**Licenças CAL**
-- CAL RDS por Dispositivo
-- CAL RDS por Usuário
+## Catálogo padrão (preços fixos do PDF)
 
-**Microsoft Office (perpétuo)**
-- Office 2021
-- Office 2024
+| Item | Valor unit. mensal |
+|---|---|
+| Computador desktop | R$ 38,00 |
+| Servidor Windows Server | R$ 90,00 |
+| Servidor Linux | R$ 90,00 |
+| Servidor Hyper-V | R$ 270,00 |
+| MS SQL Server | R$ 130,00 |
+| 1 TB de armazenamento | R$ 90,00 |
+| Ativação do Serviço (única) | R$ 90,00 |
 
-**Microsoft 365 (assinatura)**
-- 365 Business Basic / Standard / Premium
-- 365 Personal
-- 365 Family
+Botão "Adicionar item personalizado" para casos fora do catálogo.
 
-**Antivírus**
-- Kaspersky (com variação livre — Standard, Plus, Premium, Endpoint…)
+## Backend (Lovable Cloud)
 
-## O que muda na interface (área técnica e admin)
+Tabela nova `commercial_proposals`:
+- Identificação: `id`, `proposal_number`, `proposal_seq` (sequence), `created_by`, `created_at`, `updated_at`, `generated_at`
+- Cliente: `client_name`, `client_document`, `client_contact`, `client_email`, `client_address`
+- Comercial: `sales_rep_name`, `sales_rep_email`, `validity_days` (default 15), `notes`
+- Itens: `items` jsonb `[{description, qty, unit_price}]`, `activation_fee` (default 90), `discount`
+- Totais calculados na geração: `monthly_total`, `setup_total`
+- Estado: `status` ('rascunho'|'enviada'|'aceita'|'recusada'), `is_draft`, `locked`, `integrity_hash`, `audit_log` jsonb
 
-Em vez de dois campos fixos, o formulário passa a ter uma **lista dinâmica de licenças** por máquina. Cada linha contém:
+Sequence `commercial_proposals_seq` + triggers (mesmo padrão das OS):
+- `proposals_set_seq`, `proposals_lock_on_finalize`, `update_updated_at_column`
 
-1. **Categoria** (select): Sistema Operacional / Windows Server / CAL RDS / Office / Microsoft 365 / Antivírus / Outro
-2. **Produto** (select dependente da categoria) — ex.: ao escolher "Office", aparecem 2021 e 2024
-3. **Edição/Variante** (select ou texto, quando se aplica) — ex.: Pro/Home, Standard/Essentials, Business Basic/Standard/Premium
-4. **Chave de licença** (texto, com toggle mostrar/ocultar e botão copiar — igual ao atual)
-5. **Data de ativação** (date)
-6. **Observações da licença** (texto curto, opcional — útil para nº de assento, conta vinculada, expiração)
-7. Botão **remover linha** + botão **+ Adicionar licença** no fim da lista
+RLS:
+- Admin: ALL
+- Técnicos aprovados: SELECT/INSERT/UPDATE/DELETE próprios
+- Público: SELECT por `integrity_hash IS NOT NULL` (validação via QR)
 
-Visualmente, cada licença vira um "chip/card" dentro do formulário e na visualização da máquina (TechAssetViewer), substituindo as duas seções fixas Windows/Office.
+## Frontend
 
-## Mudanças no banco
-
-Como a estrutura vira N licenças por máquina, precisamos de uma tabela nova:
-
+**Arquivos novos:**
 ```text
-asset_licenses
-├── id (uuid)
-├── asset_id (uuid, FK assets)
-├── category (text)        -- 'windows' | 'windows_server' | 'cal_rds' | 'office' | 'm365' | 'antivirus' | 'outro'
-├── product (text)         -- 'Windows 11', 'Server 2022', 'Office 2024', '365 Business Standard', 'Kaspersky'…
-├── edition (text, null)   -- 'Pro', 'Standard', 'Essentials', 'Por Dispositivo', 'Premium'…
-├── license_key (text, null)
-├── activation_date (date, null)
-├── notes (text, null)
-├── created_at / updated_at
+src/components/tech/proposals/
+  ├── CommercialProposals.tsx      # shell + lista
+  ├── ProposalList.tsx             # filtros + ações (PDF, duplicar, excluir)
+  ├── ProposalForm.tsx             # formulário em seções
+  └── ProposalItemsEditor.tsx      # tabela de itens com presets
+src/pages/admin/AdminProposals.tsx  # entrada no admin
+src/pages/ValidateProposal.tsx      # validação pública por hash
+src/utils/commercialProposalPdf.ts  # gerador HTML→PDF
+src/lib/proposalContent.ts          # textos fixos + catálogo
+supabase/migrations/<ts>_commercial_proposals.sql
 ```
 
-**RLS** segue o mesmo padrão de `assets` (técnicos aprovados leem/escrevem licenças de patrimônios visíveis a eles; admins gerenciam tudo).
+**Formulário:**
+- Cliente: campo de busca por CNPJ/CPF reutilizando lookup do `ReportClientInfoDialog` + validação via `@/lib/validators/document`
+- Executivo: nome + e-mail (pré-preenchidos do perfil, editáveis)
+- Itens: catálogo com checkboxes/qtd + linhas customizadas
+- Recálculo automático do total mensal
+- Ações: Salvar rascunho / Finalizar e gerar PDF
 
-**Compatibilidade com dados existentes**: uma migração popula `asset_licenses` a partir dos campos atuais `windows_license` / `office_license` / `*_activation_date`. Os campos antigos ficam na tabela `assets` por enquanto (deprecated) para não quebrar nada, mas o app passa a ler/gravar só na tabela nova.
+**Geração de PDF** (`commercialProposalPdf.ts`):
+- Mesmo padrão de `serviceOrderPdf.ts` (`html2canvas` + `jsPDF`)
+- Logo branca em capa azul (`DELTA7_LOGO_DATA_URL`), logo escura em páginas internas (`DELTA7_LOGO_DARK_DATA_URL`)
+- Paleta corporativa azul/cinza, Helvetica
+- QR Code via `qrcode` apontando para `/validar-proposta/:hash`
+- Hash SHA-256 com `reportHash.ts`
 
-## Mudanças nos componentes
+**Roteamento:**
+- `App.tsx`: rotas `/validar-proposta/:hash` e admin
+- `AdminLayout`: novo item "Propostas"
+- `AreaTecnica`: novo card "Propostas Comerciais"
 
-- `src/components/tech/TechAssetViewer.tsx` — substitui blocos fixos Windows/Office por lista dinâmica de licenças; formulário usa novo seletor categoria→produto→edição.
-- `src/pages/admin/AdminAssets.tsx` — mesmas mudanças de formulário e exibição na tabela (coluna "Licenças" mostrando contagem + tooltip com lista resumida).
-- `src/utils/printAssetReport.ts` — relatório PDF passa a listar todas as licenças por máquina (Categoria · Produto · Edição · Ativação · Chave) em vez das colunas fixas.
-- Novo arquivo `src/lib/licenseCatalog.ts` — fonte única do catálogo (categorias, produtos, edições) para alimentar os selects.
-
-## Resumo do fluxo final
-
-1. Técnico abre "Novo Patrimônio" → preenche máquina/empresa → clica em **+ Adicionar licença**.
-2. Escolhe Categoria (ex.: Microsoft 365) → Produto (365 Business) → Edição (Standard) → cola a chave → data de ativação.
-3. Pode adicionar quantas licenças quiser (ex.: Windows 11 Pro + Office 2024 + Kaspersky na mesma máquina).
-4. Visualização e relatório imprimem todas as licenças agrupadas por máquina.
-
-Posso seguir com a implementação?
+## Segurança
+- Validação CNPJ/CPF cliente-side (zod já em uso) + máscara
+- RLS completo, hash de integridade, validação pública somente leitura
+- Trigger de auditoria registra finalização e edições pós-emissão
