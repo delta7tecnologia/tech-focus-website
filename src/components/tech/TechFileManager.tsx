@@ -9,10 +9,11 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Upload, Download, Trash2, FileText, LogOut, Search, Monitor, FileSignature, ExternalLink, Link2, ClipboardList } from 'lucide-react';
+import { Upload, Download, Trash2, FileText, LogOut, Search, Monitor, FileSignature, ExternalLink, Link2, ClipboardList, Briefcase } from 'lucide-react';
 import TechAssetViewer from './TechAssetViewer';
 import TechReports from './reports/TechReports';
 import ServiceOrders from './service-orders/ServiceOrders';
+import CommercialProposals from './proposals/CommercialProposals';
 import UploadOrLinkInput, { detectExternalProvider, type SourceMode } from './UploadOrLinkInput';
 
 const TechFileManager = () => {
