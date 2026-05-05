@@ -66,13 +66,14 @@ function buildHtml(r: CommercialProposalPdfData): string {
     )
     .join('');
 
-  const benefitsHtml = BACKUP_BENEFITS.map(
-    (b) => `<li style="margin-bottom:8px;">${escapeHtml(b)}</li>`,
-  ).join('');
+  const bulletItem = (text: string, mb = 8) => `
+    <div style="display:flex;align-items:flex-start;margin-bottom:${mb}px;line-height:1.5;">
+      <span style="color:#1e3a8a;font-weight:900;margin-right:10px;font-size:13px;line-height:1.2;flex-shrink:0;">▸</span>
+      <span style="flex:1;">${escapeHtml(text)}</span>
+    </div>`;
 
-  const supportReqHtml = SUPPORT_REQUIREMENTS.map(
-    (r) => `<li style="margin-bottom:6px;">${escapeHtml(r)}</li>`,
-  ).join('');
+  const benefitsHtml = BACKUP_BENEFITS.map((b) => bulletItem(b, 8)).join('');
+  const supportReqHtml = SUPPORT_REQUIREMENTS.map((r) => bulletItem(r, 6)).join('');
 
   return `
 <div style="width:794px;font-family:'Helvetica',Arial,sans-serif;color:#1e293b;background:white;font-size:11px;">
@@ -105,21 +106,23 @@ function buildHtml(r: CommercialProposalPdfData): string {
   <!-- ============ CONTEÚDO ============ -->
   <div style="padding:36px 44px;box-sizing:border-box;">
 
-    <div style="border-bottom:3px solid #1e3a8a;padding-bottom:12px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:flex-end;">
-      <img src="${DELTA7_LOGO_DARK_DATA_URL}" alt="Delta7" style="height:46px;" />
-      <div style="text-align:right;font-size:11px;">
-        <div style="font-weight:700;color:#1e3a8a;font-size:13px;">Proposta ${escapeHtml(r.proposalNumber)}</div>
-        <div style="color:#64748b;margin-top:2px;">${fmtDate(r.generatedAt)}</div>
-      </div>
-    </div>
+    <table style="width:100%;border-bottom:3px solid #1e3a8a;padding-bottom:0;margin-bottom:18px;border-collapse:collapse;">
+      <tr>
+        <td style="vertical-align:bottom;padding-bottom:12px;"><img src="${DELTA7_LOGO_DARK_DATA_URL}" alt="Delta7" style="height:46px;display:block;" /></td>
+        <td style="vertical-align:bottom;padding-bottom:12px;text-align:right;font-size:11px;">
+          <div style="font-weight:700;color:#1e3a8a;font-size:13px;">Proposta ${escapeHtml(r.proposalNumber)}</div>
+          <div style="color:#64748b;margin-top:2px;">${fmtDate(r.generatedAt)}</div>
+        </td>
+      </tr>
+    </table>
 
     ${sectionTitle('SOBRE A DELTA7 TECNOLOGIA')}
     <p style="margin:0;line-height:1.7;text-align:justify;color:#334155;white-space:pre-line;">${escapeHtml(ABOUT_DELTA7)}</p>
 
     ${sectionTitle('BENEFÍCIOS DO BACKUP ONLINE')}
-    <ul style="margin:0;padding-left:20px;line-height:1.6;color:#334155;">
+    <div style="color:#334155;font-size:11px;">
       ${benefitsHtml}
-    </ul>
+    </div>
 
     ${sectionTitle('IDENTIFICAÇÃO DO CLIENTE')}
     <table style="width:100%;border-collapse:collapse;font-size:11px;">
@@ -167,31 +170,33 @@ function buildHtml(r: CommercialProposalPdfData): string {
       </tbody>
     </table>
 
-    ${sectionTitle('CENÁRIO COM BACKUP ONLINE — VALORES MENSAIS')}
-    <table style="width:100%;border-collapse:collapse;font-size:11px;">
-      <thead>
-        <tr style="background:#1e3a8a;color:white;">
-          <th style="padding:8px 10px;border:1px solid #1e3a8a;text-align:left;">Item</th>
-          <th style="padding:8px 10px;border:1px solid #1e3a8a;text-align:center;width:80px;">Qtd</th>
-          <th style="padding:8px 10px;border:1px solid #1e3a8a;text-align:right;width:130px;">Valor unit.</th>
-          <th style="padding:8px 10px;border:1px solid #1e3a8a;text-align:right;width:130px;">Subtotal</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${itemRows || '<tr><td colspan="4" style="padding:14px;text-align:center;border:1px solid #cbd5e1;color:#94a3b8;font-style:italic;">Nenhum item configurado</td></tr>'}
-        ${r.discount > 0 ? `<tr>
-          <td colspan="3" style="padding:6px 10px;border:1px solid #cbd5e1;text-align:right;color:#dc2626;">Desconto</td>
-          <td style="padding:6px 10px;border:1px solid #cbd5e1;text-align:right;color:#dc2626;font-weight:600;">- ${formatBRL(r.discount)}</td>
-        </tr>` : ''}
-        <tr style="background:#1e3a8a;color:white;">
-          <td colspan="3" style="padding:10px;border:1px solid #1e3a8a;text-align:right;font-weight:800;font-size:13px;">CUSTO MENSAL TOTAL</td>
-          <td style="padding:10px;border:1px solid #1e3a8a;text-align:right;font-weight:800;font-size:14px;">${formatBRL(monthlyTotal)}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div id="prop-cenario-block" style="break-inside:avoid;page-break-inside:avoid;">
+      ${sectionTitle('CENÁRIO COM BACKUP ONLINE — VALORES MENSAIS')}
+      <table style="width:100%;border-collapse:collapse;font-size:11px;">
+        <thead>
+          <tr style="background:#1e3a8a;color:white;">
+            <th style="padding:8px 10px;border:1px solid #1e3a8a;text-align:left;">Item</th>
+            <th style="padding:8px 10px;border:1px solid #1e3a8a;text-align:center;width:80px;">Qtd</th>
+            <th style="padding:8px 10px;border:1px solid #1e3a8a;text-align:right;width:130px;">Valor unit.</th>
+            <th style="padding:8px 10px;border:1px solid #1e3a8a;text-align:right;width:130px;">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${itemRows || '<tr><td colspan="4" style="padding:14px;text-align:center;border:1px solid #cbd5e1;color:#94a3b8;font-style:italic;">Nenhum item configurado</td></tr>'}
+          ${r.discount > 0 ? `<tr>
+            <td colspan="3" style="padding:6px 10px;border:1px solid #cbd5e1;text-align:right;color:#dc2626;">Desconto</td>
+            <td style="padding:6px 10px;border:1px solid #cbd5e1;text-align:right;color:#dc2626;font-weight:600;">- ${formatBRL(r.discount)}</td>
+          </tr>` : ''}
+          <tr style="background:#1e3a8a;color:white;">
+            <td colspan="3" style="padding:10px;border:1px solid #1e3a8a;text-align:right;font-weight:800;font-size:13px;">CUSTO MENSAL TOTAL</td>
+            <td style="padding:10px;border:1px solid #1e3a8a;text-align:right;font-weight:800;font-size:14px;">${formatBRL(monthlyTotal)}</td>
+          </tr>
+        </tbody>
+      </table>
 
-    <div style="margin-top:14px;padding:10px 14px;background:#fef3c7;border-left:3px solid #f59e0b;font-size:10px;color:#78350f;line-height:1.5;">
-      <strong>Não inclusos:</strong> ${escapeHtml(NOT_INCLUDED)}
+      <div style="margin-top:14px;padding:10px 14px;background:#fef3c7;border-left:3px solid #f59e0b;font-size:10px;color:#78350f;line-height:1.5;">
+        <strong>Não inclusos:</strong> ${escapeHtml(NOT_INCLUDED)}
+      </div>
     </div>
 
     ${r.notes ? `${sectionTitle('OBSERVAÇÕES')}<p style="margin:0;padding:10px 12px;background:#f8fafc;border-left:3px solid #1e3a8a;font-size:11px;line-height:1.6;text-align:justify;white-space:pre-line;">${escapeHtml(r.notes)}</p>` : ''}
@@ -199,9 +204,9 @@ function buildHtml(r: CommercialProposalPdfData): string {
     ${sectionTitle('SUPORTE TÉCNICO')}
     <p style="margin:0 0 10px 0;line-height:1.6;text-align:justify;color:#334155;white-space:pre-line;">${escapeHtml(SUPPORT_TEXT)}</p>
     <p style="margin:8px 0 6px 0;font-weight:700;color:#1e3a8a;">Requisitos para a prestação dos serviços:</p>
-    <ul style="margin:0;padding-left:20px;line-height:1.55;color:#334155;font-size:10.5px;">
+    <div style="color:#334155;font-size:10.5px;">
       ${supportReqHtml}
-    </ul>
+    </div>
 
     <div id="prop-aceite-block" style="break-inside:avoid;page-break-inside:avoid;margin-top:30px;">
       ${sectionTitle('ACEITE DA PROPOSTA')}
@@ -295,6 +300,7 @@ export async function downloadCommercialProposalPdf(data: CommercialProposalPdfD
         el.style.marginTop = `${extraPx + baseMargin}px`;
       }
     };
+    tryPushAcross('prop-cenario-block', 8);
     tryPushAcross('prop-aceite-block', 8);
     tryPushAcross('prop-footer-block', 24);
 
