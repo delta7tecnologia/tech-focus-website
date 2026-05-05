@@ -11,7 +11,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Loader2, Save, FileDown } from 'lucide-react';
 import ProposalItemsEditor, { type EditableItem } from './ProposalItemsEditor';
 import { ACTIVATION_FEE_DEFAULT, VALIDITY_DAYS_DEFAULT } from '@/lib/proposalContent';
-import { validateDocument, formatDocument, onlyDigits } from '@/lib/validators/document';
+import { validateDocument, formatDocument } from '@/lib/validators/document';
 import { sha256Hex } from '@/utils/reportHash';
 import { downloadCommercialProposalPdf } from '@/utils/commercialProposalPdf';
 
