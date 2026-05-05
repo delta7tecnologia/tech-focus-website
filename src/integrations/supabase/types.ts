@@ -154,6 +154,93 @@ export type Database = {
         }
         Relationships: []
       }
+      commercial_proposals: {
+        Row: {
+          activation_fee: number
+          audit_log: Json
+          client_address: string | null
+          client_contact: string | null
+          client_document: string | null
+          client_email: string | null
+          client_name: string
+          created_at: string
+          created_by: string
+          discount: number
+          generated_at: string
+          id: string
+          integrity_hash: string | null
+          is_draft: boolean
+          items: Json
+          locked: boolean
+          monthly_total: number
+          notes: string | null
+          proposal_number: string
+          proposal_seq: number | null
+          sales_rep_email: string | null
+          sales_rep_name: string
+          setup_total: number
+          status: string
+          updated_at: string
+          validity_days: number
+        }
+        Insert: {
+          activation_fee?: number
+          audit_log?: Json
+          client_address?: string | null
+          client_contact?: string | null
+          client_document?: string | null
+          client_email?: string | null
+          client_name: string
+          created_at?: string
+          created_by: string
+          discount?: number
+          generated_at?: string
+          id?: string
+          integrity_hash?: string | null
+          is_draft?: boolean
+          items?: Json
+          locked?: boolean
+          monthly_total?: number
+          notes?: string | null
+          proposal_number: string
+          proposal_seq?: number | null
+          sales_rep_email?: string | null
+          sales_rep_name: string
+          setup_total?: number
+          status?: string
+          updated_at?: string
+          validity_days?: number
+        }
+        Update: {
+          activation_fee?: number
+          audit_log?: Json
+          client_address?: string | null
+          client_contact?: string | null
+          client_document?: string | null
+          client_email?: string | null
+          client_name?: string
+          created_at?: string
+          created_by?: string
+          discount?: number
+          generated_at?: string
+          id?: string
+          integrity_hash?: string | null
+          is_draft?: boolean
+          items?: Json
+          locked?: boolean
+          monthly_total?: number
+          notes?: string | null
+          proposal_number?: string
+          proposal_seq?: number | null
+          sales_rep_email?: string | null
+          sales_rep_name?: string
+          setup_total?: number
+          status?: string
+          updated_at?: string
+          validity_days?: number
+        }
+        Relationships: []
+      }
       faqs: {
         Row: {
           answer: string

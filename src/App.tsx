@@ -35,6 +35,8 @@ import AdminAssets from "./pages/admin/AdminAssets";
 import AdminFiles from "./pages/admin/AdminFiles";
 import AdminReports from "./pages/admin/AdminReports";
 import AdminServiceOrders from "./pages/admin/AdminServiceOrders";
+import AdminProposals from "./pages/admin/AdminProposals";
+import ValidateProposal from "./pages/ValidateProposal";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +61,7 @@ const App = () => (
             <Route path="/assinar-os/:token" element={<SignServiceOrder />} />
             <Route path="/validar-laudo/:hash" element={<ValidateReport />} />
             <Route path="/validar-os/:hash" element={<ValidateServiceOrder />} />
+            <Route path="/validar-proposta/:hash" element={<ValidateProposal />} />
             
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
@@ -75,6 +78,7 @@ const App = () => (
               <Route path="arquivos" element={<AdminFiles />} />
               <Route path="laudos" element={<AdminReports />} />
               <Route path="ordens-servico" element={<AdminServiceOrders />} />
+              <Route path="propostas" element={<AdminProposals />} />
               <Route path="configuracoes" element={<AdminSettings />} />
             </Route>
             
