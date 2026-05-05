@@ -78,6 +78,7 @@ const App = () => (
               <Route path="arquivos" element={<AdminFiles />} />
               <Route path="laudos" element={<AdminReports />} />
               <Route path="ordens-servico" element={<AdminServiceOrders />} />
+              <Route path="propostas" element={<AdminProposals />} />
               <Route path="configuracoes" element={<AdminSettings />} />
             </Route>
             
