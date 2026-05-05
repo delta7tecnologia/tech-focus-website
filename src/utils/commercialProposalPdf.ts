@@ -204,9 +204,9 @@ function buildHtml(r: CommercialProposalPdfData): string {
     ${sectionTitle('SUPORTE TÉCNICO')}
     <p style="margin:0 0 10px 0;line-height:1.6;text-align:justify;color:#334155;white-space:pre-line;">${escapeHtml(SUPPORT_TEXT)}</p>
     <p style="margin:8px 0 6px 0;font-weight:700;color:#1e3a8a;">Requisitos para a prestação dos serviços:</p>
-    <ul style="margin:0;padding-left:20px;line-height:1.55;color:#334155;font-size:10.5px;">
+    <div style="color:#334155;font-size:10.5px;">
       ${supportReqHtml}
-    </ul>
+    </div>
 
     <div id="prop-aceite-block" style="break-inside:avoid;page-break-inside:avoid;margin-top:30px;">
       ${sectionTitle('ACEITE DA PROPOSTA')}
