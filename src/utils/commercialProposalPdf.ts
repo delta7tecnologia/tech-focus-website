@@ -120,9 +120,9 @@ function buildHtml(r: CommercialProposalPdfData): string {
     <p style="margin:0;line-height:1.7;text-align:justify;color:#334155;white-space:pre-line;">${escapeHtml(ABOUT_DELTA7)}</p>
 
     ${sectionTitle('BENEFÍCIOS DO BACKUP ONLINE')}
-    <ul style="margin:0;padding-left:20px;line-height:1.6;color:#334155;">
+    <div style="color:#334155;font-size:11px;">
       ${benefitsHtml}
-    </ul>
+    </div>
 
     ${sectionTitle('IDENTIFICAÇÃO DO CLIENTE')}
     <table style="width:100%;border-collapse:collapse;font-size:11px;">
