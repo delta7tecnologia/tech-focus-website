@@ -66,13 +66,14 @@ function buildHtml(r: CommercialProposalPdfData): string {
     )
     .join('');
 
-  const benefitsHtml = BACKUP_BENEFITS.map(
-    (b) => `<li style="margin-bottom:8px;">${escapeHtml(b)}</li>`,
-  ).join('');
+  const bulletItem = (text: string, mb = 8) => `
+    <div style="display:flex;align-items:flex-start;margin-bottom:${mb}px;line-height:1.5;">
+      <span style="color:#1e3a8a;font-weight:900;margin-right:10px;font-size:13px;line-height:1.2;flex-shrink:0;">▸</span>
+      <span style="flex:1;">${escapeHtml(text)}</span>
+    </div>`;
 
-  const supportReqHtml = SUPPORT_REQUIREMENTS.map(
-    (r) => `<li style="margin-bottom:6px;">${escapeHtml(r)}</li>`,
-  ).join('');
+  const benefitsHtml = BACKUP_BENEFITS.map((b) => bulletItem(b, 8)).join('');
+  const supportReqHtml = SUPPORT_REQUIREMENTS.map((r) => bulletItem(r, 6)).join('');
 
   return `
 <div style="width:794px;font-family:'Helvetica',Arial,sans-serif;color:#1e293b;background:white;font-size:11px;">
