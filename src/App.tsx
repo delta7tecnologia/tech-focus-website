@@ -61,6 +61,7 @@ const App = () => (
             <Route path="/assinar-os/:token" element={<SignServiceOrder />} />
             <Route path="/validar-laudo/:hash" element={<ValidateReport />} />
             <Route path="/validar-os/:hash" element={<ValidateServiceOrder />} />
+            <Route path="/validar-proposta/:hash" element={<ValidateProposal />} />
             
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
