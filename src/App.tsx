@@ -35,6 +35,8 @@ import AdminAssets from "./pages/admin/AdminAssets";
 import AdminFiles from "./pages/admin/AdminFiles";
 import AdminReports from "./pages/admin/AdminReports";
 import AdminServiceOrders from "./pages/admin/AdminServiceOrders";
+import AdminProposals from "./pages/admin/AdminProposals";
+import ValidateProposal from "./pages/ValidateProposal";
 
 const queryClient = new QueryClient();
 
