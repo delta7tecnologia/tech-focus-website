@@ -300,6 +300,7 @@ export async function downloadCommercialProposalPdf(data: CommercialProposalPdfD
         el.style.marginTop = `${extraPx + baseMargin}px`;
       }
     };
+    tryPushAcross('prop-cenario-block', 8);
     tryPushAcross('prop-aceite-block', 8);
     tryPushAcross('prop-footer-block', 24);
 
