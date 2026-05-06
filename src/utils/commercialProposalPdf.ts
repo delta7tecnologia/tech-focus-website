@@ -393,7 +393,7 @@ function buildHtml(r: CommercialProposalPdfData): string {
 </div>`;
 }
 
-export async function downloadCommercialProposalPdf(data: CommercialProposalPdfData) {
+async function buildPdf(data: CommercialProposalPdfData): Promise<jsPDF> {
   const validationUrl = data.validationUrl
     || `${window.location.origin}/validar-proposta/${data.integrityHash}`;
   let qrCodeDataUrl = data.qrCodeDataUrl;
@@ -459,8 +459,19 @@ export async function downloadCommercialProposalPdf(data: CommercialProposalPdfD
       pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, position, imgW, imgH);
       heightLeft -= pageH;
     }
-    pdf.save(`Proposta_${data.proposalNumber}.pdf`);
+    return pdf;
   } finally {
     document.body.removeChild(wrap);
   }
+}
+
+export async function downloadCommercialProposalPdf(data: CommercialProposalPdfData) {
+  const pdf = await buildPdf(data);
+  pdf.save(`Proposta_${data.proposalNumber}.pdf`);
+}
+
+export async function previewCommercialProposalPdf(data: CommercialProposalPdfData): Promise<string> {
+  const pdf = await buildPdf(data);
+  const blob = pdf.output('blob');
+  return URL.createObjectURL(blob);
 }
