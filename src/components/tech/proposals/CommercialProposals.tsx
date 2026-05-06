@@ -72,6 +72,7 @@ const CommercialProposals: React.FC = () => {
         notes: p.notes || undefined,
         integrityHash: p.integrity_hash || '',
         sections: p.sections || undefined,
+        showAltatekLogo: p.show_altatek_logo ?? false,
         template,
       });
     } catch (e: any) {
