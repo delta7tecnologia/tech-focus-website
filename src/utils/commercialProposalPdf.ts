@@ -763,7 +763,25 @@ async function buildPdf(data: CommercialProposalPdfData): Promise<jsPDF> {
 export async function downloadCommercialProposalPdf(data: CommercialProposalPdfData) {
   const pdf = await buildPdf(data);
   const suffix = data.template === 'modelo02' ? '_Modelo02' : '';
-  pdf.save(`Proposta_${data.proposalNumber}${suffix}.pdf`);
+  const filename = `Proposta_${data.proposalNumber}${suffix}.pdf`;
+  try {
+    const blob: Blob = pdf.output('blob');
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.rel = 'noopener';
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 4000);
+  } catch (e) {
+    // Fallback to jsPDF's built-in save (handles older browsers)
+    pdf.save(filename);
+  }
 }
 
 export async function previewCommercialProposalPdf(data: CommercialProposalPdfData): Promise<string[]> {
