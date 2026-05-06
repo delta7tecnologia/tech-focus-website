@@ -721,19 +721,25 @@ async function buildPdf(data: CommercialProposalPdfData): Promise<jsPDF> {
     const pxPerMM = node.offsetWidth / pageWidthMM;
     const pageHeightPx = pageHeightMM * pxPerMM;
 
-    const tryPushAcross = (id: string, baseMargin = 24) => {
-      const el = node.querySelector(`#${id}`) as HTMLElement | null;
-      if (!el) return;
+    const pushElement = (el: HTMLElement, baseMargin: number) => {
       const top = el.offsetTop;
       const bottom = top + el.offsetHeight;
       const startPage = Math.floor(top / pageHeightPx);
       const endPage = Math.floor((bottom - 1) / pageHeightPx);
-      if (endPage > startPage) {
+      // Only push if it crosses AND fits in a single page
+      if (endPage > startPage && el.offsetHeight < pageHeightPx - 40) {
         const nextPageStart = (startPage + 1) * pageHeightPx;
         const extraPx = nextPageStart - top + 8;
-        el.style.marginTop = `${extraPx + baseMargin}px`;
+        const current = parseFloat(el.style.marginTop || '0') || 0;
+        el.style.marginTop = `${current + extraPx + baseMargin}px`;
       }
     };
+    const tryPushAcross = (id: string, baseMargin = 24) => {
+      const el = node.querySelector(`#${id}`) as HTMLElement | null;
+      if (el) pushElement(el, baseMargin);
+    };
+    // Generic: any element with data-keep also avoids breaks
+    node.querySelectorAll<HTMLElement>('[data-keep="1"]').forEach((el) => pushElement(el, 8));
     tryPushAcross('prop-financ-block', 8);
     tryPushAcross('prop-suporte-block', 8);
     tryPushAcross('prop-aceite-block', 12);
