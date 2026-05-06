@@ -52,7 +52,7 @@ const CommercialProposals: React.FC = () => {
     onError: (e: any) => toast({ title: 'Erro ao excluir', description: e.message, variant: 'destructive' }),
   });
 
-  const handleDownload = async (p: any) => {
+  const handleDownload = async (p: any, template: 'modelo01' | 'modelo02' = 'modelo01') => {
     setDownloading(p.id);
     try {
       await downloadCommercialProposalPdf({
@@ -72,6 +72,7 @@ const CommercialProposals: React.FC = () => {
         notes: p.notes || undefined,
         integrityHash: p.integrity_hash || '',
         sections: p.sections || undefined,
+        template,
       });
     } catch (e: any) {
       toast({ title: 'Erro ao gerar PDF', description: e.message, variant: 'destructive' });
