@@ -152,103 +152,113 @@ function buildHtml(r: CommercialProposalPdfData): string {
       </tr>
     </table>
 
-    ${sectionTitle('CONFIGURAÇÃO INICIAL')}
-    <table style="width:100%;border-collapse:collapse;font-size:11px;">
-      <thead>
-        <tr style="background:#1e3a8a;color:white;">
-          <th style="padding:8px 10px;border:1px solid #1e3a8a;text-align:left;">Item</th>
-          <th style="padding:8px 10px;border:1px solid #1e3a8a;text-align:center;width:80px;">Qtd</th>
-          <th style="padding:8px 10px;border:1px solid #1e3a8a;text-align:right;width:130px;">Valor unit.</th>
-          <th style="padding:8px 10px;border:1px solid #1e3a8a;text-align:right;width:130px;">Subtotal</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="padding:6px 10px;border:1px solid #cbd5e1;">Ativação do Serviço (taxa única)</td>
-          <td style="padding:6px 10px;border:1px solid #cbd5e1;text-align:center;">1</td>
-          <td style="padding:6px 10px;border:1px solid #cbd5e1;text-align:right;">${formatBRL(r.activationFee)}</td>
-          <td style="padding:6px 10px;border:1px solid #cbd5e1;text-align:right;font-weight:600;">${formatBRL(r.activationFee)}</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div id="prop-cenario-block" style="break-inside:avoid;page-break-inside:avoid;">
-      ${sectionTitle('CENÁRIO COM BACKUP ONLINE — VALORES MENSAIS')}
-      <table style="width:100%;border-collapse:collapse;font-size:11px;">
+    <div id="prop-financ-block" style="break-inside:avoid;page-break-inside:avoid;">
+      ${sectionTitle('CONFIGURAÇÃO INICIAL')}
+      <table style="width:100%;border-collapse:collapse;font-size:11px;border:1px solid #e2e8f0;border-radius:6px;overflow:hidden;">
         <thead>
           <tr style="background:#1e3a8a;color:white;">
-            <th style="padding:8px 10px;border:1px solid #1e3a8a;text-align:left;">Item</th>
-            <th style="padding:8px 10px;border:1px solid #1e3a8a;text-align:center;width:80px;">Qtd</th>
-            <th style="padding:8px 10px;border:1px solid #1e3a8a;text-align:right;width:130px;">Valor unit.</th>
-            <th style="padding:8px 10px;border:1px solid #1e3a8a;text-align:right;width:130px;">Subtotal</th>
+            <th style="padding:10px 12px;text-align:left;font-size:10px;letter-spacing:0.8px;text-transform:uppercase;">Item</th>
+            <th style="padding:10px 12px;text-align:center;width:80px;font-size:10px;letter-spacing:0.8px;text-transform:uppercase;">Qtd</th>
+            <th style="padding:10px 12px;text-align:right;width:130px;font-size:10px;letter-spacing:0.8px;text-transform:uppercase;">Valor unit.</th>
+            <th style="padding:10px 12px;text-align:right;width:130px;font-size:10px;letter-spacing:0.8px;text-transform:uppercase;">Subtotal</th>
           </tr>
         </thead>
         <tbody>
-          ${itemRows || '<tr><td colspan="4" style="padding:14px;text-align:center;border:1px solid #cbd5e1;color:#94a3b8;font-style:italic;">Nenhum item configurado</td></tr>'}
-          ${r.discount > 0 ? `<tr>
-            <td colspan="3" style="padding:6px 10px;border:1px solid #cbd5e1;text-align:right;color:#dc2626;">Desconto</td>
-            <td style="padding:6px 10px;border:1px solid #cbd5e1;text-align:right;color:#dc2626;font-weight:600;">- ${formatBRL(r.discount)}</td>
-          </tr>` : ''}
-          <tr style="background:#1e3a8a;color:white;">
-            <td colspan="3" style="padding:10px;border:1px solid #1e3a8a;text-align:right;font-weight:800;font-size:13px;">CUSTO MENSAL TOTAL</td>
-            <td style="padding:10px;border:1px solid #1e3a8a;text-align:right;font-weight:800;font-size:14px;">${formatBRL(monthlyTotal)}</td>
+          <tr>
+            <td style="padding:9px 12px;border-bottom:1px solid #f1f5f9;">Ativação do Serviço (taxa única)</td>
+            <td style="padding:9px 12px;border-bottom:1px solid #f1f5f9;text-align:center;">1</td>
+            <td style="padding:9px 12px;border-bottom:1px solid #f1f5f9;text-align:right;">${formatBRL(r.activationFee)}</td>
+            <td style="padding:9px 12px;border-bottom:1px solid #f1f5f9;text-align:right;font-weight:700;color:#1e3a8a;">${formatBRL(r.activationFee)}</td>
           </tr>
         </tbody>
       </table>
 
-      <div style="margin-top:14px;padding:10px 14px;background:#fef3c7;border-left:3px solid #f59e0b;font-size:10px;color:#78350f;line-height:1.5;">
-        <strong>Não inclusos:</strong> ${escapeHtml(NOT_INCLUDED)}
+      ${sectionTitle('CENÁRIO COM BACKUP ONLINE — VALORES MENSAIS', 18)}
+      <table style="width:100%;border-collapse:collapse;font-size:11px;border:1px solid #e2e8f0;border-radius:6px;overflow:hidden;">
+        <thead>
+          <tr style="background:#1e3a8a;color:white;">
+            <th style="padding:10px 12px;text-align:left;font-size:10px;letter-spacing:0.8px;text-transform:uppercase;">Item</th>
+            <th style="padding:10px 12px;text-align:center;width:80px;font-size:10px;letter-spacing:0.8px;text-transform:uppercase;">Qtd</th>
+            <th style="padding:10px 12px;text-align:right;width:130px;font-size:10px;letter-spacing:0.8px;text-transform:uppercase;">Valor unit.</th>
+            <th style="padding:10px 12px;text-align:right;width:130px;font-size:10px;letter-spacing:0.8px;text-transform:uppercase;">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${r.items.filter(i => i.qty > 0).map((i, idx) => `
+            <tr style="background:${idx % 2 === 0 ? '#ffffff' : '#f8fafc'};">
+              <td style="padding:9px 12px;border-bottom:1px solid #f1f5f9;">${escapeHtml(i.description)}</td>
+              <td style="padding:9px 12px;border-bottom:1px solid #f1f5f9;text-align:center;">${i.qty}</td>
+              <td style="padding:9px 12px;border-bottom:1px solid #f1f5f9;text-align:right;">${formatBRL(i.unit_price)}</td>
+              <td style="padding:9px 12px;border-bottom:1px solid #f1f5f9;text-align:right;font-weight:700;color:#1e3a8a;">${formatBRL(i.qty * i.unit_price)}</td>
+            </tr>`).join('') || '<tr><td colspan="4" style="padding:14px;text-align:center;color:#94a3b8;font-style:italic;">Nenhum item configurado</td></tr>'}
+          ${r.discount > 0 ? `<tr>
+            <td colspan="3" style="padding:9px 12px;text-align:right;color:#dc2626;border-bottom:1px solid #f1f5f9;">Desconto</td>
+            <td style="padding:9px 12px;text-align:right;color:#dc2626;font-weight:700;border-bottom:1px solid #f1f5f9;">- ${formatBRL(r.discount)}</td>
+          </tr>` : ''}
+          <tr style="background:#1e3a8a;color:white;">
+            <td colspan="3" style="padding:12px;text-align:right;font-weight:800;font-size:12px;letter-spacing:0.5px;">CUSTO MENSAL TOTAL</td>
+            <td style="padding:12px;text-align:right;font-weight:800;font-size:16px;">${formatBRL(monthlyTotal)}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="margin-top:14px;padding:11px 14px;background:#fef3c7;border-left:4px solid #f59e0b;border-radius:3px;font-size:10px;color:#78350f;line-height:1.6;">
+        <strong style="color:#92400e;">⚠ Não inclusos:</strong> ${escapeHtml(NOT_INCLUDED)}
+      </div>
+
+      ${r.notes ? `<div style="margin-top:14px;padding:12px 14px;background:#f8fafc;border-left:4px solid #1e3a8a;border-radius:3px;font-size:11px;line-height:1.6;text-align:justify;white-space:pre-line;color:#334155;"><strong style="color:#1e3a8a;display:block;margin-bottom:4px;">Observações:</strong>${escapeHtml(r.notes)}</div>` : ''}
+    </div>
+
+    <div id="prop-suporte-block" style="break-inside:avoid;page-break-inside:avoid;">
+      ${sectionTitle('SUPORTE TÉCNICO')}
+      <p style="margin:0 0 10px 0;line-height:1.7;text-align:justify;color:#334155;white-space:pre-line;">${escapeHtml(SUPPORT_TEXT)}</p>
+      <p style="margin:10px 0 8px 0;font-weight:700;color:#1e3a8a;font-size:11px;">Requisitos para a prestação dos serviços:</p>
+      <div style="color:#334155;font-size:10.5px;">
+        ${supportReqHtml}
       </div>
     </div>
 
-    ${r.notes ? `${sectionTitle('OBSERVAÇÕES')}<p style="margin:0;padding:10px 12px;background:#f8fafc;border-left:3px solid #1e3a8a;font-size:11px;line-height:1.6;text-align:justify;white-space:pre-line;">${escapeHtml(r.notes)}</p>` : ''}
-
-    ${sectionTitle('SUPORTE TÉCNICO')}
-    <p style="margin:0 0 10px 0;line-height:1.6;text-align:justify;color:#334155;white-space:pre-line;">${escapeHtml(SUPPORT_TEXT)}</p>
-    <p style="margin:8px 0 6px 0;font-weight:700;color:#1e3a8a;">Requisitos para a prestação dos serviços:</p>
-    <div style="color:#334155;font-size:10.5px;">
-      ${supportReqHtml}
-    </div>
-
-    <div id="prop-aceite-block" style="break-inside:avoid;page-break-inside:avoid;margin-top:30px;">
+    <!-- Aceite + Rodapé unidos para nunca quebrarem -->
+    <div id="prop-aceite-block" style="break-inside:avoid;page-break-inside:avoid;margin-top:24px;">
       ${sectionTitle('ACEITE DA PROPOSTA')}
-      <p style="font-size:10.5px;color:#475569;margin:0 0 18px 0;line-height:1.6;">
+      <p style="font-size:10.5px;color:#475569;margin:0 0 16px 0;line-height:1.6;">
         Declaro estar de acordo com os termos, valores e condições apresentados nesta proposta comercial,
         emitida em ${fmtDate(r.generatedAt)} com validade de ${r.validityDays} dias.
       </p>
-      <table style="width:100%;border-collapse:collapse;margin-top:30px;">
+      <table style="width:100%;border-collapse:collapse;margin-top:24px;">
         <tr>
-          <td style="width:48%;padding-top:50px;border-top:1px solid #1e293b;text-align:center;font-size:11px;font-weight:600;">
+          <td style="width:48%;padding-top:50px;border-top:1.5px solid #1e293b;text-align:center;font-size:11px;font-weight:700;">
             ${escapeHtml(r.clientName)}<br/>
             <span style="font-weight:400;color:#64748b;font-size:10px;">Cliente</span>
           </td>
           <td style="width:4%;"></td>
-          <td style="width:48%;padding-top:50px;border-top:1px solid #1e293b;text-align:center;font-size:11px;font-weight:600;">
+          <td style="width:48%;padding-top:50px;border-top:1.5px solid #1e293b;text-align:center;font-size:11px;font-weight:700;">
             Delta7 Tecnologia<br/>
             <span style="font-weight:400;color:#64748b;font-size:10px;">${escapeHtml(r.salesRepName)} — Executivo de Vendas</span>
           </td>
         </tr>
       </table>
-    </div>
 
-    <!-- Rodapé com hash + QR -->
-    <div id="prop-footer-block" style="margin-top:28px;padding-top:14px;border-top:2px solid #1e3a8a;break-inside:avoid;page-break-inside:avoid;">
-      <div style="display:flex;gap:18px;align-items:flex-start;">
-        <div style="flex-shrink:0;text-align:center;">
-          ${r.qrCodeDataUrl ? `<img src="${r.qrCodeDataUrl}" alt="QR Validação" style="width:110px;height:110px;display:block;border:1px solid #cbd5e1;padding:4px;background:white;" />` : ''}
-          <div style="font-size:8px;color:#1e3a8a;font-weight:700;margin-top:4px;">VALIDAR PROPOSTA</div>
-          <div style="font-size:7px;color:#64748b;max-width:110px;">Escaneie para verificar autenticidade</div>
-        </div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:9px;color:#64748b;margin-bottom:4px;"><strong>Hash de Legitimidade SHA-256:</strong></div>
-          <div style="font-family:'Courier New',monospace;font-size:9px;color:#1e3a8a;word-break:break-all;background:#f1f5f9;padding:6px;border-radius:3px;">
-            ${escapeHtml(r.integrityHash)}
-          </div>
-          ${r.validationUrl ? `<div style="font-size:8px;color:#475569;margin-top:6px;word-break:break-all;"><strong>Link de validação:</strong> ${escapeHtml(r.validationUrl)}</div>` : ''}
-          <div style="font-size:9px;color:#94a3b8;margin-top:8px;font-style:italic;">
-            Documento emitido eletronicamente pela plataforma Delta7. A autenticidade pode ser verificada pelo QR Code ou link acima.
-          </div>
-        </div>
+      <div style="margin-top:26px;padding:14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;">
+        <table style="width:100%;border-collapse:collapse;">
+          <tr>
+            <td style="width:120px;vertical-align:top;text-align:center;padding-right:14px;">
+              ${r.qrCodeDataUrl ? `<img src="${r.qrCodeDataUrl}" alt="QR" style="width:100px;height:100px;display:block;border:1px solid #cbd5e1;padding:3px;background:white;" />` : ''}
+              <div style="font-size:8px;color:#1e3a8a;font-weight:800;margin-top:5px;letter-spacing:0.5px;">VALIDAR PROPOSTA</div>
+              <div style="font-size:7px;color:#64748b;line-height:1.3;">Escaneie para verificar autenticidade</div>
+            </td>
+            <td style="vertical-align:top;">
+              <div style="font-size:9px;color:#64748b;margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Hash de Legitimidade SHA-256</div>
+              <div style="font-family:'Courier New',monospace;font-size:9px;color:#1e3a8a;word-break:break-all;background:white;padding:7px;border-radius:3px;border:1px solid #e2e8f0;">
+                ${escapeHtml(r.integrityHash)}
+              </div>
+              ${r.validationUrl ? `<div style="font-size:8px;color:#475569;margin-top:6px;word-break:break-all;"><strong>Link:</strong> ${escapeHtml(r.validationUrl)}</div>` : ''}
+              <div style="font-size:8.5px;color:#94a3b8;margin-top:8px;font-style:italic;line-height:1.4;">
+                Documento emitido eletronicamente pela plataforma Delta7. A autenticidade pode ser verificada pelo QR Code ou link acima.
+              </div>
+            </td>
+          </tr>
+        </table>
       </div>
     </div>
 
