@@ -59,15 +59,17 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
     setSections((s) => ({ ...s, [key]: !s[key] }));
 
   const [previewPages, setPreviewPages] = useState<string[] | null>(null);
-  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewLoading, setPreviewLoading] = useState<false | 'modelo01' | 'modelo02'>(false);
+  const [previewTemplate, setPreviewTemplate] = useState<'modelo01' | 'modelo02'>('modelo01');
 
-  const handlePreview = async () => {
+  const handlePreview = async (template: 'modelo01' | 'modelo02') => {
     const err = validateForm();
     if (err) {
       toast({ title: 'Não foi possível gerar a prévia', description: err, variant: 'destructive' });
       return;
     }
-    setPreviewLoading(true);
+    setPreviewLoading(template);
+    setPreviewTemplate(template);
     try {
       const payload = buildPayload();
       const pages = await previewCommercialProposalPdf({
@@ -87,6 +89,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
         notes: payload.notes || undefined,
         integrityHash: proposal?.integrity_hash || 'previa-sem-hash-de-integridade'.padEnd(64, '0'),
         sections,
+        template,
       });
       setPreviewPages(pages);
     } catch (e: any) {
