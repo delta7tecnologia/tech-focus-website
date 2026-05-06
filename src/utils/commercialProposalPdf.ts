@@ -459,7 +459,7 @@ function buildHtmlMinimal(r: CommercialProposalPdfData): string {
   const h2 = (txt: string) => `<h2 style="font-size:20px;font-weight:600;color:${NAVY};margin:0 0 14px 0;letter-spacing:-0.4px;">${escapeHtml(txt)}</h2>`;
   const hr = () => `<div style="height:1px;background:${LINE};margin:22px 0;"></div>`;
   const section = (eb: string, title: string, body: string, mt = 24) =>
-    `<section style="margin-top:${mt}px;">${eyebrow(eb)}${h2(title)}${body}</section>`;
+    `<section data-keep="1" style="margin-top:${mt}px;">${eyebrow(eb)}${h2(title)}${body}</section>`;
 
   const itemRows = r.items.filter(i => i.qty > 0).map(i => `
     <tr>
