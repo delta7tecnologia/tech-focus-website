@@ -46,6 +46,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
   const [salesRepEmail, setSalesRepEmail] = useState(proposal?.sales_rep_email || '');
   const [validityDays, setValidityDays] = useState<number>(proposal?.validity_days ?? VALIDITY_DAYS_DEFAULT);
   const [notes, setNotes] = useState(proposal?.notes || '');
+  const [showAltatekLogo, setShowAltatekLogo] = useState<boolean>(proposal?.show_altatek_logo ?? false);
   const [items, setItems] = useState<EditableItem[]>(
     proposal?.items?.length ? proposal.items : [],
   );
