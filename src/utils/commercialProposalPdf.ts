@@ -45,9 +45,11 @@ export interface CommercialProposalPdfData {
 const fmtDate = (iso?: string) =>
   iso ? new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }) : '—';
 
-const sectionTitle = (text: string) => `
-  <div style="font-size: 14px; font-weight: 800; color: #ffffff; background: #1e3a8a; padding: 8px 14px; margin: 22px 0 12px; border-radius: 3px; letter-spacing: 0.5px;">
-    ${text}
+const sectionTitle = (text: string, mt = 22) => `
+  <div style="display:flex;align-items:center;gap:10px;margin:${mt}px 0 12px;">
+    <div style="width:4px;height:20px;background:#1e3a8a;border-radius:2px;"></div>
+    <div style="font-size:13px;font-weight:800;color:#1e3a8a;letter-spacing:1.5px;text-transform:uppercase;">${text}</div>
+    <div style="flex:1;height:1px;background:linear-gradient(to right,#cbd5e1,transparent);"></div>
   </div>`;
 
 function buildHtml(r: CommercialProposalPdfData): string {
