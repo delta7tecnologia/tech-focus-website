@@ -5,11 +5,17 @@ import { escapeHtml } from './reportNarrative';
 import { DELTA7_LOGO_DATA_URL, DELTA7_LOGO_DARK_DATA_URL } from '@/assets/delta7LogoBase64';
 import {
   ABOUT_DELTA7,
-  BACKUP_BENEFITS,
   NOT_INCLUDED,
   SUPPORT_TEXT,
   SUPPORT_REQUIREMENTS,
   formatBRL,
+  PROP_COLORS as C,
+  DELTA7_KPIS,
+  TECH_STACK,
+  INFRA_HIGHLIGHTS,
+  BENEFIT_CARDS,
+  IDEAL_FOR,
+  INSTITUTIONAL_QUOTE,
 } from '@/lib/proposalContent';
 
 export interface ProposalItem {
@@ -45,215 +51,334 @@ export interface CommercialProposalPdfData {
 const fmtDate = (iso?: string) =>
   iso ? new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }) : '—';
 
-const sectionTitle = (text: string, mt = 22) => `
-  <div style="display:flex;align-items:center;gap:10px;margin:${mt}px 0 12px;">
-    <div style="width:4px;height:20px;background:#1e3a8a;border-radius:2px;"></div>
-    <div style="font-size:13px;font-weight:800;color:#1e3a8a;letter-spacing:1.5px;text-transform:uppercase;">${text}</div>
-    <div style="flex:1;height:1px;background:linear-gradient(to right,#cbd5e1,transparent);"></div>
+// ============ Ícones SVG (stroke gold) ============
+const ICONS: Record<string, string> = {
+  // benefit icons
+  platform: '<path d="M3 5h18v11H3z"/><path d="M8 21h8M12 16v5"/>',
+  cloud: '<path d="M7 18a5 5 0 1 1 .5-9.97A6 6 0 0 1 19 12a4 4 0 0 1 0 8H7z"/>',
+  ransom: '<path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4"/>',
+  auto: '<path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/>',
+  retention: '<path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 7v5l3 2"/>',
+  panel: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>',
+  bell: '<path d="M18 16v-5a6 6 0 1 0-12 0v5l-2 2h16l-2-2z"/><path d="M10 21a2 2 0 0 0 4 0"/>',
+  support: '<path d="M21 11.5a8.5 8.5 0 1 1-17 0 8.5 8.5 0 0 1 17 0z"/><path d="M8 11h.01M12 11h.01M16 11h.01"/>',
+  // infra
+  lock: '<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 1 1 8 0v4"/>',
+  shield: '<path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6l8-4z"/>',
+  eye: '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>',
+};
+
+const iconCircle = (name: string, size = 44, ringColor = C.gold, fillColor = C.navy, strokeColor = C.gold) => `
+  <div style="width:${size}px;height:${size}px;border-radius:50%;background:${fillColor};border:1.5px solid ${ringColor};display:inline-flex;align-items:center;justify-content:center;">
+    <svg width="${Math.round(size * 0.5)}" height="${Math.round(size * 0.5)}" viewBox="0 0 24 24" fill="none" stroke="${strokeColor}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      ${ICONS[name] || ''}
+    </svg>
+  </div>`;
+
+const sectionTitle = (eyebrow: string, title: string, mt = 26) => `
+  <div style="margin:${mt}px 0 14px;">
+    <div style="font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:${C.gold};margin-bottom:4px;">${eyebrow}</div>
+    <div style="display:flex;align-items:center;gap:14px;">
+      <div style="font-size:18px;font-weight:800;color:${C.navy};letter-spacing:-0.3px;">${title}</div>
+      <div style="flex:1;height:1px;background:linear-gradient(to right,${C.gold},transparent);"></div>
+    </div>
+  </div>`;
+
+const goldRule = (mt = 14, mb = 14) => `
+  <div style="height:1px;margin:${mt}px 0 ${mb}px;background:linear-gradient(to right,transparent,${C.gold},transparent);"></div>`;
+
+const kpiCard = (value: string, label: string) => `
+  <div style="flex:1;padding:14px 12px;background:${C.paper};border:1px solid #e7e2d2;border-top:2px solid ${C.gold};border-radius:4px;text-align:center;">
+    <div style="font-size:30px;font-weight:800;color:${C.navy};line-height:1;letter-spacing:-1px;">
+      <span style="color:${C.gold};">${escapeHtml(value)}</span>
+    </div>
+    <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:${C.muted};margin-top:8px;">${escapeHtml(label)}</div>
+  </div>`;
+
+const benefitCard = (icon: string, title: string, text: string) => `
+  <td style="width:25%;padding:8px;vertical-align:top;">
+    <div style="background:white;border:1px solid #e7e2d2;border-radius:6px;padding:14px 12px;height:100%;box-sizing:border-box;">
+      ${iconCircle(icon, 38)}
+      <div style="font-size:11px;font-weight:800;color:${C.navy};margin-top:10px;letter-spacing:0.2px;">${escapeHtml(title)}</div>
+      <div style="font-size:10px;color:${C.muted};line-height:1.5;margin-top:4px;">${escapeHtml(text)}</div>
+    </div>
+  </td>`;
+
+const infraRow = (icon: string, title: string, text: string) => `
+  <td style="width:25%;padding:6px;vertical-align:top;">
+    <div style="background:${C.paper};border:1px solid #e7e2d2;border-radius:6px;padding:14px;height:100%;box-sizing:border-box;">
+      ${iconCircle(icon, 36)}
+      <div style="font-size:11px;font-weight:800;color:${C.navy};margin-top:10px;">${escapeHtml(title)}</div>
+      <div style="font-size:10px;color:${C.muted};line-height:1.5;margin-top:4px;">${escapeHtml(text)}</div>
+    </div>
+  </td>`;
+
+const numberedItem = (n: string, title: string, text: string) => `
+  <td style="width:50%;padding:10px;vertical-align:top;">
+    <div style="display:flex;gap:14px;align-items:flex-start;">
+      <div style="font-size:34px;font-weight:800;color:${C.gold};line-height:0.9;font-family:Georgia,serif;letter-spacing:-1px;flex-shrink:0;width:46px;">${n}</div>
+      <div style="flex:1;border-left:1px solid #e7e2d2;padding-left:14px;">
+        <div style="font-size:12px;font-weight:800;color:${C.navy};">${escapeHtml(title)}</div>
+        <div style="font-size:10.5px;color:${C.muted};line-height:1.55;margin-top:4px;">${escapeHtml(text)}</div>
+      </div>
+    </div>
+  </td>`;
+
+const chip = (text: string) => `
+  <span style="display:inline-block;padding:6px 14px;background:white;border:1px solid ${C.gold};border-radius:999px;font-size:10px;font-weight:700;color:${C.navy};letter-spacing:0.5px;margin:4px 4px 0 0;">${escapeHtml(text)}</span>`;
+
+const quoteBlock = (text: string, author: string) => `
+  <div style="margin:28px 0 6px;padding:24px 28px 24px 60px;background:${C.cream};border:1px solid #e7e2d2;border-radius:8px;position:relative;">
+    <div style="position:absolute;left:18px;top:8px;font-family:Georgia,serif;font-size:64px;line-height:1;color:${C.gold};font-weight:700;">"</div>
+    <div style="font-family:Georgia,serif;font-style:italic;font-size:13px;line-height:1.6;color:${C.ink};">${escapeHtml(text)}</div>
+    <div style="margin-top:10px;font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${C.gold};">— ${escapeHtml(author)}</div>
   </div>`;
 
 function buildHtml(r: CommercialProposalPdfData): string {
   const monthlyTotal = r.items.reduce((s, i) => s + i.qty * i.unit_price, 0) - (r.discount || 0);
 
-  const itemRows = r.items
-    .filter((i) => i.qty > 0)
-    .map(
-      (i) => `
-    <tr>
-      <td style="padding:6px 10px;border:1px solid #cbd5e1;">${escapeHtml(i.description)}</td>
-      <td style="padding:6px 10px;border:1px solid #cbd5e1;text-align:center;">${i.qty}</td>
-      <td style="padding:6px 10px;border:1px solid #cbd5e1;text-align:right;">${formatBRL(i.unit_price)}</td>
-      <td style="padding:6px 10px;border:1px solid #cbd5e1;text-align:right;font-weight:600;">${formatBRL(i.qty * i.unit_price)}</td>
-    </tr>`,
-    )
-    .join('');
+  // KPIs
+  const kpisHtml = `
+    <table style="width:100%;border-collapse:separate;border-spacing:8px 0;margin-top:18px;">
+      <tr>${DELTA7_KPIS.map(k => `<td style="width:25%;">${kpiCard(k.value, k.label)}</td>`).join('')}</tr>
+    </table>`;
 
-  const bulletItem = (text: string, mb = 8) => `
-    <div style="display:flex;align-items:flex-start;margin-bottom:${mb}px;line-height:1.5;">
-      <span style="color:#1e3a8a;font-weight:900;margin-right:10px;font-size:13px;line-height:1.2;flex-shrink:0;">▸</span>
-      <span style="flex:1;">${escapeHtml(text)}</span>
+  // Benefits 4x2
+  const benefitsHtml = `
+    <table style="width:100%;border-collapse:separate;border-spacing:0;">
+      <tr>${BENEFIT_CARDS.slice(0, 4).map(b => benefitCard(b.icon, b.title, b.text)).join('')}</tr>
+      <tr>${BENEFIT_CARDS.slice(4, 8).map(b => benefitCard(b.icon, b.title, b.text)).join('')}</tr>
+    </table>`;
+
+  // Infra
+  const infraHtml = `
+    <table style="width:100%;border-collapse:separate;border-spacing:0;">
+      <tr>${INFRA_HIGHLIGHTS.map(h => infraRow(h.icon, h.title, h.text)).join('')}</tr>
+    </table>`;
+
+  // Tech stack
+  const stackHtml = `
+    <div style="background:${C.cream};border:1px solid #e7e2d2;border-radius:8px;padding:18px 22px;text-align:center;">
+      <div style="font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:${C.gold};margin-bottom:10px;">Stack & Tecnologias</div>
+      <div>${TECH_STACK.map(chip).join('')}</div>
     </div>`;
 
-  const benefitsHtml = BACKUP_BENEFITS.map((b) => bulletItem(b, 8)).join('');
-  const supportReqHtml = SUPPORT_REQUIREMENTS.map((r) => bulletItem(r, 6)).join('');
+  // Ideal for — 2 colunas
+  const idealHtml = `
+    <table style="width:100%;border-collapse:separate;border-spacing:0;">
+      <tr>${IDEAL_FOR.slice(0, 2).map((i, idx) => numberedItem(String(idx + 1).padStart(2, '0'), i.title, i.text)).join('')}</tr>
+      <tr>${IDEAL_FOR.slice(2, 4).map((i, idx) => numberedItem(String(idx + 3).padStart(2, '0'), i.title, i.text)).join('')}</tr>
+    </table>`;
+
+  // Support requirements (bullets dourados)
+  const supportReqHtml = SUPPORT_REQUIREMENTS.map(text => `
+    <div style="display:flex;align-items:flex-start;margin-bottom:7px;line-height:1.55;">
+      <span style="color:${C.gold};font-size:10px;margin-right:10px;flex-shrink:0;line-height:1.55;">◆</span>
+      <span style="flex:1;color:${C.ink};">${escapeHtml(text)}</span>
+    </div>`).join('');
+
+  // Linhas de items mensais
+  const itemRows = r.items.filter(i => i.qty > 0).map((i, idx) => `
+    <tr style="background:${idx % 2 === 0 ? '#ffffff' : C.paper};">
+      <td style="padding:10px 14px;border-bottom:1px solid #eae3cf;color:${C.ink};">${escapeHtml(i.description)}</td>
+      <td style="padding:10px 14px;border-bottom:1px solid #eae3cf;text-align:center;color:${C.ink};">${i.qty}</td>
+      <td style="padding:10px 14px;border-bottom:1px solid #eae3cf;text-align:right;color:${C.ink};">${formatBRL(i.unit_price)}</td>
+      <td style="padding:10px 14px;border-bottom:1px solid #eae3cf;text-align:right;font-weight:700;color:${C.navy};">${formatBRL(i.qty * i.unit_price)}</td>
+    </tr>`).join('') || `<tr><td colspan="4" style="padding:16px;text-align:center;color:${C.muted};font-style:italic;">Nenhum item configurado</td></tr>`;
 
   return `
-<div style="width:794px;font-family:'Helvetica',Arial,sans-serif;color:#1e293b;background:white;font-size:11px;">
+<div style="width:794px;font-family:'Helvetica',Arial,sans-serif;color:${C.ink};background:white;font-size:11px;">
 
   <!-- ============ CAPA ============ -->
-  <div style="width:794px;height:1123px;background:linear-gradient(135deg,#1e3a8a 0%,#1e40af 100%);color:white;padding:80px 60px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;page-break-after:always;">
-    <div>
-      <img src="${DELTA7_LOGO_DATA_URL}" alt="Delta7" style="height:80px;" />
+  <div style="width:794px;height:1123px;background:linear-gradient(135deg,${C.navy} 0%,${C.navyDeep} 100%);color:white;padding:80px 60px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;page-break-after:always;position:relative;overflow:hidden;">
+    <!-- Pattern de pontos dourados -->
+    <div style="position:absolute;inset:0;opacity:0.06;background-image:radial-gradient(${C.gold} 1.2px, transparent 1.2px);background-size:18px 18px;"></div>
+
+    <div style="position:relative;display:flex;justify-content:space-between;align-items:center;">
+      <img src="${DELTA7_LOGO_DATA_URL}" alt="Delta7" style="height:70px;" />
+      <div style="text-align:right;font-size:10px;color:${C.goldLight};letter-spacing:3px;text-transform:uppercase;">Delta7 Tecnologia</div>
     </div>
-    <div style="text-align:left;">
-      <div style="font-size:12px;letter-spacing:6px;color:#93c5fd;margin-bottom:14px;">PROPOSTA COMERCIAL</div>
-      <div style="font-size:64px;font-weight:800;line-height:1;letter-spacing:-1px;">BACKUP</div>
-      <div style="font-size:64px;font-weight:800;line-height:1;letter-spacing:-1px;color:#93c5fd;margin-bottom:24px;">ONLINE</div>
-      <div style="font-size:22px;font-weight:300;color:#dbeafe;max-width:560px;line-height:1.4;">
-        Sua empresa protegida de verdade.
+
+    <div style="position:relative;text-align:left;">
+      <div style="width:60px;height:2px;background:${C.gold};margin-bottom:24px;"></div>
+      <div style="font-size:11px;letter-spacing:8px;color:${C.goldLight};margin-bottom:18px;font-weight:600;">PROPOSTA COMERCIAL</div>
+      <div style="font-size:78px;font-weight:800;line-height:0.95;letter-spacing:-2px;">BACKUP</div>
+      <div style="font-size:78px;font-weight:800;line-height:0.95;letter-spacing:-2px;color:${C.gold};margin-bottom:28px;font-style:italic;">Online.</div>
+      <div style="font-size:20px;font-weight:300;color:#dfe4ef;max-width:560px;line-height:1.45;">
+        Continuidade do seu negócio<br/>
+        protegida com tecnologia de verdade.
       </div>
     </div>
-    <div style="border-top:1px solid rgba(255,255,255,0.2);padding-top:20px;display:flex;justify-content:space-between;font-size:11px;color:#dbeafe;">
+
+    <div style="position:relative;border-top:1px solid ${C.gold};padding-top:22px;display:flex;justify-content:space-between;font-size:11px;color:#dfe4ef;">
       <div>
-        <div style="font-weight:700;color:white;font-size:13px;">${escapeHtml(r.clientName)}</div>
-        <div style="margin-top:4px;">Proposta nº ${escapeHtml(r.proposalNumber)}</div>
+        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:${C.goldLight};margin-bottom:6px;">Preparado para</div>
+        <div style="font-weight:700;color:white;font-size:15px;">${escapeHtml(r.clientName)}</div>
+        <div style="margin-top:4px;color:#b9c2d6;">Proposta nº ${escapeHtml(r.proposalNumber)}</div>
       </div>
       <div style="text-align:right;">
-        <div>${fmtDate(r.generatedAt)}</div>
-        <div style="margin-top:4px;">Validade: ${r.validityDays} dias</div>
+        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:${C.goldLight};margin-bottom:6px;">Emitida em</div>
+        <div style="font-weight:700;color:white;font-size:13px;">${fmtDate(r.generatedAt)}</div>
+        <div style="margin-top:4px;color:#b9c2d6;">Validade: ${r.validityDays} dias</div>
       </div>
     </div>
   </div>
 
   <!-- ============ CONTEÚDO ============ -->
-  <div style="padding:36px 44px;box-sizing:border-box;">
+  <div style="padding:38px 46px;box-sizing:border-box;">
 
-    <table style="width:100%;border-bottom:3px solid #1e3a8a;padding-bottom:0;margin-bottom:18px;border-collapse:collapse;">
+    <!-- Header de página -->
+    <table style="width:100%;border-bottom:2px solid ${C.navy};padding-bottom:0;margin-bottom:8px;border-collapse:collapse;">
       <tr>
-        <td style="vertical-align:bottom;padding-bottom:12px;"><img src="${DELTA7_LOGO_DARK_DATA_URL}" alt="Delta7" style="height:46px;display:block;" /></td>
-        <td style="vertical-align:bottom;padding-bottom:12px;text-align:right;font-size:11px;">
-          <div style="font-weight:700;color:#1e3a8a;font-size:13px;">Proposta ${escapeHtml(r.proposalNumber)}</div>
-          <div style="color:#64748b;margin-top:2px;">${fmtDate(r.generatedAt)}</div>
+        <td style="vertical-align:bottom;padding-bottom:12px;"><img src="${DELTA7_LOGO_DARK_DATA_URL}" alt="Delta7" style="height:42px;display:block;" /></td>
+        <td style="vertical-align:bottom;padding-bottom:12px;text-align:right;">
+          <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:${C.gold};font-weight:700;">Proposta Comercial</div>
+          <div style="font-weight:800;color:${C.navy};font-size:13px;margin-top:3px;">Nº ${escapeHtml(r.proposalNumber)}</div>
+          <div style="color:${C.muted};margin-top:2px;font-size:10px;">${fmtDate(r.generatedAt)}</div>
         </td>
       </tr>
     </table>
+    <div style="height:2px;background:${C.gold};width:60px;margin-bottom:6px;"></div>
 
-    ${sectionTitle('SOBRE A DELTA7 TECNOLOGIA')}
-    <p style="margin:0;line-height:1.7;text-align:justify;color:#334155;white-space:pre-line;">${escapeHtml(ABOUT_DELTA7)}</p>
+    ${sectionTitle('Quem somos', 'Sobre a Delta7 Tecnologia', 18)}
+    <p style="margin:0;line-height:1.75;text-align:justify;color:${C.ink};white-space:pre-line;">${escapeHtml(ABOUT_DELTA7)}</p>
+    ${kpisHtml}
 
-    ${sectionTitle('BENEFÍCIOS DO BACKUP ONLINE')}
-    <div style="color:#334155;font-size:11px;">
-      ${benefitsHtml}
-    </div>
+    ${sectionTitle('Vantagens', 'Por que Backup Online')}
+    ${benefitsHtml}
 
-    ${sectionTitle('IDENTIFICAÇÃO DO CLIENTE')}
-    <table style="width:100%;border-collapse:collapse;font-size:11px;">
+    ${sectionTitle('Infraestrutura', 'Onde seus dados ficam')}
+    ${infraHtml}
+
+    <div style="margin-top:22px;">${stackHtml}</div>
+
+    ${sectionTitle('Perfil ideal', 'Esta solução é ideal se...')}
+    ${idealHtml}
+
+    ${sectionTitle('Identificação', 'Identificação do Cliente')}
+    <table style="width:100%;border-collapse:collapse;font-size:11px;border:1px solid #e7e2d2;border-radius:6px;overflow:hidden;">
       <tr>
-        <td style="padding:6px 10px;border:1px solid #cbd5e1;background:#f1f5f9;font-weight:600;width:25%;">Cliente</td>
-        <td style="padding:6px 10px;border:1px solid #cbd5e1;" colspan="3">${escapeHtml(r.clientName)}</td>
+        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};width:25%;border-bottom:1px solid #eae3cf;">Cliente</td>
+        <td style="padding:9px 12px;color:${C.ink};border-bottom:1px solid #eae3cf;" colspan="3">${escapeHtml(r.clientName)}</td>
       </tr>
       ${r.clientDocument ? `<tr>
-        <td style="padding:6px 10px;border:1px solid #cbd5e1;background:#f1f5f9;font-weight:600;">CNPJ / CPF</td>
-        <td style="padding:6px 10px;border:1px solid #cbd5e1;">${escapeHtml(r.clientDocument)}</td>
-        <td style="padding:6px 10px;border:1px solid #cbd5e1;background:#f1f5f9;font-weight:600;">Contato</td>
-        <td style="padding:6px 10px;border:1px solid #cbd5e1;">${escapeHtml(r.clientContact || '—')}</td>
+        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};border-bottom:1px solid #eae3cf;">CNPJ / CPF</td>
+        <td style="padding:9px 12px;color:${C.ink};border-bottom:1px solid #eae3cf;">${escapeHtml(r.clientDocument)}</td>
+        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};border-bottom:1px solid #eae3cf;">Contato</td>
+        <td style="padding:9px 12px;color:${C.ink};border-bottom:1px solid #eae3cf;">${escapeHtml(r.clientContact || '—')}</td>
       </tr>` : ''}
       ${r.clientEmail || r.clientAddress ? `<tr>
-        <td style="padding:6px 10px;border:1px solid #cbd5e1;background:#f1f5f9;font-weight:600;">E-mail</td>
-        <td style="padding:6px 10px;border:1px solid #cbd5e1;">${escapeHtml(r.clientEmail || '—')}</td>
-        <td style="padding:6px 10px;border:1px solid #cbd5e1;background:#f1f5f9;font-weight:600;">Endereço</td>
-        <td style="padding:6px 10px;border:1px solid #cbd5e1;">${escapeHtml(r.clientAddress || '—')}</td>
+        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};border-bottom:1px solid #eae3cf;">E-mail</td>
+        <td style="padding:9px 12px;color:${C.ink};border-bottom:1px solid #eae3cf;">${escapeHtml(r.clientEmail || '—')}</td>
+        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};border-bottom:1px solid #eae3cf;">Endereço</td>
+        <td style="padding:9px 12px;color:${C.ink};border-bottom:1px solid #eae3cf;">${escapeHtml(r.clientAddress || '—')}</td>
       </tr>` : ''}
       <tr>
-        <td style="padding:6px 10px;border:1px solid #cbd5e1;background:#f1f5f9;font-weight:600;">Executivo de Vendas</td>
-        <td style="padding:6px 10px;border:1px solid #cbd5e1;">${escapeHtml(r.salesRepName)}</td>
-        <td style="padding:6px 10px;border:1px solid #cbd5e1;background:#f1f5f9;font-weight:600;">E-mail Delta7</td>
-        <td style="padding:6px 10px;border:1px solid #cbd5e1;">${escapeHtml(r.salesRepEmail || '—')}</td>
+        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};">Executivo de Vendas</td>
+        <td style="padding:9px 12px;color:${C.ink};">${escapeHtml(r.salesRepName)}</td>
+        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};">E-mail Delta7</td>
+        <td style="padding:9px 12px;color:${C.ink};">${escapeHtml(r.salesRepEmail || '—')}</td>
       </tr>
     </table>
 
     <div id="prop-financ-block" style="break-inside:avoid;page-break-inside:avoid;">
-      ${sectionTitle('CONFIGURAÇÃO INICIAL')}
-      <table style="width:100%;border-collapse:collapse;font-size:11px;border:1px solid #e2e8f0;border-radius:6px;overflow:hidden;">
+      ${sectionTitle('Investimento', 'Configuração inicial')}
+      <table style="width:100%;border-collapse:separate;border-spacing:0;font-size:11px;border:1px solid #e7e2d2;border-radius:6px;overflow:hidden;">
         <thead>
-          <tr style="background:#1e3a8a;color:white;">
-            <th style="padding:10px 12px;text-align:left;font-size:10px;letter-spacing:0.8px;text-transform:uppercase;">Item</th>
-            <th style="padding:10px 12px;text-align:center;width:80px;font-size:10px;letter-spacing:0.8px;text-transform:uppercase;">Qtd</th>
-            <th style="padding:10px 12px;text-align:right;width:130px;font-size:10px;letter-spacing:0.8px;text-transform:uppercase;">Valor unit.</th>
-            <th style="padding:10px 12px;text-align:right;width:130px;font-size:10px;letter-spacing:0.8px;text-transform:uppercase;">Subtotal</th>
+          <tr style="background:${C.navy};color:white;">
+            <th style="padding:11px 14px;text-align:left;font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;">Item</th>
+            <th style="padding:11px 14px;text-align:center;width:70px;font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;">Qtd</th>
+            <th style="padding:11px 14px;text-align:right;width:130px;font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;">Valor unit.</th>
+            <th style="padding:11px 14px;text-align:right;width:130px;font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;">Subtotal</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td style="padding:9px 12px;border-bottom:1px solid #f1f5f9;">Ativação do Serviço (taxa única)</td>
-            <td style="padding:9px 12px;border-bottom:1px solid #f1f5f9;text-align:center;">1</td>
-            <td style="padding:9px 12px;border-bottom:1px solid #f1f5f9;text-align:right;">${formatBRL(r.activationFee)}</td>
-            <td style="padding:9px 12px;border-bottom:1px solid #f1f5f9;text-align:right;font-weight:700;color:#1e3a8a;">${formatBRL(r.activationFee)}</td>
+            <td style="padding:11px 14px;color:${C.ink};">Ativação do Serviço (taxa única)</td>
+            <td style="padding:11px 14px;text-align:center;color:${C.ink};">1</td>
+            <td style="padding:11px 14px;text-align:right;color:${C.ink};">${formatBRL(r.activationFee)}</td>
+            <td style="padding:11px 14px;text-align:right;font-weight:800;color:${C.gold};">${formatBRL(r.activationFee)}</td>
           </tr>
         </tbody>
       </table>
 
-      ${sectionTitle('CENÁRIO COM BACKUP ONLINE — VALORES MENSAIS', 18)}
-      <table style="width:100%;border-collapse:collapse;font-size:11px;border:1px solid #e2e8f0;border-radius:6px;overflow:hidden;">
+      ${sectionTitle('Mensalidade', 'Cenário com Backup Online', 22)}
+      <table style="width:100%;border-collapse:separate;border-spacing:0;font-size:11px;border:1px solid #e7e2d2;border-radius:6px;overflow:hidden;">
         <thead>
-          <tr style="background:#1e3a8a;color:white;">
-            <th style="padding:10px 12px;text-align:left;font-size:10px;letter-spacing:0.8px;text-transform:uppercase;">Item</th>
-            <th style="padding:10px 12px;text-align:center;width:80px;font-size:10px;letter-spacing:0.8px;text-transform:uppercase;">Qtd</th>
-            <th style="padding:10px 12px;text-align:right;width:130px;font-size:10px;letter-spacing:0.8px;text-transform:uppercase;">Valor unit.</th>
-            <th style="padding:10px 12px;text-align:right;width:130px;font-size:10px;letter-spacing:0.8px;text-transform:uppercase;">Subtotal</th>
+          <tr style="background:${C.navy};color:white;">
+            <th style="padding:11px 14px;text-align:left;font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;">Item</th>
+            <th style="padding:11px 14px;text-align:center;width:70px;font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;">Qtd</th>
+            <th style="padding:11px 14px;text-align:right;width:130px;font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;">Valor unit.</th>
+            <th style="padding:11px 14px;text-align:right;width:130px;font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;">Subtotal</th>
           </tr>
         </thead>
         <tbody>
-          ${r.items.filter(i => i.qty > 0).map((i, idx) => `
-            <tr style="background:${idx % 2 === 0 ? '#ffffff' : '#f8fafc'};">
-              <td style="padding:9px 12px;border-bottom:1px solid #f1f5f9;">${escapeHtml(i.description)}</td>
-              <td style="padding:9px 12px;border-bottom:1px solid #f1f5f9;text-align:center;">${i.qty}</td>
-              <td style="padding:9px 12px;border-bottom:1px solid #f1f5f9;text-align:right;">${formatBRL(i.unit_price)}</td>
-              <td style="padding:9px 12px;border-bottom:1px solid #f1f5f9;text-align:right;font-weight:700;color:#1e3a8a;">${formatBRL(i.qty * i.unit_price)}</td>
-            </tr>`).join('') || '<tr><td colspan="4" style="padding:14px;text-align:center;color:#94a3b8;font-style:italic;">Nenhum item configurado</td></tr>'}
+          ${itemRows}
           ${r.discount > 0 ? `<tr>
-            <td colspan="3" style="padding:9px 12px;text-align:right;color:#dc2626;border-bottom:1px solid #f1f5f9;">Desconto</td>
-            <td style="padding:9px 12px;text-align:right;color:#dc2626;font-weight:700;border-bottom:1px solid #f1f5f9;">- ${formatBRL(r.discount)}</td>
+            <td colspan="3" style="padding:10px 14px;text-align:right;color:#b91c1c;border-bottom:1px solid #eae3cf;">Desconto</td>
+            <td style="padding:10px 14px;text-align:right;color:#b91c1c;font-weight:700;border-bottom:1px solid #eae3cf;">- ${formatBRL(r.discount)}</td>
           </tr>` : ''}
-          <tr style="background:#1e3a8a;color:white;">
-            <td colspan="3" style="padding:12px;text-align:right;font-weight:800;font-size:12px;letter-spacing:0.5px;">CUSTO MENSAL TOTAL</td>
-            <td style="padding:12px;text-align:right;font-weight:800;font-size:16px;">${formatBRL(monthlyTotal)}</td>
+          <tr style="background:linear-gradient(90deg,${C.navy},${C.navyDeep});color:white;">
+            <td colspan="3" style="padding:14px;text-align:right;font-weight:700;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;">Custo Mensal Total</td>
+            <td style="padding:14px;text-align:right;font-weight:800;font-size:18px;color:${C.gold};letter-spacing:-0.3px;">${formatBRL(monthlyTotal)}</td>
           </tr>
         </tbody>
       </table>
 
-      <div style="margin-top:14px;padding:11px 14px;background:#fef3c7;border-left:4px solid #f59e0b;border-radius:3px;font-size:10px;color:#78350f;line-height:1.6;">
-        <strong style="color:#92400e;">⚠ Não inclusos:</strong> ${escapeHtml(NOT_INCLUDED)}
+      <div style="margin-top:14px;padding:13px 16px;background:${C.cream};border-left:3px solid ${C.gold};border-radius:3px;font-size:10px;color:${C.ink};line-height:1.6;">
+        <strong style="color:${C.navy};letter-spacing:0.5px;">Não inclusos:</strong> ${escapeHtml(NOT_INCLUDED)}
       </div>
 
-      ${r.notes ? `<div style="margin-top:14px;padding:12px 14px;background:#f8fafc;border-left:4px solid #1e3a8a;border-radius:3px;font-size:11px;line-height:1.6;text-align:justify;white-space:pre-line;color:#334155;"><strong style="color:#1e3a8a;display:block;margin-bottom:4px;">Observações:</strong>${escapeHtml(r.notes)}</div>` : ''}
+      ${r.notes ? `<div style="margin-top:14px;padding:13px 16px;background:${C.paper};border-left:3px solid ${C.navy};border-radius:3px;font-size:11px;line-height:1.6;text-align:justify;white-space:pre-line;color:${C.ink};"><strong style="color:${C.navy};display:block;margin-bottom:4px;letter-spacing:0.5px;">Observações</strong>${escapeHtml(r.notes)}</div>` : ''}
     </div>
 
     <div id="prop-suporte-block" style="break-inside:avoid;page-break-inside:avoid;">
-      ${sectionTitle('SUPORTE TÉCNICO')}
-      <p style="margin:0 0 10px 0;line-height:1.7;text-align:justify;color:#334155;white-space:pre-line;">${escapeHtml(SUPPORT_TEXT)}</p>
-      <p style="margin:10px 0 8px 0;font-weight:700;color:#1e3a8a;font-size:11px;">Requisitos para a prestação dos serviços:</p>
-      <div style="color:#334155;font-size:10.5px;">
+      ${sectionTitle('Atendimento', 'Suporte Técnico')}
+      <p style="margin:0 0 12px 0;line-height:1.7;text-align:justify;color:${C.ink};white-space:pre-line;">${escapeHtml(SUPPORT_TEXT)}</p>
+      <p style="margin:14px 0 10px 0;font-weight:800;color:${C.navy};font-size:11px;letter-spacing:0.3px;">Requisitos para a prestação dos serviços</p>
+      <div style="font-size:10.5px;">
         ${supportReqHtml}
       </div>
     </div>
 
+    ${quoteBlock(INSTITUTIONAL_QUOTE.text, INSTITUTIONAL_QUOTE.author)}
+
     <!-- Aceite + Rodapé unidos para nunca quebrarem -->
-    <div id="prop-aceite-block" style="break-inside:avoid;page-break-inside:avoid;margin-top:24px;">
-      ${sectionTitle('ACEITE DA PROPOSTA')}
-      <p style="font-size:10.5px;color:#475569;margin:0 0 16px 0;line-height:1.6;">
+    <div id="prop-aceite-block" style="break-inside:avoid;page-break-inside:avoid;margin-top:26px;">
+      ${sectionTitle('Formalização', 'Aceite da Proposta', 8)}
+      <p style="font-size:10.5px;color:${C.muted};margin:0 0 16px 0;line-height:1.65;">
         Declaro estar de acordo com os termos, valores e condições apresentados nesta proposta comercial,
         emitida em ${fmtDate(r.generatedAt)} com validade de ${r.validityDays} dias.
       </p>
-      <table style="width:100%;border-collapse:collapse;margin-top:24px;">
+      <table style="width:100%;border-collapse:collapse;margin-top:30px;">
         <tr>
-          <td style="width:48%;padding-top:50px;border-top:1.5px solid #1e293b;text-align:center;font-size:11px;font-weight:700;">
+          <td style="width:48%;padding-top:54px;border-top:1.5px solid ${C.navy};text-align:center;font-size:11px;font-weight:800;color:${C.navy};">
             ${escapeHtml(r.clientName)}<br/>
-            <span style="font-weight:400;color:#64748b;font-size:10px;">Cliente</span>
+            <span style="font-weight:500;color:${C.muted};font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;">Cliente</span>
           </td>
           <td style="width:4%;"></td>
-          <td style="width:48%;padding-top:50px;border-top:1.5px solid #1e293b;text-align:center;font-size:11px;font-weight:700;">
+          <td style="width:48%;padding-top:54px;border-top:1.5px solid ${C.navy};text-align:center;font-size:11px;font-weight:800;color:${C.navy};">
             Delta7 Tecnologia<br/>
-            <span style="font-weight:400;color:#64748b;font-size:10px;">${escapeHtml(r.salesRepName)} — Executivo de Vendas</span>
+            <span style="font-weight:500;color:${C.muted};font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;">${escapeHtml(r.salesRepName)} — Executivo de Vendas</span>
           </td>
         </tr>
       </table>
 
-      <div style="margin-top:26px;padding:14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;">
+      <div style="margin-top:28px;padding:16px;background:${C.cream};border:1px solid #e7e2d2;border-radius:8px;">
         <table style="width:100%;border-collapse:collapse;">
           <tr>
-            <td style="width:120px;vertical-align:top;text-align:center;padding-right:14px;">
-              ${r.qrCodeDataUrl ? `<img src="${r.qrCodeDataUrl}" alt="QR" style="width:100px;height:100px;display:block;border:1px solid #cbd5e1;padding:3px;background:white;" />` : ''}
-              <div style="font-size:8px;color:#1e3a8a;font-weight:800;margin-top:5px;letter-spacing:0.5px;">VALIDAR PROPOSTA</div>
-              <div style="font-size:7px;color:#64748b;line-height:1.3;">Escaneie para verificar autenticidade</div>
+            <td style="width:130px;vertical-align:top;text-align:center;padding-right:16px;">
+              ${r.qrCodeDataUrl ? `<img src="${r.qrCodeDataUrl}" alt="QR" style="width:108px;height:108px;display:block;border:2px solid ${C.gold};padding:4px;background:white;border-radius:4px;" />` : ''}
+              <div style="font-size:8px;color:${C.gold};font-weight:800;margin-top:6px;letter-spacing:1.5px;">VALIDAR PROPOSTA</div>
+              <div style="font-size:7.5px;color:${C.muted};line-height:1.3;margin-top:2px;">Escaneie para verificar autenticidade</div>
             </td>
             <td style="vertical-align:top;">
-              <div style="font-size:9px;color:#64748b;margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Hash de Legitimidade SHA-256</div>
-              <div style="font-family:'Courier New',monospace;font-size:9px;color:#1e3a8a;word-break:break-all;background:white;padding:7px;border-radius:3px;border:1px solid #e2e8f0;">
+              <div style="font-size:9px;color:${C.gold};margin-bottom:5px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;">Hash de Legitimidade SHA-256</div>
+              <div style="font-family:'Courier New',monospace;font-size:9px;color:${C.navy};word-break:break-all;background:white;padding:8px 10px;border-radius:4px;border:1px solid #e7e2d2;">
                 ${escapeHtml(r.integrityHash)}
               </div>
-              ${r.validationUrl ? `<div style="font-size:8px;color:#475569;margin-top:6px;word-break:break-all;"><strong>Link:</strong> ${escapeHtml(r.validationUrl)}</div>` : ''}
-              <div style="font-size:8.5px;color:#94a3b8;margin-top:8px;font-style:italic;line-height:1.4;">
+              ${r.validationUrl ? `<div style="font-size:8px;color:${C.muted};margin-top:7px;word-break:break-all;"><strong style="color:${C.navy};">Link:</strong> ${escapeHtml(r.validationUrl)}</div>` : ''}
+              <div style="font-size:8.5px;color:${C.muted};margin-top:9px;font-style:italic;line-height:1.45;">
                 Documento emitido eletronicamente pela plataforma Delta7. A autenticidade pode ser verificada pelo QR Code ou link acima.
               </div>
             </td>
@@ -276,7 +401,7 @@ export async function downloadCommercialProposalPdf(data: CommercialProposalPdfD
         margin: 1,
         width: 220,
         errorCorrectionLevel: 'M',
-        color: { dark: '#1e3a8a', light: '#ffffff' },
+        color: { dark: '#0a1f44', light: '#ffffff' },
       });
     } catch (e) {
       console.error('Falha ao gerar QR Code:', e);

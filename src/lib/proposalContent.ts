@@ -7,6 +7,59 @@ Nossa metodologia de trabalho garante entregas precisas em todos os projetos, co
 
 Atuamos com atendimento remoto em todo o Brasil e presencial na região Norte, sempre focados em oferecer soluções sob medida que atendam às necessidades específicas de cada negócio.`;
 
+// Paleta Navy & Gold
+export const PROP_COLORS = {
+  navy: '#0a1f44',
+  navyDeep: '#142a5c',
+  gold: '#c9a84c',
+  goldLight: '#e6c875',
+  cream: '#f5f0e0',
+  ink: '#1a2540',
+  muted: '#5b6478',
+  paper: '#fbfaf6',
+};
+
+export const DELTA7_KPIS: { value: string; label: string }[] = [
+  { value: '+10', label: 'anos de mercado' },
+  { value: '99,9%', label: 'disponibilidade' },
+  { value: '4h', label: 'SLA restauração' },
+  { value: '24/7', label: 'monitoramento' },
+];
+
+export const TECH_STACK: string[] = [
+  'Microsoft', 'Veeam', 'Bitdefender', 'Linux', 'Hyper-V', 'MS SQL Server', 'Zabbix', 'Grafana',
+];
+
+export const INFRA_HIGHLIGHTS: { title: string; text: string; icon: 'lock' | 'cloud' | 'shield' | 'eye' }[] = [
+  { icon: 'lock', title: 'Criptografia AES-256', text: 'Dados criptografados em trânsito e em repouso, garantindo confidencialidade ponta a ponta.' },
+  { icon: 'cloud', title: 'Datacenter em solo nacional', text: 'Armazenamento dentro do território brasileiro, em conformidade com a LGPD.' },
+  { icon: 'shield', title: 'Redundância de armazenamento', text: 'Múltiplas cópias dos seus dados em sistema redundante, protegendo contra falhas físicas.' },
+  { icon: 'eye', title: 'Monitoramento contínuo', text: 'Acompanhamento 24/7 da infraestrutura com alertas proativos de falhas e violações.' },
+];
+
+export const BENEFIT_CARDS: { title: string; text: string; icon: 'platform' | 'cloud' | 'ransom' | 'auto' | 'retention' | 'panel' | 'bell' | 'support' }[] = [
+  { icon: 'platform', title: 'Multiplataforma', text: 'Compatível com Windows, Linux e macOS.' },
+  { icon: 'cloud', title: 'Backup em nuvem', text: 'Sem necessidade de equipamentos locais de armazenamento.' },
+  { icon: 'ransom', title: 'Anti-Ransomware', text: 'Proteção contra perda por falhas, roubo ou desastres naturais.' },
+  { icon: 'auto', title: 'Automatização total', text: 'Backups executados automaticamente, sem intervenção manual.' },
+  { icon: 'retention', title: 'Controle de retenção', text: 'Recupere versões anteriores na data e horário desejados.' },
+  { icon: 'panel', title: 'Painel centralizado', text: 'Gerenciamento remoto em plataforma dedicada e intuitiva.' },
+  { icon: 'bell', title: 'Notificações automáticas', text: 'Alertas de cada execução de backup direto no seu e-mail.' },
+  { icon: 'support', title: 'Suporte humano', text: 'Atendimento direto Delta7 via telefone e WhatsApp.' },
+];
+
+export const IDEAL_FOR: { title: string; text: string }[] = [
+  { title: 'Empresa com servidor local', text: 'Quem possui ERP, banco de dados ou arquivos críticos em servidor físico ou virtualizado.' },
+  { title: 'Ambiente Microsoft / SQL', text: 'Negócios que dependem de Windows Server, Hyper-V, MS SQL Server ou Active Directory.' },
+  { title: 'Conformidade & LGPD', text: 'Empresas que precisam comprovar retenção, integridade e rastreabilidade dos dados.' },
+  { title: 'Continuidade do negócio', text: 'Quem não pode parar e precisa restaurar rapidamente após incidentes ou ransomware.' },
+];
+
+export const INSTITUTIONAL_QUOTE = {
+  text: 'Backup não é custo, é continuidade do negócio. Garantimos que seus dados estejam sempre seguros, acessíveis e prontos para restaurar — sem que você precise se preocupar.',
+  author: 'Delta7 Tecnologia',
+};
+
 export const BACKUP_BENEFITS: string[] = [
   'Backup multiplataforma (Windows, Linux, MacOS)',
   'Backup em nuvem — sem necessidade de equipamentos locais para armazenamento',
