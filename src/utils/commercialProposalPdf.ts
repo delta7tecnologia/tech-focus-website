@@ -11,7 +11,7 @@ import {
   formatBRL,
   PROP_COLORS as C,
   DELTA7_KPIS,
-  TECH_STACK,
+  // TECH_STACK removido
   INFRA_HIGHLIGHTS,
   BENEFIT_CARDS,
   IDEAL_FOR,
@@ -68,9 +68,9 @@ const ICONS: Record<string, string> = {
   eye: '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>',
 };
 
-const iconCircle = (name: string, size = 44, ringColor = C.gold, fillColor = C.navy, strokeColor = C.gold) => `
-  <div style="width:${size}px;height:${size}px;border-radius:50%;background:${fillColor};border:1.5px solid ${ringColor};display:inline-flex;align-items:center;justify-content:center;">
-    <svg width="${Math.round(size * 0.5)}" height="${Math.round(size * 0.5)}" viewBox="0 0 24 24" fill="none" stroke="${strokeColor}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+const iconCircle = (name: string, size = 44) => `
+  <div style="width:${size}px;height:${size}px;border-radius:50%;background:${C.cream};border:1.5px solid ${C.gold};display:inline-block;text-align:center;line-height:${size}px;">
+    <svg width="${Math.round(size * 0.55)}" height="${Math.round(size * 0.55)}" viewBox="0 0 24 24" fill="none" stroke="${C.navy}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;">
       ${ICONS[name] || ''}
     </svg>
   </div>`;
@@ -138,9 +138,10 @@ function buildHtml(r: CommercialProposalPdfData): string {
   const monthlyTotal = r.items.reduce((s, i) => s + i.qty * i.unit_price, 0) - (r.discount || 0);
 
   // KPIs
+  const kpiW = `${Math.floor(100 / DELTA7_KPIS.length)}%`;
   const kpisHtml = `
     <table style="width:100%;border-collapse:separate;border-spacing:8px 0;margin-top:18px;">
-      <tr>${DELTA7_KPIS.map(k => `<td style="width:25%;">${kpiCard(k.value, k.label)}</td>`).join('')}</tr>
+      <tr>${DELTA7_KPIS.map(k => `<td style="width:${kpiW};">${kpiCard(k.value, k.label)}</td>`).join('')}</tr>
     </table>`;
 
   // Benefits 4x2
@@ -156,12 +157,7 @@ function buildHtml(r: CommercialProposalPdfData): string {
       <tr>${INFRA_HIGHLIGHTS.map(h => infraRow(h.icon, h.title, h.text)).join('')}</tr>
     </table>`;
 
-  // Tech stack
-  const stackHtml = `
-    <div style="background:${C.cream};border:1px solid #e7e2d2;border-radius:8px;padding:18px 22px;text-align:center;">
-      <div style="font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:${C.gold};margin-bottom:10px;">Stack & Tecnologias</div>
-      <div>${TECH_STACK.map(chip).join('')}</div>
-    </div>`;
+  // Tech stack removido a pedido
 
   // Ideal for — 2 colunas
   const idealHtml = `
@@ -250,33 +246,35 @@ function buildHtml(r: CommercialProposalPdfData): string {
     ${sectionTitle('Infraestrutura', 'Onde seus dados ficam')}
     ${infraHtml}
 
-    <div style="margin-top:22px;">${stackHtml}</div>
-
     ${sectionTitle('Perfil ideal', 'Esta solução é ideal se...')}
     ${idealHtml}
 
-    ${sectionTitle('Identificação', 'Identificação do Cliente')}
+    ${sectionTitle('Cliente', 'Identificação do Cliente')}
     <table style="width:100%;border-collapse:collapse;font-size:11px;border:1px solid #e7e2d2;border-radius:6px;overflow:hidden;">
       <tr>
-        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};width:25%;border-bottom:1px solid #eae3cf;">Cliente</td>
+        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};width:25%;border-bottom:1px solid #eae3cf;">Razão Social</td>
         <td style="padding:9px 12px;color:${C.ink};border-bottom:1px solid #eae3cf;" colspan="3">${escapeHtml(r.clientName)}</td>
       </tr>
-      ${r.clientDocument ? `<tr>
+      <tr>
         <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};border-bottom:1px solid #eae3cf;">CNPJ / CPF</td>
-        <td style="padding:9px 12px;color:${C.ink};border-bottom:1px solid #eae3cf;">${escapeHtml(r.clientDocument)}</td>
+        <td style="padding:9px 12px;color:${C.ink};border-bottom:1px solid #eae3cf;">${escapeHtml(r.clientDocument || '—')}</td>
         <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};border-bottom:1px solid #eae3cf;">Contato</td>
         <td style="padding:9px 12px;color:${C.ink};border-bottom:1px solid #eae3cf;">${escapeHtml(r.clientContact || '—')}</td>
-      </tr>` : ''}
-      ${r.clientEmail || r.clientAddress ? `<tr>
-        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};border-bottom:1px solid #eae3cf;">E-mail</td>
-        <td style="padding:9px 12px;color:${C.ink};border-bottom:1px solid #eae3cf;">${escapeHtml(r.clientEmail || '—')}</td>
-        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};border-bottom:1px solid #eae3cf;">Endereço</td>
-        <td style="padding:9px 12px;color:${C.ink};border-bottom:1px solid #eae3cf;">${escapeHtml(r.clientAddress || '—')}</td>
-      </tr>` : ''}
+      </tr>
       <tr>
-        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};">Executivo de Vendas</td>
+        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};">E-mail</td>
+        <td style="padding:9px 12px;color:${C.ink};">${escapeHtml(r.clientEmail || '—')}</td>
+        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};">Endereço</td>
+        <td style="padding:9px 12px;color:${C.ink};">${escapeHtml(r.clientAddress || '—')}</td>
+      </tr>
+    </table>
+
+    ${sectionTitle('Delta7', 'Executivo Responsável')}
+    <table style="width:100%;border-collapse:collapse;font-size:11px;border:1px solid #e7e2d2;border-radius:6px;overflow:hidden;">
+      <tr>
+        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};width:25%;">Executivo de Vendas</td>
         <td style="padding:9px 12px;color:${C.ink};">${escapeHtml(r.salesRepName)}</td>
-        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};">E-mail Delta7</td>
+        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};width:18%;">E-mail</td>
         <td style="padding:9px 12px;color:${C.ink};">${escapeHtml(r.salesRepEmail || '—')}</td>
       </tr>
     </table>
