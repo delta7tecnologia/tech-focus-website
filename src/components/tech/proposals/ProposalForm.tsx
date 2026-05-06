@@ -252,6 +252,36 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
 
       <Card>
         <CardContent className="p-6 space-y-4">
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div>
+              <h3 className="text-lg font-bold text-blue-900">Conteúdo do PDF</h3>
+              <p className="text-xs text-gray-500 mt-1">Marque as seções que deseja incluir. Quanto menos seções, mais curto o documento.</p>
+            </div>
+            <div className="flex gap-2">
+              <Button type="button" size="sm" variant="outline" onClick={() => setSections(MINIMAL_SECTIONS)}>Apenas comercial</Button>
+              <Button type="button" size="sm" variant="outline" onClick={() => setSections(COMPACT_SECTIONS)}>Enxuta</Button>
+              <Button type="button" size="sm" variant="outline" onClick={() => setSections(DEFAULT_SECTIONS)}>Padrão</Button>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pt-2">
+            {SECTION_LABELS.map(({ key, label, hint }) => (
+              <label
+                key={key}
+                className="flex items-center gap-3 p-3 rounded-md border border-gray-200 hover:border-blue-300 cursor-pointer transition-colors"
+              >
+                <Checkbox checked={sections[key]} onCheckedChange={() => toggleSection(key)} />
+                <div className="flex-1">
+                  <div className="text-sm font-medium text-gray-800">{label}</div>
+                  <div className="text-xs text-gray-500">{hint}</div>
+                </div>
+              </label>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-6 space-y-4">
           <h3 className="text-lg font-bold text-blue-900">Observações</h3>
           <Textarea rows={4} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Informações adicionais para o cliente (opcional)" />
         </CardContent>
