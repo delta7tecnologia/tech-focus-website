@@ -142,6 +142,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
       monthly_total: monthlyTotal,
       setup_total: activationFee,
       sections: sections as any,
+      show_altatek_logo: showAltatekLogo,
     };
   };
 
