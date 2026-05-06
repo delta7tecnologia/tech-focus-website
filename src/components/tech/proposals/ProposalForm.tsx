@@ -353,7 +353,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
         <DialogContent className="max-w-5xl w-[95vw] h-[90vh] flex flex-col p-0">
           <DialogHeader className="px-6 py-3 border-b flex-row items-center justify-between gap-4 space-y-0">
             <DialogTitle className="text-blue-900">
-              Prévia da Proposta {previewPages ? `· ${previewPages.length} página(s)` : ''}
+              Prévia · {previewTemplate === 'modelo02' ? 'Modelo 02 (Editorial)' : 'Modelo 01 (Premium)'} {previewPages ? `· ${previewPages.length} página(s)` : ''}
             </DialogTitle>
             <span className="text-xs text-gray-500 mr-8">Visualização aproximada — finalize para baixar o PDF</span>
           </DialogHeader>
