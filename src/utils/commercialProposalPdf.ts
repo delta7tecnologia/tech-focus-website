@@ -94,7 +94,7 @@ const goldRule = (mt = 14, mb = 14) => `
   <div style="height:1px;margin:${mt}px 0 ${mb}px;background:linear-gradient(to right,transparent,${C.gold},transparent);"></div>`;
 
 const kpiCard = (value: string, label: string) => `
-  <div style="flex:1;padding:14px 12px;background:${C.paper};border:1px solid #e7e2d2;border-top:2px solid ${C.gold};border-radius:4px;text-align:center;">
+  <div style="flex:1;padding:14px 12px;background:${C.paper};border:1px solid #e7e2d2;border-top:2px solid ${C.gold};border-radius:4px;text-align:center;break-inside:avoid;page-break-inside:avoid;">
     <div style="font-size:30px;font-weight:800;color:${C.navy};line-height:1;letter-spacing:-1px;">
       <span style="color:${C.gold};">${escapeHtml(value)}</span>
     </div>
