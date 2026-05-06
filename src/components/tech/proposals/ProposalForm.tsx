@@ -329,6 +329,10 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
 
       <div className="flex flex-wrap gap-2 justify-end sticky bottom-0 bg-white py-3 border-t">
         <Button variant="outline" onClick={onClose} disabled={saveMutation.isPending}>Cancelar</Button>
+        <Button variant="outline" onClick={handlePreview} disabled={previewLoading || saveMutation.isPending}>
+          {previewLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Eye className="w-4 h-4 mr-2" />}
+          Pré-visualizar PDF
+        </Button>
         <Button variant="outline" onClick={() => saveMutation.mutate({ finalize: false })} disabled={saveMutation.isPending}>
           {saveMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
           Salvar Rascunho
@@ -338,6 +342,17 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
           Finalizar e Gerar PDF
         </Button>
       </div>
+
+      <Dialog open={!!previewUrl} onOpenChange={(o) => { if (!o) { if (previewUrl) URL.revokeObjectURL(previewUrl); setPreviewUrl(null); } }}>
+        <DialogContent className="max-w-5xl w-[95vw] h-[90vh] flex flex-col p-0">
+          <DialogHeader className="px-6 py-3 border-b">
+            <DialogTitle className="text-blue-900">Prévia da Proposta</DialogTitle>
+          </DialogHeader>
+          {previewUrl && (
+            <iframe src={previewUrl} title="Prévia PDF" className="flex-1 w-full" />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
