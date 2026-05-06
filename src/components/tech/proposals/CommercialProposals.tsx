@@ -127,9 +127,21 @@ const CommercialProposals: React.FC = () => {
                   </div>
                   <div className="flex gap-1 flex-shrink-0">
                     {p.integrity_hash && (
-                      <Button size="icon" variant="ghost" onClick={() => handleDownload(p)} disabled={downloading === p.id} title="Baixar PDF">
-                        {downloading === p.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileDown className="w-4 h-4" />}
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button size="icon" variant="ghost" disabled={downloading === p.id} title="Baixar PDF">
+                            {downloading === p.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileDown className="w-4 h-4" />}
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleDownload(p, 'modelo01')}>
+                            Modelo 01 — Premium (com QR)
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDownload(p, 'modelo02')}>
+                            Modelo 02 — Editorial (impressão)
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     )}
                     {!p.locked && (
                       <Button size="icon" variant="ghost" onClick={() => openEdit(p)} title="Editar">
