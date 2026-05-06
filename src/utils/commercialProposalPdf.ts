@@ -139,7 +139,11 @@ const quoteBlock = (text: string, author: string) => `
 
 function buildHtml(r: CommercialProposalPdfData): string {
   const S = { ...DEFAULT_SECTIONS, ...(r.sections || {}) };
-  const monthlyTotal = r.items.reduce((s, i) => s + i.qty * i.unit_price, 0) - (r.discount || 0);
+  const itemsSubtotal = r.items.reduce((s, i) => s + (Number(i.qty) || 0) * (Number(i.unit_price) || 0), 0);
+  const discount = Number(r.discount) || 0;
+  const activationFee = Number(r.activationFee) || 0;
+  const monthlyTotal = itemsSubtotal - discount;
+  const firstMonthTotal = monthlyTotal + activationFee;
 
   // KPIs
   const kpiW = `${Math.floor(100 / DELTA7_KPIS.length)}%`;
@@ -323,6 +327,39 @@ function buildHtml(r: CommercialProposalPdfData): string {
           <tr style="background:${C.navy};color:#ffffff;">
             <td colspan="3" style="padding:14px;text-align:right;font-weight:700;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#ffffff;background:${C.navy};">Custo Mensal Total</td>
             <td style="padding:14px;text-align:right;font-weight:800;font-size:18px;color:#ffffff;letter-spacing:-0.3px;background:${C.navy};">${formatBRL(monthlyTotal)}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table style="width:100%;border-collapse:separate;border-spacing:0;margin-top:14px;font-size:11px;border:1px solid #e7e2d2;border-radius:6px;overflow:hidden;">
+        <thead>
+          <tr style="background:${C.cream};">
+            <th colspan="2" style="padding:10px 14px;text-align:left;font-size:9.5px;letter-spacing:1.5px;text-transform:uppercase;font-weight:800;color:${C.navy};">Resumo do investimento</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:9px 14px;color:${C.ink};border-bottom:1px solid #eae3cf;">Subtotal mensal (itens)</td>
+            <td style="padding:9px 14px;text-align:right;color:${C.ink};border-bottom:1px solid #eae3cf;">${formatBRL(itemsSubtotal)}</td>
+          </tr>
+          ${discount > 0 ? `<tr>
+            <td style="padding:9px 14px;color:#b91c1c;border-bottom:1px solid #eae3cf;">(−) Desconto mensal</td>
+            <td style="padding:9px 14px;text-align:right;color:#b91c1c;font-weight:700;border-bottom:1px solid #eae3cf;">- ${formatBRL(discount)}</td>
+          </tr>` : ''}
+          <tr style="background:${C.paper};">
+            <td style="padding:10px 14px;color:${C.navy};font-weight:700;border-bottom:1px solid #eae3cf;">= Mensalidade recorrente</td>
+            <td style="padding:10px 14px;text-align:right;color:${C.navy};font-weight:800;border-bottom:1px solid #eae3cf;">${formatBRL(monthlyTotal)}</td>
+          </tr>
+          <tr>
+            <td style="padding:9px 14px;color:${C.ink};border-bottom:1px solid #eae3cf;">(+) Taxa de Ativação (cobrada uma única vez)</td>
+            <td style="padding:9px 14px;text-align:right;color:${C.ink};border-bottom:1px solid #eae3cf;">${formatBRL(activationFee)}</td>
+          </tr>
+          <tr style="background:${C.navy};color:#ffffff;">
+            <td style="padding:12px 14px;font-weight:700;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:#ffffff;background:${C.navy};">Investimento no 1º mês</td>
+            <td style="padding:12px 14px;text-align:right;font-weight:800;font-size:15px;color:#ffffff;background:${C.navy};">${formatBRL(firstMonthTotal)}</td>
+          </tr>
+          <tr>
+            <td colspan="2" style="padding:9px 14px;color:${C.muted};font-size:9.5px;font-style:italic;background:${C.cream};">A partir do 2º mês, o valor recorrente é de <strong style="color:${C.navy};font-style:normal;">${formatBRL(monthlyTotal)}/mês</strong>.</td>
           </tr>
         </tbody>
       </table>
