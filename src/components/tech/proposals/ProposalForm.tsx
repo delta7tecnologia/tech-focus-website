@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
-import { Loader2, Save, FileDown } from 'lucide-react';
+import { Loader2, Save, FileDown, Eye } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import ProposalItemsEditor, { type EditableItem } from './ProposalItemsEditor';
 import {
@@ -22,7 +23,7 @@ import {
 } from '@/lib/proposalContent';
 import { validateDocument, formatDocument } from '@/lib/validators/document';
 import { sha256Hex } from '@/utils/reportHash';
-import { downloadCommercialProposalPdf } from '@/utils/commercialProposalPdf';
+import { downloadCommercialProposalPdf, previewCommercialProposalPdf } from '@/utils/commercialProposalPdf';
 
 interface Props {
   proposal?: any;
@@ -56,6 +57,45 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
 
   const toggleSection = (key: keyof ProposalSections) =>
     setSections((s) => ({ ...s, [key]: !s[key] }));
+
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+
+  const handlePreview = async () => {
+    const err = validateForm();
+    if (err) {
+      toast({ title: 'Não foi possível gerar a prévia', description: err, variant: 'destructive' });
+      return;
+    }
+    setPreviewLoading(true);
+    try {
+      const payload = buildPayload();
+      const url = await previewCommercialProposalPdf({
+        proposalNumber: proposal?.proposal_number || 'PRÉVIA',
+        generatedAt: new Date().toISOString(),
+        validityDays: payload.validity_days,
+        clientName: payload.client_name,
+        clientDocument: payload.client_document || undefined,
+        clientContact: payload.client_contact || undefined,
+        clientEmail: payload.client_email || undefined,
+        clientAddress: payload.client_address || undefined,
+        salesRepName: payload.sales_rep_name,
+        salesRepEmail: payload.sales_rep_email || undefined,
+        items: payload.items as any,
+        activationFee: payload.activation_fee,
+        discount: payload.discount,
+        notes: payload.notes || undefined,
+        integrityHash: proposal?.integrity_hash || 'previa-sem-hash-de-integridade'.padEnd(64, '0'),
+        sections,
+      });
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(url);
+    } catch (e: any) {
+      toast({ title: 'Erro na prévia', description: e.message, variant: 'destructive' });
+    } finally {
+      setPreviewLoading(false);
+    }
+  };
 
   const docValidation = validateDocument(clientDocument);
 
@@ -289,6 +329,10 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
 
       <div className="flex flex-wrap gap-2 justify-end sticky bottom-0 bg-white py-3 border-t">
         <Button variant="outline" onClick={onClose} disabled={saveMutation.isPending}>Cancelar</Button>
+        <Button variant="outline" onClick={handlePreview} disabled={previewLoading || saveMutation.isPending}>
+          {previewLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Eye className="w-4 h-4 mr-2" />}
+          Pré-visualizar PDF
+        </Button>
         <Button variant="outline" onClick={() => saveMutation.mutate({ finalize: false })} disabled={saveMutation.isPending}>
           {saveMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
           Salvar Rascunho
@@ -298,6 +342,17 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
           Finalizar e Gerar PDF
         </Button>
       </div>
+
+      <Dialog open={!!previewUrl} onOpenChange={(o) => { if (!o) { if (previewUrl) URL.revokeObjectURL(previewUrl); setPreviewUrl(null); } }}>
+        <DialogContent className="max-w-5xl w-[95vw] h-[90vh] flex flex-col p-0">
+          <DialogHeader className="px-6 py-3 border-b">
+            <DialogTitle className="text-blue-900">Prévia da Proposta</DialogTitle>
+          </DialogHeader>
+          {previewUrl && (
+            <iframe src={previewUrl} title="Prévia PDF" className="flex-1 w-full" />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
