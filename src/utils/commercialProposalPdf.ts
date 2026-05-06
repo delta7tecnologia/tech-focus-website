@@ -11,11 +11,12 @@ import {
   formatBRL,
   PROP_COLORS as C,
   DELTA7_KPIS,
-  // TECH_STACK removido
   INFRA_HIGHLIGHTS,
   BENEFIT_CARDS,
   IDEAL_FOR,
   INSTITUTIONAL_QUOTE,
+  DEFAULT_SECTIONS,
+  type ProposalSections,
 } from '@/lib/proposalContent';
 
 export interface ProposalItem {
@@ -46,6 +47,7 @@ export interface CommercialProposalPdfData {
   integrityHash: string;
   validationUrl?: string;
   qrCodeDataUrl?: string;
+  sections?: ProposalSections;
 }
 
 const fmtDate = (iso?: string) =>
@@ -136,6 +138,7 @@ const quoteBlock = (text: string, author: string) => `
   </div>`;
 
 function buildHtml(r: CommercialProposalPdfData): string {
+  const S = { ...DEFAULT_SECTIONS, ...(r.sections || {}) };
   const monthlyTotal = r.items.reduce((s, i) => s + i.qty * i.unit_price, 0) - (r.discount || 0);
 
   // KPIs
@@ -237,18 +240,18 @@ function buildHtml(r: CommercialProposalPdfData): string {
     </table>
     <div style="height:2px;background:${C.gold};width:60px;margin-bottom:6px;"></div>
 
-    ${sectionTitle('Quem somos', 'Sobre a Delta7 Tecnologia', 18)}
+    ${S.showAbout ? `${sectionTitle('Quem somos', 'Sobre a Delta7 Tecnologia', 18)}
     <p style="margin:0;line-height:1.75;text-align:justify;color:${C.ink};white-space:pre-line;">${escapeHtml(ABOUT_DELTA7)}</p>
-    ${kpisHtml}
+    ${kpisHtml}` : ''}
 
-    ${sectionTitle('Vantagens', 'Por que Backup Online')}
-    ${benefitsHtml}
+    ${S.showBenefits ? `${sectionTitle('Vantagens', 'Por que Backup Online')}
+    ${benefitsHtml}` : ''}
 
-    ${sectionTitle('Infraestrutura', 'Onde seus dados ficam')}
-    ${infraHtml}
+    ${S.showInfra ? `${sectionTitle('Infraestrutura', 'Onde seus dados ficam')}
+    ${infraHtml}` : ''}
 
-    ${sectionTitle('Perfil ideal', 'Esta solução é ideal se...')}
-    ${idealHtml}
+    ${S.showIdealFor ? `${sectionTitle('Perfil ideal', 'Esta solução é ideal se...')}
+    ${idealHtml}` : ''}
 
     ${sectionTitle('Cliente', 'Identificação do Cliente')}
     <table style="width:100%;border-collapse:collapse;font-size:11px;border:1px solid #e7e2d2;border-radius:6px;overflow:hidden;">
@@ -334,13 +337,13 @@ function buildHtml(r: CommercialProposalPdfData): string {
     <div id="prop-suporte-block" style="break-inside:avoid;page-break-inside:avoid;">
       ${sectionTitle('Atendimento', 'Suporte Técnico')}
       <p style="margin:0 0 12px 0;line-height:1.7;text-align:justify;color:${C.ink};white-space:pre-line;">${escapeHtml(SUPPORT_TEXT)}</p>
-      <p style="margin:14px 0 10px 0;font-weight:800;color:${C.navy};font-size:11px;letter-spacing:0.3px;">Requisitos para a prestação dos serviços</p>
+      ${S.showSupportReqs ? `<p style="margin:14px 0 10px 0;font-weight:800;color:${C.navy};font-size:11px;letter-spacing:0.3px;">Requisitos para a prestação dos serviços</p>
       <div style="font-size:10.5px;">
         ${supportReqHtml}
-      </div>
+      </div>` : ''}
     </div>
 
-    ${quoteBlock(INSTITUTIONAL_QUOTE.text, INSTITUTIONAL_QUOTE.author)}
+    ${S.showQuote ? quoteBlock(INSTITUTIONAL_QUOTE.text, INSTITUTIONAL_QUOTE.author) : ''}
 
     <!-- Aceite + Rodapé unidos para nunca quebrarem -->
     <div id="prop-aceite-block" style="break-inside:avoid;page-break-inside:avoid;margin-top:26px;">

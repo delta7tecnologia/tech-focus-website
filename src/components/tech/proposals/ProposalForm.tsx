@@ -9,8 +9,17 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { Loader2, Save, FileDown } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import ProposalItemsEditor, { type EditableItem } from './ProposalItemsEditor';
-import { ACTIVATION_FEE_DEFAULT, VALIDITY_DAYS_DEFAULT } from '@/lib/proposalContent';
+import {
+  ACTIVATION_FEE_DEFAULT,
+  VALIDITY_DAYS_DEFAULT,
+  DEFAULT_SECTIONS,
+  COMPACT_SECTIONS,
+  MINIMAL_SECTIONS,
+  SECTION_LABELS,
+  type ProposalSections,
+} from '@/lib/proposalContent';
 import { validateDocument, formatDocument } from '@/lib/validators/document';
 import { sha256Hex } from '@/utils/reportHash';
 import { downloadCommercialProposalPdf } from '@/utils/commercialProposalPdf';
@@ -40,6 +49,13 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
   );
   const [activationFee, setActivationFee] = useState<number>(proposal?.activation_fee ?? ACTIVATION_FEE_DEFAULT);
   const [discount, setDiscount] = useState<number>(proposal?.discount ?? 0);
+  const [sections, setSections] = useState<ProposalSections>({
+    ...DEFAULT_SECTIONS,
+    ...(proposal?.sections || {}),
+  });
+
+  const toggleSection = (key: keyof ProposalSections) =>
+    setSections((s) => ({ ...s, [key]: !s[key] }));
 
   const docValidation = validateDocument(clientDocument);
 
@@ -81,6 +97,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
       discount,
       monthly_total: monthlyTotal,
       setup_total: activationFee,
+      sections: sections as any,
     };
   };
 
@@ -146,6 +163,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
           discount: Number(data.discount) || 0,
           notes: data.notes || undefined,
           integrityHash: data.integrity_hash || '',
+          sections: (data.sections as ProposalSections) || sections,
         });
       }
       onClose();
@@ -229,6 +247,36 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
             activationFee={activationFee}
             onActivationFeeChange={setActivationFee}
           />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-6 space-y-4">
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div>
+              <h3 className="text-lg font-bold text-blue-900">Conteúdo do PDF</h3>
+              <p className="text-xs text-gray-500 mt-1">Marque as seções que deseja incluir. Quanto menos seções, mais curto o documento.</p>
+            </div>
+            <div className="flex gap-2">
+              <Button type="button" size="sm" variant="outline" onClick={() => setSections(MINIMAL_SECTIONS)}>Apenas comercial</Button>
+              <Button type="button" size="sm" variant="outline" onClick={() => setSections(COMPACT_SECTIONS)}>Enxuta</Button>
+              <Button type="button" size="sm" variant="outline" onClick={() => setSections(DEFAULT_SECTIONS)}>Padrão</Button>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pt-2">
+            {SECTION_LABELS.map(({ key, label, hint }) => (
+              <label
+                key={key}
+                className="flex items-center gap-3 p-3 rounded-md border border-gray-200 hover:border-blue-300 cursor-pointer transition-colors"
+              >
+                <Checkbox checked={sections[key]} onCheckedChange={() => toggleSection(key)} />
+                <div className="flex-1">
+                  <div className="text-sm font-medium text-gray-800">{label}</div>
+                  <div className="text-xs text-gray-500">{hint}</div>
+                </div>
+              </label>
+            ))}
+          </div>
         </CardContent>
       </Card>
 

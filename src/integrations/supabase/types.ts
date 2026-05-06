@@ -178,6 +178,7 @@ export type Database = {
           proposal_seq: number | null
           sales_rep_email: string | null
           sales_rep_name: string
+          sections: Json | null
           setup_total: number
           status: string
           updated_at: string
@@ -206,6 +207,7 @@ export type Database = {
           proposal_seq?: number | null
           sales_rep_email?: string | null
           sales_rep_name: string
+          sections?: Json | null
           setup_total?: number
           status?: string
           updated_at?: string
@@ -234,6 +236,7 @@ export type Database = {
           proposal_seq?: number | null
           sales_rep_email?: string | null
           sales_rep_name?: string
+          sections?: Json | null
           setup_total?: number
           status?: string
           updated_at?: string
