@@ -6,6 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { FilePlus, Edit, Trash2, FileDown, Loader2, Lock, FileText } from 'lucide-react';
 import ProposalForm from './ProposalForm';
 import { downloadCommercialProposalPdf } from '@/utils/commercialProposalPdf';
