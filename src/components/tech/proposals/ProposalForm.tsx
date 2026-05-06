@@ -9,8 +9,17 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { Loader2, Save, FileDown } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import ProposalItemsEditor, { type EditableItem } from './ProposalItemsEditor';
-import { ACTIVATION_FEE_DEFAULT, VALIDITY_DAYS_DEFAULT } from '@/lib/proposalContent';
+import {
+  ACTIVATION_FEE_DEFAULT,
+  VALIDITY_DAYS_DEFAULT,
+  DEFAULT_SECTIONS,
+  COMPACT_SECTIONS,
+  MINIMAL_SECTIONS,
+  SECTION_LABELS,
+  type ProposalSections,
+} from '@/lib/proposalContent';
 import { validateDocument, formatDocument } from '@/lib/validators/document';
 import { sha256Hex } from '@/utils/reportHash';
 import { downloadCommercialProposalPdf } from '@/utils/commercialProposalPdf';
