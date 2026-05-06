@@ -47,6 +47,7 @@ export interface CommercialProposalPdfData {
   integrityHash: string;
   validationUrl?: string;
   qrCodeDataUrl?: string;
+  sections?: ProposalSections;
 }
 
 const fmtDate = (iso?: string) =>
