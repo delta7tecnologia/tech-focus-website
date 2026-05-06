@@ -337,13 +337,13 @@ function buildHtml(r: CommercialProposalPdfData): string {
     <div id="prop-suporte-block" style="break-inside:avoid;page-break-inside:avoid;">
       ${sectionTitle('Atendimento', 'Suporte Técnico')}
       <p style="margin:0 0 12px 0;line-height:1.7;text-align:justify;color:${C.ink};white-space:pre-line;">${escapeHtml(SUPPORT_TEXT)}</p>
-      <p style="margin:14px 0 10px 0;font-weight:800;color:${C.navy};font-size:11px;letter-spacing:0.3px;">Requisitos para a prestação dos serviços</p>
+      ${S.showSupportReqs ? `<p style="margin:14px 0 10px 0;font-weight:800;color:${C.navy};font-size:11px;letter-spacing:0.3px;">Requisitos para a prestação dos serviços</p>
       <div style="font-size:10.5px;">
         ${supportReqHtml}
-      </div>
+      </div>` : ''}
     </div>
 
-    ${quoteBlock(INSTITUTIONAL_QUOTE.text, INSTITUTIONAL_QUOTE.author)}
+    ${S.showQuote ? quoteBlock(INSTITUTIONAL_QUOTE.text, INSTITUTIONAL_QUOTE.author) : ''}
 
     <!-- Aceite + Rodapé unidos para nunca quebrarem -->
     <div id="prop-aceite-block" style="break-inside:avoid;page-break-inside:avoid;margin-top:26px;">
