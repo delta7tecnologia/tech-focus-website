@@ -22,7 +22,6 @@ export const PROP_COLORS = {
 export const DELTA7_KPIS: { value: string; label: string }[] = [
   { value: '+10', label: 'anos de mercado' },
   { value: '99,9%', label: 'disponibilidade' },
-  { value: '4h', label: 'SLA restauração' },
   { value: '24/7', label: 'monitoramento' },
 ];
 
