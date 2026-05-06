@@ -312,9 +312,9 @@ export async function downloadCommercialProposalPdf(data: CommercialProposalPdfD
         el.style.marginTop = `${extraPx + baseMargin}px`;
       }
     };
-    tryPushAcross('prop-cenario-block', 8);
-    tryPushAcross('prop-aceite-block', 8);
-    tryPushAcross('prop-footer-block', 24);
+    tryPushAcross('prop-financ-block', 8);
+    tryPushAcross('prop-suporte-block', 8);
+    tryPushAcross('prop-aceite-block', 12);
 
     const canvas = await html2canvas(node, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
     const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
