@@ -4,6 +4,7 @@ import html2canvas from 'html2canvas';
 import { escapeHtml } from './reportNarrative';
 import { DELTA7_LOGO_DATA_URL, DELTA7_LOGO_DARK_DATA_URL } from '@/assets/delta7LogoBase64';
 import { ALTATEK_LOGO_DATA_URL } from '@/assets/altatekLogoBase64';
+import { ALTATEK_LOGO_MODELO01_DATA_URL } from '@/assets/altatekLogoModelo01Base64';
 import {
   ABOUT_DELTA7,
   NOT_INCLUDED,
@@ -209,7 +210,7 @@ function buildHtml(r: CommercialProposalPdfData): string {
         <div style="font-size:10px;color:${C.goldLight};letter-spacing:3px;text-transform:uppercase;">Delta7 Tecnologia</div>
         ${r.showAltatekLogo ? `<div style="margin-top:14px;display:inline-block;background:rgba(255,255,255,0.95);padding:8px 12px;border-radius:6px;border:1px solid ${C.gold};">
           <div style="font-size:7px;letter-spacing:2px;text-transform:uppercase;color:${C.navy};font-weight:700;margin-bottom:4px;text-align:center;">Revenda Autorizada</div>
-          <img src="${ALTATEK_LOGO_DATA_URL}" alt="Altatek" style="height:26px;display:block;" />
+          <img src="${ALTATEK_LOGO_MODELO01_DATA_URL}" alt="Altatek" style="height:26px;display:block;" />
         </div>` : ''}
       </div>
     </div>
