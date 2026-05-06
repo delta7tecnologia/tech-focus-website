@@ -240,18 +240,18 @@ function buildHtml(r: CommercialProposalPdfData): string {
     </table>
     <div style="height:2px;background:${C.gold};width:60px;margin-bottom:6px;"></div>
 
-    ${sectionTitle('Quem somos', 'Sobre a Delta7 Tecnologia', 18)}
+    ${S.showAbout ? `${sectionTitle('Quem somos', 'Sobre a Delta7 Tecnologia', 18)}
     <p style="margin:0;line-height:1.75;text-align:justify;color:${C.ink};white-space:pre-line;">${escapeHtml(ABOUT_DELTA7)}</p>
-    ${kpisHtml}
+    ${kpisHtml}` : ''}
 
-    ${sectionTitle('Vantagens', 'Por que Backup Online')}
-    ${benefitsHtml}
+    ${S.showBenefits ? `${sectionTitle('Vantagens', 'Por que Backup Online')}
+    ${benefitsHtml}` : ''}
 
-    ${sectionTitle('Infraestrutura', 'Onde seus dados ficam')}
-    ${infraHtml}
+    ${S.showInfra ? `${sectionTitle('Infraestrutura', 'Onde seus dados ficam')}
+    ${infraHtml}` : ''}
 
-    ${sectionTitle('Perfil ideal', 'Esta solução é ideal se...')}
-    ${idealHtml}
+    ${S.showIdealFor ? `${sectionTitle('Perfil ideal', 'Esta solução é ideal se...')}
+    ${idealHtml}` : ''}
 
     ${sectionTitle('Cliente', 'Identificação do Cliente')}
     <table style="width:100%;border-collapse:collapse;font-size:11px;border:1px solid #e7e2d2;border-radius:6px;overflow:hidden;">
