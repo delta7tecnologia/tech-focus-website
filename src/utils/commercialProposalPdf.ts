@@ -138,9 +138,10 @@ function buildHtml(r: CommercialProposalPdfData): string {
   const monthlyTotal = r.items.reduce((s, i) => s + i.qty * i.unit_price, 0) - (r.discount || 0);
 
   // KPIs
+  const kpiW = `${Math.floor(100 / DELTA7_KPIS.length)}%`;
   const kpisHtml = `
     <table style="width:100%;border-collapse:separate;border-spacing:8px 0;margin-top:18px;">
-      <tr>${DELTA7_KPIS.map(k => `<td style="width:25%;">${kpiCard(k.value, k.label)}</td>`).join('')}</tr>
+      <tr>${DELTA7_KPIS.map(k => `<td style="width:${kpiW};">${kpiCard(k.value, k.label)}</td>`).join('')}</tr>
     </table>`;
 
   // Benefits 4x2
