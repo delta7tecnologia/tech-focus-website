@@ -488,6 +488,10 @@ function buildHtmlMinimal(r: CommercialProposalPdfData): string {
       <div style="text-align:right;">
         <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:${MUTED};">Proposta Comercial</div>
         <div style="font-size:11px;color:${INK};margin-top:6px;font-weight:600;">Nº ${escapeHtml(r.proposalNumber)}</div>
+        ${r.showAltatekLogo ? `<div style="margin-top:14px;display:inline-block;padding:6px 10px;border:1px solid ${LINE};border-radius:4px;">
+          <div style="font-size:7px;letter-spacing:2px;text-transform:uppercase;color:${MUTED};font-weight:600;margin-bottom:3px;text-align:center;">Revenda Autorizada</div>
+          <img src="${ALTATEK_LOGO_DATA_URL}" alt="Altatek" style="height:22px;display:block;" />
+        </div>` : ''}
       </div>
     </div>
 
