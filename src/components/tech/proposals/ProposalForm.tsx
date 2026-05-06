@@ -12,6 +12,7 @@ import { Loader2, Save, FileDown, Eye } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import ProposalItemsEditor, { type EditableItem } from './ProposalItemsEditor';
+import ProposalSignatureLinksManager from './ProposalSignatureLinksManager';
 import {
   ACTIVATION_FEE_DEFAULT,
   VALIDITY_DAYS_DEFAULT,
