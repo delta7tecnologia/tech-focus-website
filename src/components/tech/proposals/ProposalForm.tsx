@@ -331,9 +331,13 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
 
       <div className="flex flex-wrap gap-2 justify-end sticky bottom-0 bg-white py-3 border-t">
         <Button variant="outline" onClick={onClose} disabled={saveMutation.isPending}>Cancelar</Button>
-        <Button variant="outline" onClick={handlePreview} disabled={previewLoading || saveMutation.isPending}>
-          {previewLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Eye className="w-4 h-4 mr-2" />}
-          Pré-visualizar PDF
+        <Button variant="outline" onClick={() => handlePreview('modelo01')} disabled={!!previewLoading || saveMutation.isPending}>
+          {previewLoading === 'modelo01' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Eye className="w-4 h-4 mr-2" />}
+          Prévia · Modelo 01
+        </Button>
+        <Button variant="outline" onClick={() => handlePreview('modelo02')} disabled={!!previewLoading || saveMutation.isPending}>
+          {previewLoading === 'modelo02' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Eye className="w-4 h-4 mr-2" />}
+          Prévia · Modelo 02
         </Button>
         <Button variant="outline" onClick={() => saveMutation.mutate({ finalize: false })} disabled={saveMutation.isPending}>
           {saveMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
