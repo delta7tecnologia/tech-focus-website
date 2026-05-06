@@ -339,6 +339,16 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
               </label>
             ))}
           </div>
+
+          <div className="pt-3 border-t mt-2">
+            <label className="flex items-center gap-3 p-3 rounded-md border border-gray-200 hover:border-blue-300 cursor-pointer transition-colors">
+              <Checkbox checked={showAltatekLogo} onCheckedChange={(v) => setShowAltatekLogo(!!v)} />
+              <div className="flex-1">
+                <div className="text-sm font-medium text-gray-800">Exibir selo "Revenda Autorizada Altatek"</div>
+                <div className="text-xs text-gray-500">Inclui a logo Altatek na capa do PDF (use apenas para clientes em que essa parceria é relevante).</div>
+              </div>
+            </label>
+          </div>
         </CardContent>
       </Card>
 
