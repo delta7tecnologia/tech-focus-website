@@ -211,6 +211,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
             notes: data.notes || undefined,
             integrityHash: data.integrity_hash || '',
             sections: (data.sections as ProposalSections) || sections,
+            showAltatekLogo: data.show_altatek_logo ?? showAltatekLogo,
           });
         } catch (pdfErr: any) {
           console.error('Falha ao gerar PDF após salvar proposta:', pdfErr);
