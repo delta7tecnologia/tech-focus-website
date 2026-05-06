@@ -189,28 +189,43 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
       queryClient.invalidateQueries({ queryKey: ['commercial-proposals'] });
       toast({ title: vars.finalize ? 'Proposta gerada' : 'Rascunho salvo' });
       if (vars.finalize) {
-        await downloadCommercialProposalPdf({
-          proposalNumber: data.proposal_number,
-          generatedAt: data.generated_at,
-          validityDays: data.validity_days,
-          clientName: data.client_name,
-          clientDocument: data.client_document || undefined,
-          clientContact: data.client_contact || undefined,
-          clientEmail: data.client_email || undefined,
-          clientAddress: data.client_address || undefined,
-          salesRepName: data.sales_rep_name,
-          salesRepEmail: data.sales_rep_email || undefined,
-          items: (data.items as EditableItem[]) || [],
-          activationFee: Number(data.activation_fee) || 0,
-          discount: Number(data.discount) || 0,
-          notes: data.notes || undefined,
-          integrityHash: data.integrity_hash || '',
-          sections: (data.sections as ProposalSections) || sections,
-        });
+        try {
+          await downloadCommercialProposalPdf({
+            proposalNumber: data.proposal_number,
+            generatedAt: data.generated_at,
+            validityDays: data.validity_days,
+            clientName: data.client_name,
+            clientDocument: data.client_document || undefined,
+            clientContact: data.client_contact || undefined,
+            clientEmail: data.client_email || undefined,
+            clientAddress: data.client_address || undefined,
+            salesRepName: data.sales_rep_name,
+            salesRepEmail: data.sales_rep_email || undefined,
+            items: (data.items as EditableItem[]) || [],
+            activationFee: Number(data.activation_fee) || 0,
+            discount: Number(data.discount) || 0,
+            notes: data.notes || undefined,
+            integrityHash: data.integrity_hash || '',
+            sections: (data.sections as ProposalSections) || sections,
+          });
+        } catch (pdfErr: any) {
+          console.error('Falha ao gerar PDF após salvar proposta:', pdfErr);
+          toast({
+            title: 'Proposta salva, mas falhou ao gerar PDF',
+            description: `${pdfErr?.message || 'Erro desconhecido'}. Você pode baixar o PDF novamente pela lista de propostas.`,
+            variant: 'destructive',
+          });
+        }
       }
       onClose();
     },
-    onError: (e: any) => toast({ title: 'Erro', description: e.message, variant: 'destructive' }),
+    onError: (e: any) => {
+      const msg = e?.message || String(e) || 'Erro desconhecido';
+      const hint = /load failed|failed to fetch|network/i.test(msg)
+        ? ' Verifique sua conexão e tente novamente.'
+        : '';
+      toast({ title: 'Erro ao salvar proposta', description: msg + hint, variant: 'destructive' });
+    },
   });
 
   return (
