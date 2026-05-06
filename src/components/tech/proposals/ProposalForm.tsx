@@ -58,6 +58,45 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
   const toggleSection = (key: keyof ProposalSections) =>
     setSections((s) => ({ ...s, [key]: !s[key] }));
 
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+
+  const handlePreview = async () => {
+    const err = validateForm();
+    if (err) {
+      toast({ title: 'Não foi possível gerar a prévia', description: err, variant: 'destructive' });
+      return;
+    }
+    setPreviewLoading(true);
+    try {
+      const payload = buildPayload();
+      const url = await previewCommercialProposalPdf({
+        proposalNumber: proposal?.proposal_number || 'PRÉVIA',
+        generatedAt: new Date().toISOString(),
+        validityDays: payload.validity_days,
+        clientName: payload.client_name,
+        clientDocument: payload.client_document || undefined,
+        clientContact: payload.client_contact || undefined,
+        clientEmail: payload.client_email || undefined,
+        clientAddress: payload.client_address || undefined,
+        salesRepName: payload.sales_rep_name,
+        salesRepEmail: payload.sales_rep_email || undefined,
+        items: payload.items as any,
+        activationFee: payload.activation_fee,
+        discount: payload.discount,
+        notes: payload.notes || undefined,
+        integrityHash: proposal?.integrity_hash || 'previa-sem-hash-de-integridade'.padEnd(64, '0'),
+        sections,
+      });
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(url);
+    } catch (e: any) {
+      toast({ title: 'Erro na prévia', description: e.message, variant: 'destructive' });
+    } finally {
+      setPreviewLoading(false);
+    }
+  };
+
   const docValidation = validateDocument(clientDocument);
 
   // Pré-preenche executivo com dados do perfil logado
