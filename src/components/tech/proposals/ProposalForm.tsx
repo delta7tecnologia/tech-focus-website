@@ -46,6 +46,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
   const [salesRepEmail, setSalesRepEmail] = useState(proposal?.sales_rep_email || '');
   const [validityDays, setValidityDays] = useState<number>(proposal?.validity_days ?? VALIDITY_DAYS_DEFAULT);
   const [notes, setNotes] = useState(proposal?.notes || '');
+  const [showAltatekLogo, setShowAltatekLogo] = useState<boolean>(proposal?.show_altatek_logo ?? false);
   const [items, setItems] = useState<EditableItem[]>(
     proposal?.items?.length ? proposal.items : [],
   );
@@ -90,6 +91,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
         notes: payload.notes || undefined,
         integrityHash: proposal?.integrity_hash || 'previa-sem-hash-de-integridade'.padEnd(64, '0'),
         sections,
+        showAltatekLogo,
         template,
       });
       setPreviewPages(pages);
@@ -141,6 +143,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
       monthly_total: monthlyTotal,
       setup_total: activationFee,
       sections: sections as any,
+      show_altatek_logo: showAltatekLogo,
     };
   };
 
@@ -208,6 +211,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
             notes: data.notes || undefined,
             integrityHash: data.integrity_hash || '',
             sections: (data.sections as ProposalSections) || sections,
+            showAltatekLogo: data.show_altatek_logo ?? showAltatekLogo,
           });
         } catch (pdfErr: any) {
           console.error('Falha ao gerar PDF após salvar proposta:', pdfErr);
@@ -334,6 +338,16 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
                 </div>
               </label>
             ))}
+          </div>
+
+          <div className="pt-3 border-t mt-2">
+            <label className="flex items-center gap-3 p-3 rounded-md border border-gray-200 hover:border-blue-300 cursor-pointer transition-colors">
+              <Checkbox checked={showAltatekLogo} onCheckedChange={(v) => setShowAltatekLogo(!!v)} />
+              <div className="flex-1">
+                <div className="text-sm font-medium text-gray-800">Exibir selo "Revenda Autorizada Altatek"</div>
+                <div className="text-xs text-gray-500">Inclui a logo Altatek na capa do PDF (use apenas para clientes em que essa parceria é relevante).</div>
+              </div>
+            </label>
           </div>
         </CardContent>
       </Card>

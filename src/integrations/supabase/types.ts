@@ -180,6 +180,7 @@ export type Database = {
           sales_rep_name: string
           sections: Json | null
           setup_total: number
+          show_altatek_logo: boolean
           status: string
           updated_at: string
           validity_days: number
@@ -209,6 +210,7 @@ export type Database = {
           sales_rep_name: string
           sections?: Json | null
           setup_total?: number
+          show_altatek_logo?: boolean
           status?: string
           updated_at?: string
           validity_days?: number
@@ -238,6 +240,7 @@ export type Database = {
           sales_rep_name?: string
           sections?: Json | null
           setup_total?: number
+          show_altatek_logo?: boolean
           status?: string
           updated_at?: string
           validity_days?: number
