@@ -138,6 +138,7 @@ const quoteBlock = (text: string, author: string) => `
   </div>`;
 
 function buildHtml(r: CommercialProposalPdfData): string {
+  const S = { ...DEFAULT_SECTIONS, ...(r.sections || {}) };
   const monthlyTotal = r.items.reduce((s, i) => s + i.qty * i.unit_price, 0) - (r.discount || 0);
 
   // KPIs
