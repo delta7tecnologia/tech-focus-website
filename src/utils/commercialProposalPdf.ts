@@ -509,5 +509,6 @@ export async function downloadCommercialProposalPdf(data: CommercialProposalPdfD
 
 export async function previewCommercialProposalPdf(data: CommercialProposalPdfData): Promise<string> {
   const pdf = await buildPdf(data);
-  return pdf.output('datauristring');
+  const blob = pdf.output('blob');
+  return URL.createObjectURL(blob);
 }
