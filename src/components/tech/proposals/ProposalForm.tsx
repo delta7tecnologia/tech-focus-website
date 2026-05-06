@@ -345,11 +345,28 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
 
       <Dialog open={!!previewUrl} onOpenChange={(o) => { if (!o) { if (previewUrl) URL.revokeObjectURL(previewUrl); setPreviewUrl(null); } }}>
         <DialogContent className="max-w-5xl w-[95vw] h-[90vh] flex flex-col p-0">
-          <DialogHeader className="px-6 py-3 border-b">
+          <DialogHeader className="px-6 py-3 border-b flex-row items-center justify-between gap-4 space-y-0">
             <DialogTitle className="text-blue-900">Prévia da Proposta</DialogTitle>
+            {previewUrl && (
+              <a
+                href={previewUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-blue-700 hover:underline mr-8"
+              >
+                Abrir em nova aba ↗
+              </a>
+            )}
           </DialogHeader>
           {previewUrl && (
-            <iframe src={previewUrl} title="Prévia PDF" className="flex-1 w-full" />
+            <object data={previewUrl} type="application/pdf" className="flex-1 w-full">
+              <div className="p-8 text-center text-sm text-gray-600">
+                Seu navegador não conseguiu exibir o PDF embutido.{' '}
+                <a href={previewUrl} target="_blank" rel="noopener noreferrer" className="text-blue-700 underline">
+                  Clique aqui para abrir em nova aba
+                </a>.
+              </div>
+            </object>
           )}
         </DialogContent>
       </Dialog>
