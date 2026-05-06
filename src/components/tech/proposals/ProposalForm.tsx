@@ -163,6 +163,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
           discount: Number(data.discount) || 0,
           notes: data.notes || undefined,
           integrityHash: data.integrity_hash || '',
+          sections: (data.sections as ProposalSections) || sections,
         });
       }
       onClose();
