@@ -49,6 +49,13 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
   );
   const [activationFee, setActivationFee] = useState<number>(proposal?.activation_fee ?? ACTIVATION_FEE_DEFAULT);
   const [discount, setDiscount] = useState<number>(proposal?.discount ?? 0);
+  const [sections, setSections] = useState<ProposalSections>({
+    ...DEFAULT_SECTIONS,
+    ...(proposal?.sections || {}),
+  });
+
+  const toggleSection = (key: keyof ProposalSections) =>
+    setSections((s) => ({ ...s, [key]: !s[key] }));
 
   const docValidation = validateDocument(clientDocument);
 
