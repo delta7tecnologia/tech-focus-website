@@ -70,6 +70,7 @@ const CommercialProposals: React.FC = () => {
         discount: Number(p.discount) || 0,
         notes: p.notes || undefined,
         integrityHash: p.integrity_hash || '',
+        sections: p.sections || undefined,
       });
     } catch (e: any) {
       toast({ title: 'Erro ao gerar PDF', description: e.message, variant: 'destructive' });
