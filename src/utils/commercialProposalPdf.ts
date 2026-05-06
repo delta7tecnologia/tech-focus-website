@@ -11,7 +11,7 @@ import {
   formatBRL,
   PROP_COLORS as C,
   DELTA7_KPIS,
-  TECH_STACK,
+  // TECH_STACK removido
   INFRA_HIGHLIGHTS,
   BENEFIT_CARDS,
   IDEAL_FOR,
