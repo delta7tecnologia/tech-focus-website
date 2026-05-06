@@ -59,15 +59,17 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
     setSections((s) => ({ ...s, [key]: !s[key] }));
 
   const [previewPages, setPreviewPages] = useState<string[] | null>(null);
-  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewLoading, setPreviewLoading] = useState<false | 'modelo01' | 'modelo02'>(false);
+  const [previewTemplate, setPreviewTemplate] = useState<'modelo01' | 'modelo02'>('modelo01');
 
-  const handlePreview = async () => {
+  const handlePreview = async (template: 'modelo01' | 'modelo02') => {
     const err = validateForm();
     if (err) {
       toast({ title: 'Não foi possível gerar a prévia', description: err, variant: 'destructive' });
       return;
     }
-    setPreviewLoading(true);
+    setPreviewLoading(template);
+    setPreviewTemplate(template);
     try {
       const payload = buildPayload();
       const pages = await previewCommercialProposalPdf({
@@ -87,6 +89,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
         notes: payload.notes || undefined,
         integrityHash: proposal?.integrity_hash || 'previa-sem-hash-de-integridade'.padEnd(64, '0'),
         sections,
+        template,
       });
       setPreviewPages(pages);
     } catch (e: any) {
@@ -328,9 +331,13 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
 
       <div className="flex flex-wrap gap-2 justify-end sticky bottom-0 bg-white py-3 border-t">
         <Button variant="outline" onClick={onClose} disabled={saveMutation.isPending}>Cancelar</Button>
-        <Button variant="outline" onClick={handlePreview} disabled={previewLoading || saveMutation.isPending}>
-          {previewLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Eye className="w-4 h-4 mr-2" />}
-          Pré-visualizar PDF
+        <Button variant="outline" onClick={() => handlePreview('modelo01')} disabled={!!previewLoading || saveMutation.isPending}>
+          {previewLoading === 'modelo01' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Eye className="w-4 h-4 mr-2" />}
+          Prévia · Modelo 01
+        </Button>
+        <Button variant="outline" onClick={() => handlePreview('modelo02')} disabled={!!previewLoading || saveMutation.isPending}>
+          {previewLoading === 'modelo02' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Eye className="w-4 h-4 mr-2" />}
+          Prévia · Modelo 02
         </Button>
         <Button variant="outline" onClick={() => saveMutation.mutate({ finalize: false })} disabled={saveMutation.isPending}>
           {saveMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
@@ -346,7 +353,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
         <DialogContent className="max-w-5xl w-[95vw] h-[90vh] flex flex-col p-0">
           <DialogHeader className="px-6 py-3 border-b flex-row items-center justify-between gap-4 space-y-0">
             <DialogTitle className="text-blue-900">
-              Prévia da Proposta {previewPages ? `· ${previewPages.length} página(s)` : ''}
+              Prévia · {previewTemplate === 'modelo02' ? 'Modelo 02 (Editorial)' : 'Modelo 01 (Premium)'} {previewPages ? `· ${previewPages.length} página(s)` : ''}
             </DialogTitle>
             <span className="text-xs text-gray-500 mr-8">Visualização aproximada — finalize para baixar o PDF</span>
           </DialogHeader>

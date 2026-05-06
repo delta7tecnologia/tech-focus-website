@@ -6,6 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { FilePlus, Edit, Trash2, FileDown, Loader2, Lock, FileText } from 'lucide-react';
 import ProposalForm from './ProposalForm';
 import { downloadCommercialProposalPdf } from '@/utils/commercialProposalPdf';
@@ -51,7 +52,7 @@ const CommercialProposals: React.FC = () => {
     onError: (e: any) => toast({ title: 'Erro ao excluir', description: e.message, variant: 'destructive' }),
   });
 
-  const handleDownload = async (p: any) => {
+  const handleDownload = async (p: any, template: 'modelo01' | 'modelo02' = 'modelo01') => {
     setDownloading(p.id);
     try {
       await downloadCommercialProposalPdf({
@@ -71,6 +72,7 @@ const CommercialProposals: React.FC = () => {
         notes: p.notes || undefined,
         integrityHash: p.integrity_hash || '',
         sections: p.sections || undefined,
+        template,
       });
     } catch (e: any) {
       toast({ title: 'Erro ao gerar PDF', description: e.message, variant: 'destructive' });
@@ -125,9 +127,21 @@ const CommercialProposals: React.FC = () => {
                   </div>
                   <div className="flex gap-1 flex-shrink-0">
                     {p.integrity_hash && (
-                      <Button size="icon" variant="ghost" onClick={() => handleDownload(p)} disabled={downloading === p.id} title="Baixar PDF">
-                        {downloading === p.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileDown className="w-4 h-4" />}
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button size="icon" variant="ghost" disabled={downloading === p.id} title="Baixar PDF">
+                            {downloading === p.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileDown className="w-4 h-4" />}
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleDownload(p, 'modelo01')}>
+                            Modelo 01 — Premium (com QR)
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDownload(p, 'modelo02')}>
+                            Modelo 02 — Editorial (impressão)
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     )}
                     {!p.locked && (
                       <Button size="icon" variant="ghost" onClick={() => openEdit(p)} title="Editar">
