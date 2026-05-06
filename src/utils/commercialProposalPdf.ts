@@ -139,7 +139,11 @@ const quoteBlock = (text: string, author: string) => `
 
 function buildHtml(r: CommercialProposalPdfData): string {
   const S = { ...DEFAULT_SECTIONS, ...(r.sections || {}) };
-  const monthlyTotal = r.items.reduce((s, i) => s + i.qty * i.unit_price, 0) - (r.discount || 0);
+  const itemsSubtotal = r.items.reduce((s, i) => s + (Number(i.qty) || 0) * (Number(i.unit_price) || 0), 0);
+  const discount = Number(r.discount) || 0;
+  const activationFee = Number(r.activationFee) || 0;
+  const monthlyTotal = itemsSubtotal - discount;
+  const firstMonthTotal = monthlyTotal + activationFee;
 
   // KPIs
   const kpiW = `${Math.floor(100 / DELTA7_KPIS.length)}%`;
