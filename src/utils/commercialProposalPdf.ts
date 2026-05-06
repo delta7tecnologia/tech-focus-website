@@ -3,6 +3,7 @@ import QRCode from 'qrcode';
 import html2canvas from 'html2canvas';
 import { escapeHtml } from './reportNarrative';
 import { DELTA7_LOGO_DATA_URL, DELTA7_LOGO_DARK_DATA_URL } from '@/assets/delta7LogoBase64';
+import { ALTATEK_LOGO_DATA_URL } from '@/assets/altatekLogoBase64';
 import {
   ABOUT_DELTA7,
   NOT_INCLUDED,
