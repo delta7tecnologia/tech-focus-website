@@ -68,6 +68,7 @@ const ValidateProposal = () => {
         discount: Number(p.discount) || 0,
         notes: p.notes || undefined,
         integrityHash: p.integrity_hash || '',
+        sections: (p as any).sections || undefined,
       });
     } catch (e: any) {
       toast({ title: 'Erro ao gerar PDF', description: e.message, variant: 'destructive' });
