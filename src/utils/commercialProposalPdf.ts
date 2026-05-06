@@ -246,33 +246,35 @@ function buildHtml(r: CommercialProposalPdfData): string {
     ${sectionTitle('Infraestrutura', 'Onde seus dados ficam')}
     ${infraHtml}
 
-    <div style="margin-top:22px;">${stackHtml}</div>
-
     ${sectionTitle('Perfil ideal', 'Esta solução é ideal se...')}
     ${idealHtml}
 
-    ${sectionTitle('Identificação', 'Identificação do Cliente')}
+    ${sectionTitle('Cliente', 'Identificação do Cliente')}
     <table style="width:100%;border-collapse:collapse;font-size:11px;border:1px solid #e7e2d2;border-radius:6px;overflow:hidden;">
       <tr>
-        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};width:25%;border-bottom:1px solid #eae3cf;">Cliente</td>
+        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};width:25%;border-bottom:1px solid #eae3cf;">Razão Social</td>
         <td style="padding:9px 12px;color:${C.ink};border-bottom:1px solid #eae3cf;" colspan="3">${escapeHtml(r.clientName)}</td>
       </tr>
-      ${r.clientDocument ? `<tr>
+      <tr>
         <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};border-bottom:1px solid #eae3cf;">CNPJ / CPF</td>
-        <td style="padding:9px 12px;color:${C.ink};border-bottom:1px solid #eae3cf;">${escapeHtml(r.clientDocument)}</td>
+        <td style="padding:9px 12px;color:${C.ink};border-bottom:1px solid #eae3cf;">${escapeHtml(r.clientDocument || '—')}</td>
         <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};border-bottom:1px solid #eae3cf;">Contato</td>
         <td style="padding:9px 12px;color:${C.ink};border-bottom:1px solid #eae3cf;">${escapeHtml(r.clientContact || '—')}</td>
-      </tr>` : ''}
-      ${r.clientEmail || r.clientAddress ? `<tr>
-        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};border-bottom:1px solid #eae3cf;">E-mail</td>
-        <td style="padding:9px 12px;color:${C.ink};border-bottom:1px solid #eae3cf;">${escapeHtml(r.clientEmail || '—')}</td>
-        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};border-bottom:1px solid #eae3cf;">Endereço</td>
-        <td style="padding:9px 12px;color:${C.ink};border-bottom:1px solid #eae3cf;">${escapeHtml(r.clientAddress || '—')}</td>
-      </tr>` : ''}
+      </tr>
       <tr>
-        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};">Executivo de Vendas</td>
+        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};">E-mail</td>
+        <td style="padding:9px 12px;color:${C.ink};">${escapeHtml(r.clientEmail || '—')}</td>
+        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};">Endereço</td>
+        <td style="padding:9px 12px;color:${C.ink};">${escapeHtml(r.clientAddress || '—')}</td>
+      </tr>
+    </table>
+
+    ${sectionTitle('Delta7', 'Executivo Responsável')}
+    <table style="width:100%;border-collapse:collapse;font-size:11px;border:1px solid #e7e2d2;border-radius:6px;overflow:hidden;">
+      <tr>
+        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};width:25%;">Executivo de Vendas</td>
         <td style="padding:9px 12px;color:${C.ink};">${escapeHtml(r.salesRepName)}</td>
-        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};">E-mail Delta7</td>
+        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};width:18%;">E-mail</td>
         <td style="padding:9px 12px;color:${C.ink};">${escapeHtml(r.salesRepEmail || '—')}</td>
       </tr>
     </table>
