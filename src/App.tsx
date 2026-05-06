@@ -19,6 +19,7 @@ import SignReport from "./pages/SignReport";
 import ValidateReport from "./pages/ValidateReport";
 import ValidateServiceOrder from "./pages/ValidateServiceOrder";
 import SignServiceOrder from "./pages/SignServiceOrder";
+import SignProposal from "./pages/SignProposal";
 
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminSetup from "./pages/admin/AdminSetup";
