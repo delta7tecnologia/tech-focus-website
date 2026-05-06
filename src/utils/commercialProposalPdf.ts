@@ -68,12 +68,13 @@ const ICONS: Record<string, string> = {
   eye: '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>',
 };
 
-const iconCircle = (name: string, size = 44) => `
-  <div style="width:${size}px;height:${size}px;border-radius:50%;background:${C.cream};border:1.5px solid ${C.gold};display:inline-block;text-align:center;line-height:${size}px;">
-    <svg width="${Math.round(size * 0.55)}" height="${Math.round(size * 0.55)}" viewBox="0 0 24 24" fill="none" stroke="${C.navy}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;">
-      ${ICONS[name] || ''}
-    </svg>
-  </div>`;
+const iconCircle = (name: string, size = 44) => {
+  const inner = Math.round(size * 0.55);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${inner}" height="${inner}" viewBox="0 0 24 24" fill="none" stroke="${C.navy}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[name] || ''}</svg>`;
+  const dataUrl = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+  const pad = Math.round((size - inner) / 2);
+  return `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${C.cream};border:1.5px solid ${C.navy};box-sizing:border-box;padding:${pad}px;"><img src="${dataUrl}" width="${inner}" height="${inner}" style="display:block;" alt="" /></div>`;
+};
 
 const sectionTitle = (eyebrow: string, title: string, mt = 26) => `
   <div style="margin:${mt}px 0 14px;">
