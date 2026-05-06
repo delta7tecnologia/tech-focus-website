@@ -247,19 +247,20 @@ function buildHtml(r: CommercialProposalPdfData): string {
     </table>
     <div style="height:2px;background:${C.gold};width:60px;margin-bottom:6px;"></div>
 
-    ${S.showAbout ? `${sectionTitle('Quem somos', 'Sobre a Delta7 Tecnologia', 18)}
+    ${S.showAbout ? `<div data-keep="1">${sectionTitle('Quem somos', 'Sobre a Delta7 Tecnologia', 18)}
     <p style="margin:0;line-height:1.75;text-align:justify;color:${C.ink};white-space:pre-line;">${escapeHtml(ABOUT_DELTA7)}</p>
-    ${kpisHtml}` : ''}
+    ${kpisHtml}</div>` : ''}
 
-    ${S.showBenefits ? `${sectionTitle('Vantagens', 'Por que Backup Online')}
-    ${benefitsHtml}` : ''}
+    ${S.showBenefits ? `<div data-keep="1">${sectionTitle('Vantagens', 'Por que Backup Online')}
+    ${benefitsHtml}</div>` : ''}
 
-    ${S.showInfra ? `${sectionTitle('Infraestrutura', 'Onde seus dados ficam')}
-    ${infraHtml}` : ''}
+    ${S.showInfra ? `<div data-keep="1">${sectionTitle('Infraestrutura', 'Onde seus dados ficam')}
+    ${infraHtml}</div>` : ''}
 
-    ${S.showIdealFor ? `${sectionTitle('Perfil ideal', 'Esta solução é ideal se...')}
-    ${idealHtml}` : ''}
+    ${S.showIdealFor ? `<div data-keep="1">${sectionTitle('Perfil ideal', 'Esta solução é ideal se...')}
+    ${idealHtml}</div>` : ''}
 
+    <div data-keep="1">
     ${sectionTitle('Cliente', 'Identificação do Cliente')}
     <table style="width:100%;border-collapse:collapse;font-size:11px;border:1px solid #e7e2d2;border-radius:6px;overflow:hidden;">
       <tr>
@@ -279,7 +280,9 @@ function buildHtml(r: CommercialProposalPdfData): string {
         <td style="padding:9px 12px;color:${C.ink};">${escapeHtml(r.clientAddress || '—')}</td>
       </tr>
     </table>
+    </div>
 
+    <div data-keep="1">
     ${sectionTitle('Delta7', 'Executivo Responsável')}
     <table style="width:100%;border-collapse:collapse;font-size:11px;border:1px solid #e7e2d2;border-radius:6px;overflow:hidden;">
       <tr>
@@ -289,6 +292,7 @@ function buildHtml(r: CommercialProposalPdfData): string {
         <td style="padding:9px 12px;color:${C.ink};">${escapeHtml(r.salesRepEmail || '—')}</td>
       </tr>
     </table>
+    </div>
 
     <div id="prop-financ-block" style="break-inside:avoid;page-break-inside:avoid;">
       ${sectionTitle('Investimento', 'Configuração inicial')}
