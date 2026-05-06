@@ -331,6 +331,39 @@ function buildHtml(r: CommercialProposalPdfData): string {
         </tbody>
       </table>
 
+      <table style="width:100%;border-collapse:separate;border-spacing:0;margin-top:14px;font-size:11px;border:1px solid #e7e2d2;border-radius:6px;overflow:hidden;">
+        <thead>
+          <tr style="background:${C.cream};">
+            <th colspan="2" style="padding:10px 14px;text-align:left;font-size:9.5px;letter-spacing:1.5px;text-transform:uppercase;font-weight:800;color:${C.navy};">Resumo do investimento</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:9px 14px;color:${C.ink};border-bottom:1px solid #eae3cf;">Subtotal mensal (itens)</td>
+            <td style="padding:9px 14px;text-align:right;color:${C.ink};border-bottom:1px solid #eae3cf;">${formatBRL(itemsSubtotal)}</td>
+          </tr>
+          ${discount > 0 ? `<tr>
+            <td style="padding:9px 14px;color:#b91c1c;border-bottom:1px solid #eae3cf;">(−) Desconto mensal</td>
+            <td style="padding:9px 14px;text-align:right;color:#b91c1c;font-weight:700;border-bottom:1px solid #eae3cf;">- ${formatBRL(discount)}</td>
+          </tr>` : ''}
+          <tr style="background:${C.paper};">
+            <td style="padding:10px 14px;color:${C.navy};font-weight:700;border-bottom:1px solid #eae3cf;">= Mensalidade recorrente</td>
+            <td style="padding:10px 14px;text-align:right;color:${C.navy};font-weight:800;border-bottom:1px solid #eae3cf;">${formatBRL(monthlyTotal)}</td>
+          </tr>
+          <tr>
+            <td style="padding:9px 14px;color:${C.ink};border-bottom:1px solid #eae3cf;">(+) Taxa de Ativação (cobrada uma única vez)</td>
+            <td style="padding:9px 14px;text-align:right;color:${C.ink};border-bottom:1px solid #eae3cf;">${formatBRL(activationFee)}</td>
+          </tr>
+          <tr style="background:${C.navy};color:#ffffff;">
+            <td style="padding:12px 14px;font-weight:700;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:#ffffff;background:${C.navy};">Investimento no 1º mês</td>
+            <td style="padding:12px 14px;text-align:right;font-weight:800;font-size:15px;color:#ffffff;background:${C.navy};">${formatBRL(firstMonthTotal)}</td>
+          </tr>
+          <tr>
+            <td colspan="2" style="padding:9px 14px;color:${C.muted};font-size:9.5px;font-style:italic;background:${C.cream};">A partir do 2º mês, o valor recorrente é de <strong style="color:${C.navy};font-style:normal;">${formatBRL(monthlyTotal)}/mês</strong>.</td>
+          </tr>
+        </tbody>
+      </table>
+
       <div style="margin-top:14px;padding:13px 16px;background:${C.cream};border-left:3px solid ${C.gold};border-radius:3px;font-size:10px;color:${C.ink};line-height:1.6;">
         <strong style="color:${C.navy};letter-spacing:0.5px;">Não inclusos:</strong> ${escapeHtml(NOT_INCLUDED)}
       </div>
