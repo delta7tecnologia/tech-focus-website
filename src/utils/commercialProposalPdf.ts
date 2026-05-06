@@ -433,11 +433,264 @@ function buildHtml(r: CommercialProposalPdfData): string {
 </div>`;
 }
 
+// ============================================================
+// MODELO 02 — Editorial / Clean / Minimalista
+// Linhas finas, muito espaço em branco, sem cards coloridos,
+// tipografia editorial. Sem QR Code (versão impressa).
+// ============================================================
+function buildHtmlMinimal(r: CommercialProposalPdfData): string {
+  const S = { ...DEFAULT_SECTIONS, ...(r.sections || {}) };
+  const itemsSubtotal = r.items.reduce((s, i) => s + (Number(i.qty) || 0) * (Number(i.unit_price) || 0), 0);
+  const discount = Number(r.discount) || 0;
+  const activationFee = Number(r.activationFee) || 0;
+  const monthlyTotal = itemsSubtotal - discount;
+  const firstMonthTotal = monthlyTotal + activationFee;
+
+  const NAVY = C.navy;
+  const INK = '#0f172a';
+  const MUTED = '#64748b';
+  const LINE = '#e2e8f0';
+
+  const eyebrow = (txt: string) => `<div style="font-size:9px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:${MUTED};margin-bottom:6px;">${escapeHtml(txt)}</div>`;
+  const h2 = (txt: string) => `<h2 style="font-size:20px;font-weight:600;color:${NAVY};margin:0 0 14px 0;letter-spacing:-0.4px;">${escapeHtml(txt)}</h2>`;
+  const hr = () => `<div style="height:1px;background:${LINE};margin:22px 0;"></div>`;
+  const section = (eb: string, title: string, body: string, mt = 24) =>
+    `<section style="margin-top:${mt}px;">${eyebrow(eb)}${h2(title)}${body}</section>`;
+
+  const itemRows = r.items.filter(i => i.qty > 0).map(i => `
+    <tr>
+      <td style="padding:11px 0;border-bottom:1px solid ${LINE};color:${INK};font-size:11px;">${escapeHtml(i.description)}</td>
+      <td style="padding:11px 0;border-bottom:1px solid ${LINE};text-align:center;color:${MUTED};font-size:11px;">${i.qty}</td>
+      <td style="padding:11px 0;border-bottom:1px solid ${LINE};text-align:right;color:${MUTED};font-size:11px;">${formatBRL(i.unit_price)}</td>
+      <td style="padding:11px 0;border-bottom:1px solid ${LINE};text-align:right;color:${INK};font-weight:600;font-size:11px;">${formatBRL(i.qty * i.unit_price)}</td>
+    </tr>`).join('') || `<tr><td colspan="4" style="padding:14px 0;text-align:center;color:${MUTED};font-style:italic;font-size:11px;">Nenhum item configurado</td></tr>`;
+
+  return `
+<div style="width:794px;font-family:'Helvetica',Arial,sans-serif;color:${INK};background:white;font-size:11px;line-height:1.6;">
+
+  <!-- ============ CAPA MINIMALISTA ============ -->
+  <div style="width:794px;height:1123px;background:white;padding:80px 70px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;page-break-after:always;border-top:6px solid ${NAVY};">
+
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <img src="${DELTA7_LOGO_DARK_DATA_URL}" alt="Delta7" style="height:54px;" />
+      <div style="text-align:right;">
+        <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:${MUTED};">Proposta Comercial</div>
+        <div style="font-size:11px;color:${INK};margin-top:6px;font-weight:600;">Nº ${escapeHtml(r.proposalNumber)}</div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:10px;letter-spacing:6px;text-transform:uppercase;color:${MUTED};margin-bottom:24px;">Backup Online · Continuidade</div>
+      <div style="font-size:64px;font-weight:300;color:${NAVY};line-height:1.05;letter-spacing:-2px;">
+        Tecnologia<br/>
+        que <span style="font-weight:600;">protege</span>
+      </div>
+      <div style="font-size:64px;font-weight:300;color:${INK};line-height:1.05;letter-spacing:-2px;">
+        a continuidade.
+      </div>
+      <div style="width:48px;height:2px;background:${NAVY};margin:36px 0 28px 0;"></div>
+      <div style="font-size:14px;color:${MUTED};max-width:540px;line-height:1.6;">
+        Solução Delta7 de backup em nuvem para infraestrutura crítica — proteção contínua, recuperação rápida e conformidade com a LGPD.
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;font-size:10px;color:${MUTED};border-top:1px solid ${LINE};padding-top:18px;">
+      <div>
+        <div style="letter-spacing:2px;text-transform:uppercase;font-size:8.5px;">Preparado para</div>
+        <div style="color:${INK};font-weight:600;font-size:13px;margin-top:4px;">${escapeHtml(r.clientName)}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="letter-spacing:2px;text-transform:uppercase;font-size:8.5px;">Emitida em</div>
+        <div style="color:${INK};font-weight:600;font-size:13px;margin-top:4px;">${fmtDate(r.generatedAt)}</div>
+        <div style="margin-top:2px;">Validade ${r.validityDays} dias</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MIOLO ============ -->
+  <div style="padding:50px 70px;box-sizing:border-box;">
+
+    <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;border-bottom:1px solid ${LINE};">
+      <img src="${DELTA7_LOGO_DARK_DATA_URL}" alt="Delta7" style="height:30px;" />
+      <div style="font-size:10px;color:${MUTED};letter-spacing:1.5px;text-transform:uppercase;">Proposta nº ${escapeHtml(r.proposalNumber)}</div>
+    </div>
+
+    ${S.showAbout ? section('01', 'A Delta7 Tecnologia', `
+      <p style="margin:0;color:${INK};text-align:justify;white-space:pre-line;font-size:11.5px;line-height:1.75;">${escapeHtml(ABOUT_DELTA7)}</p>
+      <table style="width:100%;margin-top:28px;border-collapse:collapse;">
+        <tr>
+          ${DELTA7_KPIS.map(k => `
+            <td style="text-align:left;padding-right:24px;border-left:2px solid ${NAVY};padding-left:14px;">
+              <div style="font-size:30px;font-weight:300;color:${NAVY};line-height:1;letter-spacing:-1px;">${escapeHtml(k.value)}</div>
+              <div style="font-size:9px;color:${MUTED};letter-spacing:1.5px;text-transform:uppercase;margin-top:6px;">${escapeHtml(k.label)}</div>
+            </td>`).join('')}
+        </tr>
+      </table>
+    `, 36) : ''}
+
+    ${S.showBenefits ? section('02', 'Por que Backup Online', `
+      <table style="width:100%;border-collapse:collapse;">
+        ${BENEFIT_CARDS.map((b, idx) => `
+          <tr>
+            <td style="padding:12px 0;border-bottom:1px solid ${LINE};vertical-align:top;width:36px;color:${MUTED};font-size:10px;font-weight:600;letter-spacing:1px;">${String(idx + 1).padStart(2, '0')}</td>
+            <td style="padding:12px 0;border-bottom:1px solid ${LINE};vertical-align:top;width:200px;color:${NAVY};font-weight:600;font-size:11.5px;">${escapeHtml(b.title)}</td>
+            <td style="padding:12px 0;border-bottom:1px solid ${LINE};vertical-align:top;color:${INK};font-size:11px;line-height:1.55;">${escapeHtml(b.text)}</td>
+          </tr>`).join('')}
+      </table>
+    `) : ''}
+
+    ${S.showInfra ? section('03', 'Infraestrutura', `
+      <table style="width:100%;border-collapse:collapse;">
+        <tr>
+          ${INFRA_HIGHLIGHTS.map(h => `
+            <td style="width:25%;padding:0 12px 0 0;vertical-align:top;">
+              <div style="border-top:2px solid ${NAVY};padding-top:14px;">
+                <div style="font-size:11.5px;font-weight:600;color:${NAVY};">${escapeHtml(h.title)}</div>
+                <div style="font-size:10.5px;color:${MUTED};line-height:1.55;margin-top:6px;">${escapeHtml(h.text)}</div>
+              </div>
+            </td>`).join('')}
+        </tr>
+      </table>
+    `) : ''}
+
+    ${S.showIdealFor ? section('04', 'Para quem é', `
+      <table style="width:100%;border-collapse:collapse;">
+        ${IDEAL_FOR.map((i, idx) => `
+          <tr>
+            <td style="padding:14px 0;border-bottom:1px solid ${LINE};vertical-align:top;width:50px;font-size:11px;color:${MUTED};font-weight:600;letter-spacing:1px;">${String(idx + 1).padStart(2, '0')}</td>
+            <td style="padding:14px 0;border-bottom:1px solid ${LINE};vertical-align:top;">
+              <div style="font-size:12px;font-weight:600;color:${NAVY};">${escapeHtml(i.title)}</div>
+              <div style="font-size:11px;color:${INK};line-height:1.6;margin-top:4px;">${escapeHtml(i.text)}</div>
+            </td>
+          </tr>`).join('')}
+      </table>
+    `) : ''}
+
+    ${section('05', 'Cliente & Executivo', `
+      <table style="width:100%;border-collapse:collapse;">
+        <tr>
+          <td style="width:50%;padding:0 24px 0 0;vertical-align:top;border-top:1px solid ${LINE};padding-top:16px;">
+            <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:${MUTED};margin-bottom:10px;">Cliente</div>
+            <div style="font-size:13px;font-weight:600;color:${NAVY};">${escapeHtml(r.clientName)}</div>
+            <div style="font-size:10.5px;color:${INK};margin-top:8px;line-height:1.7;">
+              ${r.clientDocument ? `<div><span style="color:${MUTED};">Documento:</span> ${escapeHtml(r.clientDocument)}</div>` : ''}
+              ${r.clientContact ? `<div><span style="color:${MUTED};">Contato:</span> ${escapeHtml(r.clientContact)}</div>` : ''}
+              ${r.clientEmail ? `<div><span style="color:${MUTED};">E-mail:</span> ${escapeHtml(r.clientEmail)}</div>` : ''}
+              ${r.clientAddress ? `<div><span style="color:${MUTED};">Endereço:</span> ${escapeHtml(r.clientAddress)}</div>` : ''}
+            </div>
+          </td>
+          <td style="width:50%;padding:0;vertical-align:top;border-top:1px solid ${LINE};padding-top:16px;">
+            <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:${MUTED};margin-bottom:10px;">Executivo Delta7</div>
+            <div style="font-size:13px;font-weight:600;color:${NAVY};">${escapeHtml(r.salesRepName)}</div>
+            <div style="font-size:10.5px;color:${INK};margin-top:8px;line-height:1.7;">
+              ${r.salesRepEmail ? `<div><span style="color:${MUTED};">E-mail:</span> ${escapeHtml(r.salesRepEmail)}</div>` : ''}
+              <div><span style="color:${MUTED};">Validade:</span> ${r.validityDays} dias</div>
+              <div><span style="color:${MUTED};">Emissão:</span> ${fmtDate(r.generatedAt)}</div>
+            </div>
+          </td>
+        </tr>
+      </table>
+    `)}
+
+    <div id="prop-financ-block" style="break-inside:avoid;page-break-inside:avoid;">
+      ${section('06', 'Investimento', `
+        <table style="width:100%;border-collapse:collapse;margin-top:8px;">
+          <thead>
+            <tr>
+              <th style="text-align:left;padding:0 0 10px 0;border-bottom:2px solid ${NAVY};font-size:9px;letter-spacing:2px;text-transform:uppercase;color:${MUTED};font-weight:600;">Item</th>
+              <th style="text-align:center;width:60px;padding:0 0 10px 0;border-bottom:2px solid ${NAVY};font-size:9px;letter-spacing:2px;text-transform:uppercase;color:${MUTED};font-weight:600;">Qtd</th>
+              <th style="text-align:right;width:120px;padding:0 0 10px 0;border-bottom:2px solid ${NAVY};font-size:9px;letter-spacing:2px;text-transform:uppercase;color:${MUTED};font-weight:600;">Unit.</th>
+              <th style="text-align:right;width:130px;padding:0 0 10px 0;border-bottom:2px solid ${NAVY};font-size:9px;letter-spacing:2px;text-transform:uppercase;color:${MUTED};font-weight:600;">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>${itemRows}</tbody>
+        </table>
+
+        <table style="width:100%;border-collapse:collapse;margin-top:22px;">
+          <tr>
+            <td style="padding:8px 0;color:${MUTED};font-size:11px;">Subtotal mensal</td>
+            <td style="padding:8px 0;text-align:right;color:${INK};font-size:11px;">${formatBRL(itemsSubtotal)}</td>
+          </tr>
+          ${discount > 0 ? `<tr>
+            <td style="padding:8px 0;color:${MUTED};font-size:11px;">Desconto</td>
+            <td style="padding:8px 0;text-align:right;color:#b91c1c;font-size:11px;">− ${formatBRL(discount)}</td>
+          </tr>` : ''}
+          <tr>
+            <td style="padding:14px 0 8px 0;border-top:1px solid ${LINE};color:${NAVY};font-size:12px;font-weight:600;">Mensalidade recorrente</td>
+            <td style="padding:14px 0 8px 0;border-top:1px solid ${LINE};text-align:right;color:${NAVY};font-size:18px;font-weight:600;letter-spacing:-0.5px;">${formatBRL(monthlyTotal)}</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;color:${MUTED};font-size:11px;">Taxa de ativação <span style="font-style:italic;">(única)</span></td>
+            <td style="padding:8px 0;text-align:right;color:${INK};font-size:11px;">${formatBRL(activationFee)}</td>
+          </tr>
+          <tr>
+            <td style="padding:14px 0;border-top:2px solid ${NAVY};color:${NAVY};font-size:10px;letter-spacing:2px;text-transform:uppercase;font-weight:600;">Investimento no 1º mês</td>
+            <td style="padding:14px 0;border-top:2px solid ${NAVY};text-align:right;color:${NAVY};font-size:22px;font-weight:600;letter-spacing:-0.8px;">${formatBRL(firstMonthTotal)}</td>
+          </tr>
+        </table>
+
+        <div style="margin-top:18px;padding:14px 0;border-top:1px solid ${LINE};font-size:10px;color:${MUTED};line-height:1.6;">
+          <strong style="color:${NAVY};font-weight:600;">Não inclusos:</strong> ${escapeHtml(NOT_INCLUDED)}
+        </div>
+
+        ${r.notes ? `<div style="margin-top:14px;padding:14px 0;border-top:1px solid ${LINE};font-size:11px;color:${INK};line-height:1.65;white-space:pre-line;"><strong style="color:${NAVY};font-weight:600;display:block;margin-bottom:4px;">Observações</strong>${escapeHtml(r.notes)}</div>` : ''}
+      `)}
+    </div>
+
+    <div id="prop-suporte-block" style="break-inside:avoid;page-break-inside:avoid;">
+      ${section('07', 'Suporte Técnico', `
+        <p style="margin:0;color:${INK};text-align:justify;white-space:pre-line;font-size:11px;line-height:1.7;">${escapeHtml(SUPPORT_TEXT)}</p>
+        ${S.showSupportReqs ? `<table style="width:100%;border-collapse:collapse;margin-top:18px;">
+          ${SUPPORT_REQUIREMENTS.map(t => `
+            <tr>
+              <td style="padding:8px 0;border-bottom:1px solid ${LINE};vertical-align:top;width:18px;color:${NAVY};font-size:11px;">·</td>
+              <td style="padding:8px 0;border-bottom:1px solid ${LINE};color:${INK};font-size:10.5px;line-height:1.55;">${escapeHtml(t)}</td>
+            </tr>`).join('')}
+        </table>` : ''}
+      `)}
+    </div>
+
+    ${S.showQuote ? `<div style="margin-top:36px;padding:0;">
+      <div style="font-family:Georgia,serif;font-style:italic;font-size:18px;line-height:1.5;color:${NAVY};font-weight:300;letter-spacing:-0.3px;">"${escapeHtml(INSTITUTIONAL_QUOTE.text)}"</div>
+      <div style="margin-top:14px;font-size:9.5px;color:${MUTED};letter-spacing:2px;text-transform:uppercase;">— ${escapeHtml(INSTITUTIONAL_QUOTE.author)}</div>
+    </div>` : ''}
+
+    <div id="prop-aceite-block" style="break-inside:avoid;page-break-inside:avoid;margin-top:40px;">
+      ${eyebrow('08')}
+      ${h2('Aceite')}
+      <p style="font-size:10.5px;color:${MUTED};margin:0 0 24px 0;line-height:1.65;">
+        Declaro estar de acordo com os termos, valores e condições apresentados nesta proposta, emitida em ${fmtDate(r.generatedAt)} com validade de ${r.validityDays} dias.
+      </p>
+      <table style="width:100%;border-collapse:collapse;margin-top:50px;">
+        <tr>
+          <td style="width:48%;padding-top:60px;border-top:1px solid ${INK};text-align:left;font-size:11px;color:${NAVY};font-weight:600;">
+            ${escapeHtml(r.clientName)}
+            <div style="font-weight:400;color:${MUTED};font-size:9px;letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;">Cliente</div>
+          </td>
+          <td style="width:4%;"></td>
+          <td style="width:48%;padding-top:60px;border-top:1px solid ${INK};text-align:left;font-size:11px;color:${NAVY};font-weight:600;">
+            Delta7 Tecnologia
+            <div style="font-weight:400;color:${MUTED};font-size:9px;letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;">${escapeHtml(r.salesRepName)} — Executivo</div>
+          </td>
+        </tr>
+      </table>
+
+      <div style="margin-top:40px;padding-top:14px;border-top:1px solid ${LINE};font-size:8.5px;color:${MUTED};line-height:1.6;text-align:center;letter-spacing:0.5px;">
+        Documento emitido eletronicamente pela plataforma Delta7 Tecnologia.<br/>
+        Verificação de autenticidade disponível mediante solicitação · ${escapeHtml(r.proposalNumber)}
+      </div>
+    </div>
+
+  </div>
+</div>`;
+}
+
 async function buildPdf(data: CommercialProposalPdfData): Promise<jsPDF> {
+  const template: ProposalTemplate = data.template || 'modelo01';
   const validationUrl = data.validationUrl
     || `${window.location.origin}/validar-proposta/${data.integrityHash}`;
   let qrCodeDataUrl = data.qrCodeDataUrl;
-  if (!qrCodeDataUrl) {
+  if (template === 'modelo01' && !qrCodeDataUrl) {
     try {
       qrCodeDataUrl = await QRCode.toDataURL(validationUrl, {
         margin: 1,
@@ -450,7 +703,9 @@ async function buildPdf(data: CommercialProposalPdfData): Promise<jsPDF> {
     }
   }
 
-  const html = buildHtml({ ...data, qrCodeDataUrl, validationUrl });
+  const html = template === 'modelo02'
+    ? buildHtmlMinimal({ ...data, qrCodeDataUrl, validationUrl })
+    : buildHtml({ ...data, qrCodeDataUrl, validationUrl });
   const wrap = document.createElement('div');
   wrap.style.position = 'fixed';
   wrap.style.left = '-10000px';
@@ -507,14 +762,16 @@ async function buildPdf(data: CommercialProposalPdfData): Promise<jsPDF> {
 
 export async function downloadCommercialProposalPdf(data: CommercialProposalPdfData) {
   const pdf = await buildPdf(data);
-  pdf.save(`Proposta_${data.proposalNumber}.pdf`);
+  const suffix = data.template === 'modelo02' ? '_Modelo02' : '';
+  pdf.save(`Proposta_${data.proposalNumber}${suffix}.pdf`);
 }
 
 export async function previewCommercialProposalPdf(data: CommercialProposalPdfData): Promise<string[]> {
+  const template: ProposalTemplate = data.template || 'modelo01';
   const validationUrl = data.validationUrl
     || `${window.location.origin}/validar-proposta/${data.integrityHash}`;
   let qrCodeDataUrl = data.qrCodeDataUrl;
-  if (!qrCodeDataUrl) {
+  if (template === 'modelo01' && !qrCodeDataUrl) {
     try {
       qrCodeDataUrl = await QRCode.toDataURL(validationUrl, {
         margin: 1, width: 220, errorCorrectionLevel: 'M',
@@ -522,7 +779,9 @@ export async function previewCommercialProposalPdf(data: CommercialProposalPdfDa
       });
     } catch {}
   }
-  const html = buildHtml({ ...data, qrCodeDataUrl, validationUrl });
+  const html = template === 'modelo02'
+    ? buildHtmlMinimal({ ...data, qrCodeDataUrl, validationUrl })
+    : buildHtml({ ...data, qrCodeDataUrl, validationUrl });
   const wrap = document.createElement('div');
   wrap.style.position = 'fixed';
   wrap.style.left = '-10000px';
