@@ -345,6 +345,10 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
         </CardContent>
       </Card>
 
+      {isEdit && proposal?.id && !proposal?.is_draft && (
+        <ProposalSignatureLinksManager proposalId={proposal.id} />
+      )}
+
       <div className="flex flex-wrap gap-2 justify-end sticky bottom-0 bg-white py-3 border-t">
         <Button variant="outline" onClick={onClose} disabled={saveMutation.isPending}>Cancelar</Button>
         <Button variant="outline" onClick={() => handlePreview('modelo01')} disabled={!!previewLoading || saveMutation.isPending}>
