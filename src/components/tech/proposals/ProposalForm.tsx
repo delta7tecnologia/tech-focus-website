@@ -97,6 +97,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
       discount,
       monthly_total: monthlyTotal,
       setup_total: activationFee,
+      sections: sections as any,
     };
   };
 
