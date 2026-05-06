@@ -58,7 +58,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
   const toggleSection = (key: keyof ProposalSections) =>
     setSections((s) => ({ ...s, [key]: !s[key] }));
 
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewPages, setPreviewPages] = useState<string[] | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
 
   const handlePreview = async () => {
@@ -70,7 +70,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
     setPreviewLoading(true);
     try {
       const payload = buildPayload();
-      const url = await previewCommercialProposalPdf({
+      const pages = await previewCommercialProposalPdf({
         proposalNumber: proposal?.proposal_number || 'PRÉVIA',
         generatedAt: new Date().toISOString(),
         validityDays: payload.validity_days,
@@ -88,8 +88,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
         integrityHash: proposal?.integrity_hash || 'previa-sem-hash-de-integridade'.padEnd(64, '0'),
         sections,
       });
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
-      setPreviewUrl(url);
+      setPreviewPages(pages);
     } catch (e: any) {
       toast({ title: 'Erro na prévia', description: e.message, variant: 'destructive' });
     } finally {
