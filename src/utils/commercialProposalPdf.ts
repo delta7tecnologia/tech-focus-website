@@ -94,7 +94,7 @@ const goldRule = (mt = 14, mb = 14) => `
   <div style="height:1px;margin:${mt}px 0 ${mb}px;background:linear-gradient(to right,transparent,${C.gold},transparent);"></div>`;
 
 const kpiCard = (value: string, label: string) => `
-  <div style="flex:1;padding:14px 12px;background:${C.paper};border:1px solid #e7e2d2;border-top:2px solid ${C.gold};border-radius:4px;text-align:center;">
+  <div style="flex:1;padding:14px 12px;background:${C.paper};border:1px solid #e7e2d2;border-top:2px solid ${C.gold};border-radius:4px;text-align:center;break-inside:avoid;page-break-inside:avoid;">
     <div style="font-size:30px;font-weight:800;color:${C.navy};line-height:1;letter-spacing:-1px;">
       <span style="color:${C.gold};">${escapeHtml(value)}</span>
     </div>
@@ -247,19 +247,20 @@ function buildHtml(r: CommercialProposalPdfData): string {
     </table>
     <div style="height:2px;background:${C.gold};width:60px;margin-bottom:6px;"></div>
 
-    ${S.showAbout ? `${sectionTitle('Quem somos', 'Sobre a Delta7 Tecnologia', 18)}
+    ${S.showAbout ? `<div data-keep="1">${sectionTitle('Quem somos', 'Sobre a Delta7 Tecnologia', 18)}
     <p style="margin:0;line-height:1.75;text-align:justify;color:${C.ink};white-space:pre-line;">${escapeHtml(ABOUT_DELTA7)}</p>
-    ${kpisHtml}` : ''}
+    ${kpisHtml}</div>` : ''}
 
-    ${S.showBenefits ? `${sectionTitle('Vantagens', 'Por que Backup Online')}
-    ${benefitsHtml}` : ''}
+    ${S.showBenefits ? `<div data-keep="1">${sectionTitle('Vantagens', 'Por que Backup Online')}
+    ${benefitsHtml}</div>` : ''}
 
-    ${S.showInfra ? `${sectionTitle('Infraestrutura', 'Onde seus dados ficam')}
-    ${infraHtml}` : ''}
+    ${S.showInfra ? `<div data-keep="1">${sectionTitle('Infraestrutura', 'Onde seus dados ficam')}
+    ${infraHtml}</div>` : ''}
 
-    ${S.showIdealFor ? `${sectionTitle('Perfil ideal', 'Esta solução é ideal se...')}
-    ${idealHtml}` : ''}
+    ${S.showIdealFor ? `<div data-keep="1">${sectionTitle('Perfil ideal', 'Esta solução é ideal se...')}
+    ${idealHtml}</div>` : ''}
 
+    <div data-keep="1">
     ${sectionTitle('Cliente', 'Identificação do Cliente')}
     <table style="width:100%;border-collapse:collapse;font-size:11px;border:1px solid #e7e2d2;border-radius:6px;overflow:hidden;">
       <tr>
@@ -279,7 +280,9 @@ function buildHtml(r: CommercialProposalPdfData): string {
         <td style="padding:9px 12px;color:${C.ink};">${escapeHtml(r.clientAddress || '—')}</td>
       </tr>
     </table>
+    </div>
 
+    <div data-keep="1">
     ${sectionTitle('Delta7', 'Executivo Responsável')}
     <table style="width:100%;border-collapse:collapse;font-size:11px;border:1px solid #e7e2d2;border-radius:6px;overflow:hidden;">
       <tr>
@@ -289,6 +292,7 @@ function buildHtml(r: CommercialProposalPdfData): string {
         <td style="padding:9px 12px;color:${C.ink};">${escapeHtml(r.salesRepEmail || '—')}</td>
       </tr>
     </table>
+    </div>
 
     <div id="prop-financ-block" style="break-inside:avoid;page-break-inside:avoid;">
       ${sectionTitle('Investimento', 'Configuração inicial')}
@@ -455,7 +459,7 @@ function buildHtmlMinimal(r: CommercialProposalPdfData): string {
   const h2 = (txt: string) => `<h2 style="font-size:20px;font-weight:600;color:${NAVY};margin:0 0 14px 0;letter-spacing:-0.4px;">${escapeHtml(txt)}</h2>`;
   const hr = () => `<div style="height:1px;background:${LINE};margin:22px 0;"></div>`;
   const section = (eb: string, title: string, body: string, mt = 24) =>
-    `<section style="margin-top:${mt}px;">${eyebrow(eb)}${h2(title)}${body}</section>`;
+    `<section data-keep="1" style="margin-top:${mt}px;">${eyebrow(eb)}${h2(title)}${body}</section>`;
 
   const itemRows = r.items.filter(i => i.qty > 0).map(i => `
     <tr>
@@ -721,19 +725,25 @@ async function buildPdf(data: CommercialProposalPdfData): Promise<jsPDF> {
     const pxPerMM = node.offsetWidth / pageWidthMM;
     const pageHeightPx = pageHeightMM * pxPerMM;
 
-    const tryPushAcross = (id: string, baseMargin = 24) => {
-      const el = node.querySelector(`#${id}`) as HTMLElement | null;
-      if (!el) return;
+    const pushElement = (el: HTMLElement, baseMargin: number) => {
       const top = el.offsetTop;
       const bottom = top + el.offsetHeight;
       const startPage = Math.floor(top / pageHeightPx);
       const endPage = Math.floor((bottom - 1) / pageHeightPx);
-      if (endPage > startPage) {
+      // Only push if it crosses AND fits in a single page
+      if (endPage > startPage && el.offsetHeight < pageHeightPx - 40) {
         const nextPageStart = (startPage + 1) * pageHeightPx;
         const extraPx = nextPageStart - top + 8;
-        el.style.marginTop = `${extraPx + baseMargin}px`;
+        const current = parseFloat(el.style.marginTop || '0') || 0;
+        el.style.marginTop = `${current + extraPx + baseMargin}px`;
       }
     };
+    const tryPushAcross = (id: string, baseMargin = 24) => {
+      const el = node.querySelector(`#${id}`) as HTMLElement | null;
+      if (el) pushElement(el, baseMargin);
+    };
+    // Generic: any element with data-keep also avoids breaks
+    node.querySelectorAll<HTMLElement>('[data-keep="1"]').forEach((el) => pushElement(el, 8));
     tryPushAcross('prop-financ-block', 8);
     tryPushAcross('prop-suporte-block', 8);
     tryPushAcross('prop-aceite-block', 12);
@@ -812,19 +822,23 @@ export async function previewCommercialProposalPdf(data: CommercialProposalPdfDa
     const pageHeightMM = 297;
     const pxPerMM = node.offsetWidth / pageWidthMM;
     const pageHeightPx = pageHeightMM * pxPerMM;
-    const tryPushAcross = (id: string, baseMargin = 24) => {
-      const el = node.querySelector(`#${id}`) as HTMLElement | null;
-      if (!el) return;
+    const pushElement = (el: HTMLElement, baseMargin: number) => {
       const top = el.offsetTop;
       const bottom = top + el.offsetHeight;
       const startPage = Math.floor(top / pageHeightPx);
       const endPage = Math.floor((bottom - 1) / pageHeightPx);
-      if (endPage > startPage) {
+      if (endPage > startPage && el.offsetHeight < pageHeightPx - 40) {
         const nextPageStart = (startPage + 1) * pageHeightPx;
         const extraPx = nextPageStart - top + 8;
-        el.style.marginTop = `${extraPx + baseMargin}px`;
+        const current = parseFloat(el.style.marginTop || '0') || 0;
+        el.style.marginTop = `${current + extraPx + baseMargin}px`;
       }
     };
+    const tryPushAcross = (id: string, baseMargin = 24) => {
+      const el = node.querySelector(`#${id}`) as HTMLElement | null;
+      if (el) pushElement(el, baseMargin);
+    };
+    node.querySelectorAll<HTMLElement>('[data-keep="1"]').forEach((el) => pushElement(el, 8));
     tryPushAcross('prop-financ-block', 8);
     tryPushAcross('prop-suporte-block', 8);
     tryPushAcross('prop-aceite-block', 12);

@@ -12,6 +12,7 @@ import { Loader2, Save, FileDown, Eye } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import ProposalItemsEditor, { type EditableItem } from './ProposalItemsEditor';
+import ProposalSignatureLinksManager from './ProposalSignatureLinksManager';
 import {
   ACTIVATION_FEE_DEFAULT,
   VALIDITY_DAYS_DEFAULT,
@@ -343,6 +344,10 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
           <Textarea rows={4} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Informações adicionais para o cliente (opcional)" />
         </CardContent>
       </Card>
+
+      {isEdit && proposal?.id && !proposal?.is_draft && (
+        <ProposalSignatureLinksManager proposalId={proposal.id} />
+      )}
 
       <div className="flex flex-wrap gap-2 justify-end sticky bottom-0 bg-white py-3 border-t">
         <Button variant="outline" onClick={onClose} disabled={saveMutation.isPending}>Cancelar</Button>

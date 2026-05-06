@@ -463,6 +463,62 @@ export type Database = {
         }
         Relationships: []
       }
+      proposal_signature_links: {
+        Row: {
+          created_at: string
+          created_by: string
+          expires_at: string
+          id: string
+          proposal_id: string
+          signature_data: string | null
+          signed_at: string | null
+          signed_ip: string | null
+          signer_email: string | null
+          signer_name: string | null
+          signer_role: string
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          expires_at?: string
+          id?: string
+          proposal_id: string
+          signature_data?: string | null
+          signed_at?: string | null
+          signed_ip?: string | null
+          signer_email?: string | null
+          signer_name?: string | null
+          signer_role: string
+          token: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          expires_at?: string
+          id?: string
+          proposal_id?: string
+          signature_data?: string | null
+          signed_at?: string | null
+          signed_ip?: string | null
+          signer_email?: string | null
+          signer_name?: string | null
+          signer_role?: string
+          token?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proposal_signature_links_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_proposals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       report_signature_links: {
         Row: {
           created_at: string
