@@ -157,12 +157,7 @@ function buildHtml(r: CommercialProposalPdfData): string {
       <tr>${INFRA_HIGHLIGHTS.map(h => infraRow(h.icon, h.title, h.text)).join('')}</tr>
     </table>`;
 
-  // Tech stack
-  const stackHtml = `
-    <div style="background:${C.cream};border:1px solid #e7e2d2;border-radius:8px;padding:18px 22px;text-align:center;">
-      <div style="font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:${C.gold};margin-bottom:10px;">Stack & Tecnologias</div>
-      <div>${TECH_STACK.map(chip).join('')}</div>
-    </div>`;
+  // Tech stack removido a pedido
 
   // Ideal for — 2 colunas
   const idealHtml = `
