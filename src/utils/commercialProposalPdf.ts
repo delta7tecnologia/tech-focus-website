@@ -507,8 +507,65 @@ export async function downloadCommercialProposalPdf(data: CommercialProposalPdfD
   pdf.save(`Proposta_${data.proposalNumber}.pdf`);
 }
 
-export async function previewCommercialProposalPdf(data: CommercialProposalPdfData): Promise<string> {
-  const pdf = await buildPdf(data);
-  const blob = pdf.output('blob');
-  return URL.createObjectURL(blob);
+export async function previewCommercialProposalPdf(data: CommercialProposalPdfData): Promise<string[]> {
+  const validationUrl = data.validationUrl
+    || `${window.location.origin}/validar-proposta/${data.integrityHash}`;
+  let qrCodeDataUrl = data.qrCodeDataUrl;
+  if (!qrCodeDataUrl) {
+    try {
+      qrCodeDataUrl = await QRCode.toDataURL(validationUrl, {
+        margin: 1, width: 220, errorCorrectionLevel: 'M',
+        color: { dark: '#0a1f44', light: '#ffffff' },
+      });
+    } catch {}
+  }
+  const html = buildHtml({ ...data, qrCodeDataUrl, validationUrl });
+  const wrap = document.createElement('div');
+  wrap.style.position = 'fixed';
+  wrap.style.left = '-10000px';
+  wrap.style.top = '0';
+  wrap.innerHTML = html;
+  document.body.appendChild(wrap);
+  try {
+    const node = wrap.firstElementChild as HTMLElement;
+    const pageWidthMM = 210;
+    const pageHeightMM = 297;
+    const pxPerMM = node.offsetWidth / pageWidthMM;
+    const pageHeightPx = pageHeightMM * pxPerMM;
+    const tryPushAcross = (id: string, baseMargin = 24) => {
+      const el = node.querySelector(`#${id}`) as HTMLElement | null;
+      if (!el) return;
+      const top = el.offsetTop;
+      const bottom = top + el.offsetHeight;
+      const startPage = Math.floor(top / pageHeightPx);
+      const endPage = Math.floor((bottom - 1) / pageHeightPx);
+      if (endPage > startPage) {
+        const nextPageStart = (startPage + 1) * pageHeightPx;
+        const extraPx = nextPageStart - top + 8;
+        el.style.marginTop = `${extraPx + baseMargin}px`;
+      }
+    };
+    tryPushAcross('prop-financ-block', 8);
+    tryPushAcross('prop-suporte-block', 8);
+    tryPushAcross('prop-aceite-block', 12);
+
+    const canvas = await html2canvas(node, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+    const slicePxPerMM = canvas.width / pageWidthMM;
+    const slicePageH = Math.round(pageHeightMM * slicePxPerMM);
+    const pages: string[] = [];
+    for (let y = 0; y < canvas.height; y += slicePageH) {
+      const h = Math.min(slicePageH, canvas.height - y);
+      const slice = document.createElement('canvas');
+      slice.width = canvas.width;
+      slice.height = h;
+      const ctx = slice.getContext('2d')!;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, slice.width, slice.height);
+      ctx.drawImage(canvas, 0, y, canvas.width, h, 0, 0, canvas.width, h);
+      pages.push(slice.toDataURL('image/jpeg', 0.85));
+    }
+    return pages;
+  } finally {
+    document.body.removeChild(wrap);
+  }
 }
