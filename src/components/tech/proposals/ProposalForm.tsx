@@ -342,31 +342,26 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
         </Button>
       </div>
 
-      <Dialog open={!!previewUrl} onOpenChange={(o) => { if (!o) { if (previewUrl) URL.revokeObjectURL(previewUrl); setPreviewUrl(null); } }}>
+      <Dialog open={!!previewPages} onOpenChange={(o) => { if (!o) setPreviewPages(null); }}>
         <DialogContent className="max-w-5xl w-[95vw] h-[90vh] flex flex-col p-0">
           <DialogHeader className="px-6 py-3 border-b flex-row items-center justify-between gap-4 space-y-0">
-            <DialogTitle className="text-blue-900">Prévia da Proposta</DialogTitle>
-            {previewUrl && (
-              <a
-                href={previewUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-blue-700 hover:underline mr-8"
-              >
-                Abrir em nova aba ↗
-              </a>
-            )}
+            <DialogTitle className="text-blue-900">
+              Prévia da Proposta {previewPages ? `· ${previewPages.length} página(s)` : ''}
+            </DialogTitle>
+            <span className="text-xs text-gray-500 mr-8">Visualização aproximada — finalize para baixar o PDF</span>
           </DialogHeader>
-          {previewUrl && (
-            <object data={previewUrl} type="application/pdf" className="flex-1 w-full">
-              <div className="p-8 text-center text-sm text-gray-600">
-                Seu navegador não conseguiu exibir o PDF embutido.{' '}
-                <a href={previewUrl} target="_blank" rel="noopener noreferrer" className="text-blue-700 underline">
-                  Clique aqui para abrir em nova aba
-                </a>.
-              </div>
-            </object>
-          )}
+          <div className="flex-1 overflow-auto bg-gray-200 p-4">
+            <div className="mx-auto max-w-3xl space-y-4">
+              {previewPages?.map((src, i) => (
+                <img
+                  key={i}
+                  src={src}
+                  alt={`Página ${i + 1}`}
+                  className="w-full block bg-white shadow-lg rounded"
+                />
+              ))}
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
