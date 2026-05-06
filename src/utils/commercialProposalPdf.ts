@@ -299,7 +299,7 @@ function buildHtml(r: CommercialProposalPdfData): string {
             <td style="padding:11px 14px;color:${C.ink};">Ativação do Serviço (taxa única)</td>
             <td style="padding:11px 14px;text-align:center;color:${C.ink};">1</td>
             <td style="padding:11px 14px;text-align:right;color:${C.ink};">${formatBRL(r.activationFee)}</td>
-            <td style="padding:11px 14px;text-align:right;font-weight:800;color:${C.gold};">${formatBRL(r.activationFee)}</td>
+            <td style="padding:11px 14px;text-align:right;font-weight:800;color:${C.navy};">${formatBRL(r.activationFee)}</td>
           </tr>
         </tbody>
       </table>
@@ -320,9 +320,9 @@ function buildHtml(r: CommercialProposalPdfData): string {
             <td colspan="3" style="padding:10px 14px;text-align:right;color:#b91c1c;border-bottom:1px solid #eae3cf;">Desconto</td>
             <td style="padding:10px 14px;text-align:right;color:#b91c1c;font-weight:700;border-bottom:1px solid #eae3cf;">- ${formatBRL(r.discount)}</td>
           </tr>` : ''}
-          <tr style="background:linear-gradient(90deg,${C.navy},${C.navyDeep});color:white;">
-            <td colspan="3" style="padding:14px;text-align:right;font-weight:700;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;">Custo Mensal Total</td>
-            <td style="padding:14px;text-align:right;font-weight:800;font-size:18px;color:${C.gold};letter-spacing:-0.3px;">${formatBRL(monthlyTotal)}</td>
+          <tr style="background:${C.navy};color:#ffffff;">
+            <td colspan="3" style="padding:14px;text-align:right;font-weight:700;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#ffffff;background:${C.navy};">Custo Mensal Total</td>
+            <td style="padding:14px;text-align:right;font-weight:800;font-size:18px;color:#ffffff;letter-spacing:-0.3px;background:${C.navy};">${formatBRL(monthlyTotal)}</td>
           </tr>
         </tbody>
       </table>
