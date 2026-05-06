@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
-import { Loader2, Save, FileDown } from 'lucide-react';
+import { Loader2, Save, FileDown, Eye } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import ProposalItemsEditor, { type EditableItem } from './ProposalItemsEditor';
 import {
@@ -22,7 +23,7 @@ import {
 } from '@/lib/proposalContent';
 import { validateDocument, formatDocument } from '@/lib/validators/document';
 import { sha256Hex } from '@/utils/reportHash';
-import { downloadCommercialProposalPdf } from '@/utils/commercialProposalPdf';
+import { downloadCommercialProposalPdf, previewCommercialProposalPdf } from '@/utils/commercialProposalPdf';
 
 interface Props {
   proposal?: any;
