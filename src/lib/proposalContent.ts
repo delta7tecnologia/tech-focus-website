@@ -7,16 +7,16 @@ Nossa metodologia de trabalho garante entregas precisas em todos os projetos, co
 
 Atuamos com atendimento remoto em todo o Brasil e presencial na região Norte, sempre focados em oferecer soluções sob medida que atendam às necessidades específicas de cada negócio.`;
 
-// Paleta Navy & Gold
+// Paleta Navy & Slate (sem dourado)
 export const PROP_COLORS = {
   navy: '#0a1f44',
   navyDeep: '#142a5c',
-  gold: '#c9a84c',
-  goldLight: '#e6c875',
-  cream: '#f5f0e0',
+  gold: '#475569',      // alias mantido — agora slate
+  goldLight: '#94a3b8', // alias mantido — agora slate claro
+  cream: '#f1f5f9',     // slate-100
   ink: '#1a2540',
-  muted: '#5b6478',
-  paper: '#fbfaf6',
+  muted: '#64748b',
+  paper: '#f8fafc',
 };
 
 export const DELTA7_KPIS: { value: string; label: string }[] = [
