@@ -48,7 +48,10 @@ export interface CommercialProposalPdfData {
   validationUrl?: string;
   qrCodeDataUrl?: string;
   sections?: ProposalSections;
+  template?: 'modelo01' | 'modelo02';
 }
+
+export type ProposalTemplate = 'modelo01' | 'modelo02';
 
 const fmtDate = (iso?: string) =>
   iso ? new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }) : '—';
