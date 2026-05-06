@@ -50,6 +50,7 @@ export interface CommercialProposalPdfData {
   qrCodeDataUrl?: string;
   sections?: ProposalSections;
   template?: 'modelo01' | 'modelo02';
+  showAltatekLogo?: boolean;
 }
 
 export type ProposalTemplate = 'modelo01' | 'modelo02';
