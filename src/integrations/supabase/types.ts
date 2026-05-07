@@ -280,6 +280,158 @@ export type Database = {
         }
         Relationships: []
       }
+      it_support_proposal_signature_links: {
+        Row: {
+          created_at: string
+          created_by: string
+          expires_at: string
+          id: string
+          proposal_id: string
+          signature_data: string | null
+          signed_at: string | null
+          signed_ip: string | null
+          signer_email: string | null
+          signer_name: string | null
+          signer_role: string
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          expires_at?: string
+          id?: string
+          proposal_id: string
+          signature_data?: string | null
+          signed_at?: string | null
+          signed_ip?: string | null
+          signer_email?: string | null
+          signer_name?: string | null
+          signer_role: string
+          token: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          expires_at?: string
+          id?: string
+          proposal_id?: string
+          signature_data?: string | null
+          signed_at?: string | null
+          signed_ip?: string | null
+          signer_email?: string | null
+          signer_name?: string | null
+          signer_role?: string
+          token?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "it_support_proposal_signature_links_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "it_support_proposals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      it_support_proposals: {
+        Row: {
+          audit_log: Json
+          client_address: string | null
+          client_contact: string | null
+          client_document: string | null
+          client_email: string | null
+          client_name: string
+          contract_months: number
+          created_at: string
+          created_by: string
+          discount: number
+          generated_at: string
+          id: string
+          integrity_hash: string | null
+          is_draft: boolean
+          items: Json
+          locked: boolean
+          monthly_total: number
+          notes: string | null
+          proposal_number: string
+          proposal_seq: number | null
+          sales_rep_email: string | null
+          sales_rep_name: string
+          sections: Json | null
+          setup_fee: number
+          setup_total: number
+          show_altatek_logo: boolean
+          status: string
+          updated_at: string
+          validity_days: number
+        }
+        Insert: {
+          audit_log?: Json
+          client_address?: string | null
+          client_contact?: string | null
+          client_document?: string | null
+          client_email?: string | null
+          client_name: string
+          contract_months?: number
+          created_at?: string
+          created_by: string
+          discount?: number
+          generated_at?: string
+          id?: string
+          integrity_hash?: string | null
+          is_draft?: boolean
+          items?: Json
+          locked?: boolean
+          monthly_total?: number
+          notes?: string | null
+          proposal_number?: string
+          proposal_seq?: number | null
+          sales_rep_email?: string | null
+          sales_rep_name: string
+          sections?: Json | null
+          setup_fee?: number
+          setup_total?: number
+          show_altatek_logo?: boolean
+          status?: string
+          updated_at?: string
+          validity_days?: number
+        }
+        Update: {
+          audit_log?: Json
+          client_address?: string | null
+          client_contact?: string | null
+          client_document?: string | null
+          client_email?: string | null
+          client_name?: string
+          contract_months?: number
+          created_at?: string
+          created_by?: string
+          discount?: number
+          generated_at?: string
+          id?: string
+          integrity_hash?: string | null
+          is_draft?: boolean
+          items?: Json
+          locked?: boolean
+          monthly_total?: number
+          notes?: string | null
+          proposal_number?: string
+          proposal_seq?: number | null
+          sales_rep_email?: string | null
+          sales_rep_name?: string
+          sections?: Json | null
+          setup_fee?: number
+          setup_total?: number
+          show_altatek_logo?: boolean
+          status?: string
+          updated_at?: string
+          validity_days?: number
+        }
+        Relationships: []
+      }
       licenses: {
         Row: {
           activated_at: string | null
