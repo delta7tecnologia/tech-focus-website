@@ -14,6 +14,7 @@ import TechAssetViewer from './TechAssetViewer';
 import TechReports from './reports/TechReports';
 import ServiceOrders from './service-orders/ServiceOrders';
 import CommercialProposals from './proposals/CommercialProposals';
+import ItSupportProposals from './it-support/ItSupportProposals';
 import UploadOrLinkInput, { detectExternalProvider, type SourceMode } from './UploadOrLinkInput';
 
 const TechFileManager = () => {
@@ -183,7 +184,10 @@ const TechFileManager = () => {
             <ClipboardList className="w-4 h-4" /> Ordens de Serviço
           </TabsTrigger>
           <TabsTrigger value="proposals" className="gap-2">
-            <Briefcase className="w-4 h-4" /> Propostas
+            <Briefcase className="w-4 h-4" /> Propostas Backup
+          </TabsTrigger>
+          <TabsTrigger value="it-support" className="gap-2">
+            <Briefcase className="w-4 h-4" /> Propostas Suporte TI
           </TabsTrigger>
         </TabsList>
 
@@ -315,6 +319,10 @@ const TechFileManager = () => {
 
         <TabsContent value="proposals" className="mt-4">
           <CommercialProposals />
+        </TabsContent>
+
+        <TabsContent value="it-support" className="mt-4">
+          <ItSupportProposals />
         </TabsContent>
       </Tabs>
     </div>
