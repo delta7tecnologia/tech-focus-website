@@ -184,7 +184,10 @@ const TechFileManager = () => {
             <ClipboardList className="w-4 h-4" /> Ordens de Serviço
           </TabsTrigger>
           <TabsTrigger value="proposals" className="gap-2">
-            <Briefcase className="w-4 h-4" /> Propostas
+            <Briefcase className="w-4 h-4" /> Propostas Backup
+          </TabsTrigger>
+          <TabsTrigger value="it-support" className="gap-2">
+            <Briefcase className="w-4 h-4" /> Propostas Suporte TI
           </TabsTrigger>
         </TabsList>
 
