@@ -45,25 +45,10 @@ const SignServiceOrder = () => {
       if (!data) throw new Error('Sem dados');
       if (!signature) throw new Error('Assine no campo abaixo');
       if (!name.trim()) throw new Error('Informe seu nome completo');
-
-      const { link, os } = data;
-      const now = new Date().toISOString();
-
-      // Atualiza OS com assinatura presencial
-      const update: any = {
-        signer_name: name,
-        signer_role: role || os.signer_role,
-        signature_data: signature,
-        signed_at: now,
-      };
-      const { error: u1 } = await supabase.from('service_orders').update(update).eq('id', os.id);
-      if (u1) throw u1;
-
-      const { error: u2 } = await supabase
-        .from('service_order_signature_links')
-        .update({ signed_at: now, signature_data: signature, signer_name: name })
-        .eq('id', link.id);
-      if (u2) throw u2;
+      const { error: rpcErr } = await (supabase as any).rpc('sign_service_order_signature_link', {
+        p_token: token, p_signature: signature, p_name: name, p_role: role || null,
+      });
+      if (rpcErr) throw rpcErr;
     },
     onSuccess: () => {
       toast({ title: 'Assinatura registrada!', description: 'Obrigado, seu aceite foi gravado.' });
