@@ -25,7 +25,9 @@ export const SUP_KPIS: { value: string; label: string }[] = [
   { value: '99,9%', label: 'disponibilidade' },
 ];
 
-export const SUP_BENEFITS: { title: string; text: string; icon: 'platform' | 'cloud' | 'ransom' | 'auto' | 'retention' | 'panel' | 'bell' | 'support' }[] = [
+export type SupBenefitIcon = 'platform' | 'cloud' | 'ransom' | 'auto' | 'retention' | 'panel' | 'bell' | 'support' | 'lock' | 'shield' | 'eye';
+
+export const SUP_BENEFITS: { title: string; text: string; icon: SupBenefitIcon }[] = [
   { icon: 'support', title: 'Time especializado', text: 'Acesso a equipe multidisciplinar em servidores, redes, cloud e segurança — sem custo de contratação.' },
   { icon: 'auto', title: 'Foco no seu negócio', text: 'Você delega a TI e direciona energia para o que realmente importa: o crescimento da empresa.' },
   { icon: 'platform', title: 'Redução de custos', text: 'Custo previsível e menor que manter equipe interna, com escala e maturidade de processos.' },
