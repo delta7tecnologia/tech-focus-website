@@ -4,6 +4,7 @@ import html2canvas from 'html2canvas';
 import { escapeHtml } from './reportNarrative';
 import { DELTA7_LOGO_DATA_URL, DELTA7_LOGO_DARK_DATA_URL } from '@/assets/delta7LogoBase64';
 import { DELL_EXPERT_LOGO_DATA_URL } from '@/assets/dellExpertLogoBase64';
+import { DELL_EXPERT_LOGO_SQUARE_DATA_URL } from '@/assets/dellExpertLogoSquareBase64';
 import {
   ABOUT_DELTA7_SUP,
   SUP_NOT_INCLUDED,
@@ -212,9 +213,12 @@ function buildHtml(r: ItSupportProposalPdfData): string {
       <img src="${DELTA7_LOGO_DATA_URL}" alt="Delta7" style="height:70px;" />
       <div style="text-align:right;">
         <div style="font-size:10px;color:${C.goldLight};letter-spacing:3px;text-transform:uppercase;">Delta7 Tecnologia</div>
-        ${r.showAltatekLogo ? `<div style="margin-top:14px;display:inline-block;background:rgba(255,255,255,0.95);padding:8px 12px;border-radius:6px;border:1px solid ${C.gold};">
-          <div style="font-size:7px;letter-spacing:2px;text-transform:uppercase;color:${C.navy};font-weight:700;margin-bottom:4px;text-align:center;">Consultor Autorizado</div>
-          <img src="${DELL_EXPERT_LOGO_DATA_URL}" alt="Dell Expert Network" style="height:30px;display:block;" />
+        ${r.showAltatekLogo ? `<div style="margin-top:14px;display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,0.06);padding:8px 12px 8px 8px;border-radius:8px;border:1px solid ${C.gold};">
+          <img src="${DELL_EXPERT_LOGO_SQUARE_DATA_URL}" alt="Dell Expert Network" style="height:44px;width:44px;display:block;border-radius:6px;" />
+          <div style="text-align:left;">
+            <div style="font-size:7px;letter-spacing:2px;text-transform:uppercase;color:${C.goldLight};font-weight:700;">Consultor Autorizado</div>
+            <div style="font-size:11px;color:#ffffff;font-weight:700;letter-spacing:0.5px;margin-top:2px;">Dell Expert Network</div>
+          </div>
         </div>` : ''}
       </div>
     </div>
