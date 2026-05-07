@@ -325,8 +325,8 @@ const ItSupportProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
             <label className="flex items-center gap-3 p-3 rounded-md border border-gray-200 hover:border-blue-300 cursor-pointer transition-colors">
               <Checkbox checked={showAltatekLogo} onCheckedChange={(v) => setShowAltatekLogo(!!v)} />
               <div className="flex-1">
-                <div className="text-sm font-medium text-gray-800">Exibir selo "Revenda Autorizada Altatek"</div>
-                <div className="text-xs text-gray-500">Inclui a logo Altatek na capa do PDF.</div>
+                <div className="text-sm font-medium text-gray-800">Exibir selo "Consultor Autorizado Dell Expert Network"</div>
+                <div className="text-xs text-gray-500">Inclui a logo Dell Expert Network na capa do PDF.</div>
               </div>
             </label>
           </div>
