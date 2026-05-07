@@ -26,22 +26,11 @@ const SignServiceOrder = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['sign-os-link', token],
     queryFn: async () => {
-      const { data: link, error: lErr } = await supabase
-        .from('service_order_signature_links')
-        .select('*')
-        .eq('token', token!)
-        .maybeSingle();
-      if (lErr) throw lErr;
-      if (!link) throw new Error('Link inválido');
-
-      const { data: os, error: oErr } = await supabase
-        .from('service_orders')
-        .select('*')
-        .eq('id', link.service_order_id)
-        .maybeSingle();
-      if (oErr) throw oErr;
-      if (!os) throw new Error('Ordem de serviço não encontrada');
-      return { link, os };
+      const { data: result, error: rpcErr } = await (supabase as any).rpc('get_service_order_signature_link', { p_token: token });
+      if (rpcErr) throw rpcErr;
+      if (!result || !result.link) throw new Error('Link inválido');
+      if (!result.os) throw new Error('Ordem de serviço não encontrada');
+      return { link: result.link, os: result.os };
     },
     enabled: !!token,
     retry: false,
