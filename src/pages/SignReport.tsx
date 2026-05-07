@@ -26,22 +26,11 @@ const SignReport = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['sign-link', token],
     queryFn: async () => {
-      const { data: link, error: linkErr } = await supabase
-        .from('report_signature_links')
-        .select('*')
-        .eq('token', token!)
-        .maybeSingle();
-      if (linkErr) throw linkErr;
-      if (!link) throw new Error('Link inválido');
-
-      const { data: report, error: rErr } = await supabase
-        .from('technical_reports')
-        .select('*')
-        .eq('id', link.report_id)
-        .maybeSingle();
-      if (rErr) throw rErr;
-      if (!report) throw new Error('Laudo não encontrado');
-      return { link, report };
+      const { data: result, error: rpcErr } = await (supabase as any).rpc('get_report_signature_link', { p_token: token });
+      if (rpcErr) throw rpcErr;
+      if (!result || !result.link) throw new Error('Link inválido');
+      if (!result.report) throw new Error('Laudo não encontrado');
+      return { link: result.link, report: result.report };
     },
     enabled: !!token,
     retry: false,
@@ -56,55 +45,10 @@ const SignReport = () => {
       if (!data) throw new Error('Sem dados');
       if (!signature) throw new Error('Por favor, assine no campo abaixo');
       if (!name.trim()) throw new Error('Informe seu nome completo');
-
-      const { link, report } = data;
-      const now = new Date().toISOString();
-
-      // 1. Update report form_data with signature in correct field
-      const formData = (report.form_data || {}) as any;
-      const signatures = formData.signatures || {};
-      const updatedSignatures = { ...signatures };
-
-      if (link.signer_role === 'cliente') {
-        updatedSignatures.assinaturaUsuario = signature;
-        updatedSignatures.usuarioNome = name;
-      } else if (link.signer_role === 'gestor') {
-        updatedSignatures.assinaturaGestor = signature;
-        updatedSignatures.gestorNome = name;
-      }
-
-      const existingHistory = normalizeSignatureHistory(report.signature_history);
-      const nextHistory = appendSignatureHistory({
-        previousForm: signatures,
-        nextForm: updatedSignatures,
-        existingHistory,
-        reportNumber: report.report_number,
-        signedAt: now,
-        technicianName: report.technician_name,
-        previousHash: report.integrity_hash,
-        nextHash: report.integrity_hash,
+      const { error: rpcErr } = await (supabase as any).rpc('sign_report_signature_link', {
+        p_token: token, p_signature: signature, p_name: name,
       });
-
-      const { error: updErr } = await supabase
-        .from('technical_reports')
-        .update({
-          form_data: { ...formData, signatures: updatedSignatures } as any,
-          signature_history: nextHistory as any,
-          updated_at: now,
-        })
-        .eq('id', report.id);
-      if (updErr) throw updErr;
-
-      // 2. Mark link as signed
-      const { error: linkErr } = await supabase
-        .from('report_signature_links')
-        .update({
-          signature_data: signature,
-          signed_at: now,
-          signer_name: name,
-        })
-        .eq('id', link.id);
-      if (linkErr) throw linkErr;
+      if (rpcErr) throw rpcErr;
     },
     onSuccess: () => {
       toast({ title: 'Assinatura registrada!', description: 'Obrigado, seu aceite foi gravado com sucesso.' });

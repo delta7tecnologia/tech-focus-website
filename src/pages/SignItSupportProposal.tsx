@@ -24,22 +24,11 @@ const SignItSupportProposal = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['sign-it-support-proposal-link', token],
     queryFn: async () => {
-      const { data: link, error: linkErr } = await (supabase as any)
-        .from('it_support_proposal_signature_links')
-        .select('*')
-        .eq('token', token!)
-        .maybeSingle();
-      if (linkErr) throw linkErr;
-      if (!link) throw new Error('Link inválido');
-
-      const { data: proposal, error: pErr } = await (supabase as any)
-        .from('it_support_proposals')
-        .select('*')
-        .eq('id', link.proposal_id)
-        .maybeSingle();
-      if (pErr) throw pErr;
-      if (!proposal) throw new Error('Proposta não encontrada');
-      return { link, proposal };
+      const { data: result, error: rpcErr } = await (supabase as any).rpc('get_it_support_proposal_signature_link', { p_token: token });
+      if (rpcErr) throw rpcErr;
+      if (!result || !result.link) throw new Error('Link inválido');
+      if (!result.proposal) throw new Error('Proposta não encontrada');
+      return { link: result.link, proposal: result.proposal };
     },
     enabled: !!token,
     retry: false,
@@ -54,16 +43,10 @@ const SignItSupportProposal = () => {
       if (!data) throw new Error('Sem dados');
       if (!signature) throw new Error('Por favor, assine no campo abaixo');
       if (!name.trim()) throw new Error('Informe seu nome completo');
-      const { link } = data;
-      const { error: linkErr } = await (supabase as any)
-        .from('it_support_proposal_signature_links')
-        .update({
-          signature_data: signature,
-          signed_at: new Date().toISOString(),
-          signer_name: name,
-        })
-        .eq('id', link.id);
-      if (linkErr) throw linkErr;
+      const { error: rpcErr } = await (supabase as any).rpc('sign_it_support_proposal_signature_link', {
+        p_token: token, p_signature: signature, p_name: name,
+      });
+      if (rpcErr) throw rpcErr;
     },
     onSuccess: () => {
       toast({ title: 'Aceite registrado!', description: 'Obrigado, sua assinatura foi gravada.' });

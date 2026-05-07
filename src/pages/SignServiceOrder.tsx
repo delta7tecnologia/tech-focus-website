@@ -26,22 +26,11 @@ const SignServiceOrder = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['sign-os-link', token],
     queryFn: async () => {
-      const { data: link, error: lErr } = await supabase
-        .from('service_order_signature_links')
-        .select('*')
-        .eq('token', token!)
-        .maybeSingle();
-      if (lErr) throw lErr;
-      if (!link) throw new Error('Link inválido');
-
-      const { data: os, error: oErr } = await supabase
-        .from('service_orders')
-        .select('*')
-        .eq('id', link.service_order_id)
-        .maybeSingle();
-      if (oErr) throw oErr;
-      if (!os) throw new Error('Ordem de serviço não encontrada');
-      return { link, os };
+      const { data: result, error: rpcErr } = await (supabase as any).rpc('get_service_order_signature_link', { p_token: token });
+      if (rpcErr) throw rpcErr;
+      if (!result || !result.link) throw new Error('Link inválido');
+      if (!result.os) throw new Error('Ordem de serviço não encontrada');
+      return { link: result.link, os: result.os };
     },
     enabled: !!token,
     retry: false,
@@ -56,25 +45,10 @@ const SignServiceOrder = () => {
       if (!data) throw new Error('Sem dados');
       if (!signature) throw new Error('Assine no campo abaixo');
       if (!name.trim()) throw new Error('Informe seu nome completo');
-
-      const { link, os } = data;
-      const now = new Date().toISOString();
-
-      // Atualiza OS com assinatura presencial
-      const update: any = {
-        signer_name: name,
-        signer_role: role || os.signer_role,
-        signature_data: signature,
-        signed_at: now,
-      };
-      const { error: u1 } = await supabase.from('service_orders').update(update).eq('id', os.id);
-      if (u1) throw u1;
-
-      const { error: u2 } = await supabase
-        .from('service_order_signature_links')
-        .update({ signed_at: now, signature_data: signature, signer_name: name })
-        .eq('id', link.id);
-      if (u2) throw u2;
+      const { error: rpcErr } = await (supabase as any).rpc('sign_service_order_signature_link', {
+        p_token: token, p_signature: signature, p_name: name, p_role: role || null,
+      });
+      if (rpcErr) throw rpcErr;
     },
     onSuccess: () => {
       toast({ title: 'Assinatura registrada!', description: 'Obrigado, seu aceite foi gravado.' });

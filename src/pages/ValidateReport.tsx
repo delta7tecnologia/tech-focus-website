@@ -27,29 +27,11 @@ const ValidateReport = () => {
         throw new Error('Hash inválida ou muito curta. Verifique o link recebido.');
       }
 
-      // 1) Tenta correspondência exata
-      let { data, error } = await supabase
-        .from('technical_reports')
-        .select('*')
-        .eq('integrity_hash', cleanHash)
-        .maybeSingle();
+      const { data: rows, error } = await (supabase as any).rpc('get_technical_report_by_hash', { p_hash: cleanHash });
       if (error) throw error;
-
-      // 2) Se vier truncada (ex.: link cortado no PDF/QR), busca por prefixo
-      if (!data && cleanHash.length < 64) {
-        const { data: rows, error: e2 } = await supabase
-          .from('technical_reports')
-          .select('*')
-          .like('integrity_hash', `${cleanHash}%`)
-          .limit(2);
-        if (e2) throw e2;
-        if (rows && rows.length === 1) data = rows[0];
-        else if (rows && rows.length > 1) {
-          throw new Error('Hash parcial corresponde a múltiplos laudos. Use o link completo.');
-        }
-      }
-
-      if (!data) throw new Error('Nenhum laudo encontrado para esta hash de validação.');
+      if (!rows || rows.length === 0) throw new Error('Nenhum laudo encontrado para esta hash de validação.');
+      if (rows.length > 1) throw new Error('Hash parcial corresponde a múltiplos laudos. Use o link completo.');
+      const data = rows[0];
       return data;
     },
     enabled: !!hash,
