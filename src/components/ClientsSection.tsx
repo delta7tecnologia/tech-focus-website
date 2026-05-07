@@ -15,10 +15,9 @@ const ClientsSection = () => {
   const { data: clients } = useQuery({
     queryKey: ['clients'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('clients')
+      const { data, error } = await (supabase as any)
+        .from('clients_public')
         .select('*')
-        .eq('is_active', true)
         .order('order_index', { ascending: true });
       
       if (error) throw error;
