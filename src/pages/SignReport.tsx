@@ -45,55 +45,10 @@ const SignReport = () => {
       if (!data) throw new Error('Sem dados');
       if (!signature) throw new Error('Por favor, assine no campo abaixo');
       if (!name.trim()) throw new Error('Informe seu nome completo');
-
-      const { link, report } = data;
-      const now = new Date().toISOString();
-
-      // 1. Update report form_data with signature in correct field
-      const formData = (report.form_data || {}) as any;
-      const signatures = formData.signatures || {};
-      const updatedSignatures = { ...signatures };
-
-      if (link.signer_role === 'cliente') {
-        updatedSignatures.assinaturaUsuario = signature;
-        updatedSignatures.usuarioNome = name;
-      } else if (link.signer_role === 'gestor') {
-        updatedSignatures.assinaturaGestor = signature;
-        updatedSignatures.gestorNome = name;
-      }
-
-      const existingHistory = normalizeSignatureHistory(report.signature_history);
-      const nextHistory = appendSignatureHistory({
-        previousForm: signatures,
-        nextForm: updatedSignatures,
-        existingHistory,
-        reportNumber: report.report_number,
-        signedAt: now,
-        technicianName: report.technician_name,
-        previousHash: report.integrity_hash,
-        nextHash: report.integrity_hash,
+      const { error: rpcErr } = await (supabase as any).rpc('sign_report_signature_link', {
+        p_token: token, p_signature: signature, p_name: name,
       });
-
-      const { error: updErr } = await supabase
-        .from('technical_reports')
-        .update({
-          form_data: { ...formData, signatures: updatedSignatures } as any,
-          signature_history: nextHistory as any,
-          updated_at: now,
-        })
-        .eq('id', report.id);
-      if (updErr) throw updErr;
-
-      // 2. Mark link as signed
-      const { error: linkErr } = await supabase
-        .from('report_signature_links')
-        .update({
-          signature_data: signature,
-          signed_at: now,
-          signer_name: name,
-        })
-        .eq('id', link.id);
-      if (linkErr) throw linkErr;
+      if (rpcErr) throw rpcErr;
     },
     onSuccess: () => {
       toast({ title: 'Assinatura registrada!', description: 'Obrigado, seu aceite foi gravado com sucesso.' });
