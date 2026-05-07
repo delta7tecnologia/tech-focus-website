@@ -14,6 +14,7 @@ import TechAssetViewer from './TechAssetViewer';
 import TechReports from './reports/TechReports';
 import ServiceOrders from './service-orders/ServiceOrders';
 import CommercialProposals from './proposals/CommercialProposals';
+import ItSupportProposals from './it-support/ItSupportProposals';
 import UploadOrLinkInput, { detectExternalProvider, type SourceMode } from './UploadOrLinkInput';
 
 const TechFileManager = () => {
