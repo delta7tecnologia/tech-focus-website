@@ -26,22 +26,11 @@ const SignReport = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['sign-link', token],
     queryFn: async () => {
-      const { data: link, error: linkErr } = await supabase
-        .from('report_signature_links')
-        .select('*')
-        .eq('token', token!)
-        .maybeSingle();
-      if (linkErr) throw linkErr;
-      if (!link) throw new Error('Link inválido');
-
-      const { data: report, error: rErr } = await supabase
-        .from('technical_reports')
-        .select('*')
-        .eq('id', link.report_id)
-        .maybeSingle();
-      if (rErr) throw rErr;
-      if (!report) throw new Error('Laudo não encontrado');
-      return { link, report };
+      const { data: result, error: rpcErr } = await (supabase as any).rpc('get_report_signature_link', { p_token: token });
+      if (rpcErr) throw rpcErr;
+      if (!result || !result.link) throw new Error('Link inválido');
+      if (!result.report) throw new Error('Laudo não encontrado');
+      return { link: result.link, report: result.report };
     },
     enabled: !!token,
     retry: false,
