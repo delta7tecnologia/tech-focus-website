@@ -24,22 +24,11 @@ const SignProposal = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['sign-proposal-link', token],
     queryFn: async () => {
-      const { data: link, error: linkErr } = await (supabase as any)
-        .from('proposal_signature_links')
-        .select('*')
-        .eq('token', token!)
-        .maybeSingle();
-      if (linkErr) throw linkErr;
-      if (!link) throw new Error('Link inválido');
-
-      const { data: proposal, error: pErr } = await supabase
-        .from('commercial_proposals')
-        .select('*')
-        .eq('id', link.proposal_id)
-        .maybeSingle();
-      if (pErr) throw pErr;
-      if (!proposal) throw new Error('Proposta não encontrada');
-      return { link, proposal };
+      const { data: result, error: rpcErr } = await (supabase as any).rpc('get_proposal_signature_link', { p_token: token });
+      if (rpcErr) throw rpcErr;
+      if (!result || !result.link) throw new Error('Link inválido');
+      if (!result.proposal) throw new Error('Proposta não encontrada');
+      return { link: result.link, proposal: result.proposal };
     },
     enabled: !!token,
     retry: false,
