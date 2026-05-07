@@ -92,7 +92,8 @@ const AdminLayout = () => {
     { name: 'Arquivos Técnicos', icon: Package, path: '/admin/arquivos' },
     { name: 'Laudos', icon: FileSignature, path: '/admin/laudos' },
     { name: 'Ordens de Serviço', icon: ClipboardList, path: '/admin/ordens-servico' },
-    { name: 'Propostas', icon: Briefcase, path: '/admin/propostas' },
+    { name: 'Propostas Backup', icon: Briefcase, path: '/admin/propostas' },
+    { name: 'Propostas Suporte TI', icon: Briefcase, path: '/admin/propostas-suporte' },
     { name: 'FAQ', icon: HelpCircle, path: '/admin/faq' },
     { name: 'Configurações', icon: Settings, path: '/admin/configuracoes' },
   ];
