@@ -1159,9 +1159,209 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      clients_public: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          is_active: boolean | null
+          logo_url: string | null
+          name: string | null
+          order_index: number | null
+          website_url: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          logo_url?: string | null
+          name?: string | null
+          order_index?: number | null
+          website_url?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          logo_url?: string | null
+          name?: string | null
+          order_index?: number | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      get_commercial_proposal_by_hash: {
+        Args: { p_hash: string }
+        Returns: {
+          activation_fee: number
+          audit_log: Json
+          client_address: string | null
+          client_contact: string | null
+          client_document: string | null
+          client_email: string | null
+          client_name: string
+          created_at: string
+          created_by: string
+          discount: number
+          generated_at: string
+          id: string
+          integrity_hash: string | null
+          is_draft: boolean
+          items: Json
+          locked: boolean
+          monthly_total: number
+          notes: string | null
+          proposal_number: string
+          proposal_seq: number | null
+          sales_rep_email: string | null
+          sales_rep_name: string
+          sections: Json | null
+          setup_total: number
+          show_altatek_logo: boolean
+          status: string
+          updated_at: string
+          validity_days: number
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "commercial_proposals"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      get_it_support_proposal_by_hash: {
+        Args: { p_hash: string }
+        Returns: {
+          audit_log: Json
+          client_address: string | null
+          client_contact: string | null
+          client_document: string | null
+          client_email: string | null
+          client_name: string
+          contract_months: number
+          created_at: string
+          created_by: string
+          discount: number
+          generated_at: string
+          id: string
+          integrity_hash: string | null
+          is_draft: boolean
+          items: Json
+          locked: boolean
+          monthly_total: number
+          notes: string | null
+          proposal_number: string
+          proposal_seq: number | null
+          sales_rep_email: string | null
+          sales_rep_name: string
+          sections: Json | null
+          setup_fee: number
+          setup_total: number
+          show_altatek_logo: boolean
+          status: string
+          updated_at: string
+          validity_days: number
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "it_support_proposals"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      get_it_support_proposal_signature_link: {
+        Args: { p_token: string }
+        Returns: Json
+      }
+      get_proposal_signature_link: { Args: { p_token: string }; Returns: Json }
+      get_report_signature_link: { Args: { p_token: string }; Returns: Json }
+      get_service_order_by_hash: {
+        Args: { p_hash: string }
+        Returns: {
+          audit_log: Json
+          checkin_accuracy: number | null
+          checkin_at: string | null
+          checkin_lat: number | null
+          checkin_lng: number | null
+          checklist: Json
+          checkout_accuracy: number | null
+          checkout_at: string | null
+          checkout_lat: number | null
+          checkout_lng: number | null
+          client_address: string
+          client_contact: string | null
+          client_name: string
+          created_at: string
+          created_by: string
+          evidences: Json
+          finished_at: string | null
+          generated_at: string
+          id: string
+          integrity_hash: string | null
+          is_draft: boolean
+          locked: boolean
+          materials: Json
+          os_number: string
+          os_seq: number | null
+          requested_by: string | null
+          requested_by_role: string | null
+          scheduled_at: string | null
+          signature_data: string | null
+          signed_at: string | null
+          signer_document: string | null
+          signer_name: string | null
+          signer_role: string | null
+          started_at: string | null
+          status: string
+          summary: string | null
+          technician_id: string
+          technician_name: string
+          travel: Json
+          updated_at: string
+          visit_type: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "service_orders"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      get_service_order_signature_link: {
+        Args: { p_token: string }
+        Returns: Json
+      }
+      get_technical_report_by_hash: {
+        Args: { p_hash: string }
+        Returns: {
+          company_name: string
+          conclusao: Json
+          created_at: string
+          created_by: string
+          diagnostico: Json
+          equipment: string
+          form_data: Json | null
+          generated_at: string
+          id: string
+          integrity_hash: string
+          is_draft: boolean
+          photos: Json
+          report_number: string
+          report_type: string
+          signature_history: Json
+          status_final: string
+          technician_name: string
+          triagem: Json
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "technical_reports"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1170,6 +1370,27 @@ export type Database = {
         Returns: boolean
       }
       is_valid_http_url: { Args: { url: string }; Returns: boolean }
+      sign_it_support_proposal_signature_link: {
+        Args: { p_name: string; p_signature: string; p_token: string }
+        Returns: Json
+      }
+      sign_proposal_signature_link: {
+        Args: { p_name: string; p_signature: string; p_token: string }
+        Returns: Json
+      }
+      sign_report_signature_link: {
+        Args: { p_name: string; p_signature: string; p_token: string }
+        Returns: Json
+      }
+      sign_service_order_signature_link: {
+        Args: {
+          p_name: string
+          p_role?: string
+          p_signature: string
+          p_token: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
       app_role: "admin" | "user"
