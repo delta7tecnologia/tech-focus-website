@@ -43,19 +43,10 @@ const SignProposal = () => {
       if (!data) throw new Error('Sem dados');
       if (!signature) throw new Error('Por favor, assine no campo abaixo');
       if (!name.trim()) throw new Error('Informe seu nome completo');
-
-      const { link } = data;
-      const now = new Date().toISOString();
-
-      const { error: linkErr } = await (supabase as any)
-        .from('proposal_signature_links')
-        .update({
-          signature_data: signature,
-          signed_at: now,
-          signer_name: name,
-        })
-        .eq('id', link.id);
-      if (linkErr) throw linkErr;
+      const { error: rpcErr } = await (supabase as any).rpc('sign_proposal_signature_link', {
+        p_token: token, p_signature: signature, p_name: name,
+      });
+      if (rpcErr) throw rpcErr;
     },
     onSuccess: () => {
       toast({ title: 'Aceite registrado!', description: 'Obrigado, sua assinatura foi gravada.' });
