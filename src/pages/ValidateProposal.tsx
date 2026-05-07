@@ -24,24 +24,11 @@ const ValidateProposal = () => {
       const cleanHash = hash.trim().toLowerCase().replace(/[^a-f0-9]/g, '');
       if (cleanHash.length < 16) throw new Error('Hash inválida.');
 
-      let { data, error } = await supabase
-        .from('commercial_proposals')
-        .select('*')
-        .eq('integrity_hash', cleanHash)
-        .maybeSingle();
+      const { data: rows, error } = await (supabase as any).rpc('get_commercial_proposal_by_hash', { p_hash: cleanHash });
       if (error) throw error;
-
-      if (!data && cleanHash.length < 64) {
-        const { data: rows } = await supabase
-          .from('commercial_proposals')
-          .select('*')
-          .like('integrity_hash', `${cleanHash}%`)
-          .limit(2);
-        if (rows && rows.length === 1) data = rows[0];
-        else if (rows && rows.length > 1) throw new Error('Hash parcial corresponde a múltiplas propostas.');
-      }
-
-      if (!data) throw new Error('Nenhuma proposta encontrada para esta hash.');
+      if (!rows || rows.length === 0) throw new Error('Nenhuma proposta encontrada para esta hash.');
+      if (rows.length > 1) throw new Error('Hash parcial corresponde a múltiplas propostas.');
+      const data = rows[0];
       return data;
     },
     enabled: !!hash,
