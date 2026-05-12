@@ -272,7 +272,7 @@ const TechAssetViewer = () => {
           variant="outline"
           className="gap-2"
           disabled={filtered.length === 0}
-          onClick={() => setReportInfoOpen(true)}
+          onClick={() => setLicenseSelectOpen(true)}
         >
           <Printer className="w-4 h-4" /> Imprimir
         </Button>
