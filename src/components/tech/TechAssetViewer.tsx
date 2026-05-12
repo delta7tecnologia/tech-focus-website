@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { printAssetReport } from '@/utils/printAssetReport';
 import ReportClientInfoDialog, { type ReportClientInfo } from './assets/ReportClientInfoDialog';
+import LicenseSelectionDialog from './assets/LicenseSelectionDialog';
 import UploadOrLinkInput, { type SourceMode } from './UploadOrLinkInput';
 import LicenseListEditor from './assets/LicenseListEditor';
 import { fetchAssetLicenses, licensesToDrafts, syncAssetLicenses } from '@/lib/assetLicenses';
