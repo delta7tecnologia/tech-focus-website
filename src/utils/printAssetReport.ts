@@ -75,12 +75,28 @@ const renderAssetCard = (
 `;
 
 export const printAssetReport = async (
-  assets: AssetForReport[],
+  assetsInput: AssetForReport[],
   companyName: string,
   clientInfo?: ReportClientInfo,
+  selectedLicenseIds?: string[] | null,
 ) => {
   const client: ReportClientInfo = clientInfo || { company_name: companyName };
-  const grouped = await fetchAssetLicenses(assets.map((a) => a.id));
+  const groupedRaw = await fetchAssetLicenses(assetsInput.map((a) => a.id));
+
+  // Aplica filtro de licenças (se informado) e remove ativos sem licenças visíveis
+  const grouped: Record<string, AssetLicense[]> = {};
+  if (selectedLicenseIds && selectedLicenseIds.length > 0) {
+    const set = new Set(selectedLicenseIds);
+    for (const [aid, list] of Object.entries(groupedRaw)) {
+      const filtered = list.filter((l) => set.has(l.id));
+      if (filtered.length > 0) grouped[aid] = filtered;
+    }
+  } else {
+    Object.assign(grouped, groupedRaw);
+  }
+  const assets = selectedLicenseIds && selectedLicenseIds.length > 0
+    ? assetsInput.filter((a) => (grouped[a.id] || []).length > 0)
+    : assetsInput;
 
   // Resumo executivo: contagem por categoria
   const categoryCounts = new Map<string, number>();
