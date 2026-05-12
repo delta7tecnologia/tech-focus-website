@@ -480,12 +480,29 @@ const TechAssetViewer = () => {
         </AlertDialogContent>
       </AlertDialog>
 
+      <LicenseSelectionDialog
+        open={licenseSelectOpen}
+        onOpenChange={setLicenseSelectOpen}
+        assets={filtered}
+        licensesByAsset={licensesByAsset}
+        onConfirm={(ids) => {
+          setSelectedLicenseIds(ids);
+          setLicenseSelectOpen(false);
+          setReportInfoOpen(true);
+        }}
+      />
+
       <ReportClientInfoDialog
         open={reportInfoOpen}
         onOpenChange={setReportInfoOpen}
         defaultCompany={companyFilter || undefined}
         onConfirm={(info) => {
-          printAssetReport(filtered, info.company_name || companyFilter || 'Todas as empresas', info);
+          printAssetReport(
+            filtered,
+            info.company_name || companyFilter || 'Todas as empresas',
+            info,
+            selectedLicenseIds,
+          );
         }}
       />
     </div>
