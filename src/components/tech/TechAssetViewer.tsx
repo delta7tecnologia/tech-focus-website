@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { printAssetReport } from '@/utils/printAssetReport';
 import ReportClientInfoDialog, { type ReportClientInfo } from './assets/ReportClientInfoDialog';
+import LicenseSelectionDialog from './assets/LicenseSelectionDialog';
 import UploadOrLinkInput, { type SourceMode } from './UploadOrLinkInput';
 import LicenseListEditor from './assets/LicenseListEditor';
 import { fetchAssetLicenses, licensesToDrafts, syncAssetLicenses } from '@/lib/assetLicenses';
@@ -47,6 +48,8 @@ const TechAssetViewer = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [showCompanyDropdown, setShowCompanyDropdown] = useState(false);
   const [reportInfoOpen, setReportInfoOpen] = useState(false);
+  const [licenseSelectOpen, setLicenseSelectOpen] = useState(false);
+  const [selectedLicenseIds, setSelectedLicenseIds] = useState<string[] | null>(null);
 
   const toggleLicense = (key: string) => {
     setVisibleLicenses(prev => ({ ...prev, [key]: !prev[key] }));
@@ -269,7 +272,7 @@ const TechAssetViewer = () => {
           variant="outline"
           className="gap-2"
           disabled={filtered.length === 0}
-          onClick={() => setReportInfoOpen(true)}
+          onClick={() => setLicenseSelectOpen(true)}
         >
           <Printer className="w-4 h-4" /> Imprimir
         </Button>
@@ -477,12 +480,29 @@ const TechAssetViewer = () => {
         </AlertDialogContent>
       </AlertDialog>
 
+      <LicenseSelectionDialog
+        open={licenseSelectOpen}
+        onOpenChange={setLicenseSelectOpen}
+        assets={filtered}
+        licensesByAsset={licensesByAsset}
+        onConfirm={(ids) => {
+          setSelectedLicenseIds(ids);
+          setLicenseSelectOpen(false);
+          setReportInfoOpen(true);
+        }}
+      />
+
       <ReportClientInfoDialog
         open={reportInfoOpen}
         onOpenChange={setReportInfoOpen}
         defaultCompany={companyFilter || undefined}
         onConfirm={(info) => {
-          printAssetReport(filtered, info.company_name || companyFilter || 'Todas as empresas', info);
+          printAssetReport(
+            filtered,
+            info.company_name || companyFilter || 'Todas as empresas',
+            info,
+            selectedLicenseIds,
+          );
         }}
       />
     </div>
