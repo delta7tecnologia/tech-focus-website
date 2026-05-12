@@ -109,7 +109,7 @@ const LicenseSelectionDialog = ({ open, onOpenChange, assets, licensesByAsset, o
           </div>
         </div>
 
-        <ScrollArea className="flex-1 max-h-[55vh] border rounded-md">
+        <ScrollArea className="flex-1 h-[55vh] border rounded-md overflow-y-auto">
           <div className="p-2 space-y-3">
             {grouped.length === 0 && (
               <p className="text-sm text-muted-foreground text-center py-6 italic">
