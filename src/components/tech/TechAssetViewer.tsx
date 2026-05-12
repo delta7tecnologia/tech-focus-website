@@ -48,6 +48,8 @@ const TechAssetViewer = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [showCompanyDropdown, setShowCompanyDropdown] = useState(false);
   const [reportInfoOpen, setReportInfoOpen] = useState(false);
+  const [licenseSelectOpen, setLicenseSelectOpen] = useState(false);
+  const [selectedLicenseIds, setSelectedLicenseIds] = useState<string[] | null>(null);
 
   const toggleLicense = (key: string) => {
     setVisibleLicenses(prev => ({ ...prev, [key]: !prev[key] }));
