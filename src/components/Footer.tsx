@@ -30,6 +30,7 @@ const Footer = () => {
     { name: "Soluções", href: "/solucoes" },
     { name: "Quem Somos", href: "/#about" },
     { name: "Links Úteis", href: "/links-uteis" },
+    { name: "FAQ", href: "/faq" },
     { name: "Contato", href: "/#contact" },
   ];
 
