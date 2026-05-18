@@ -21,8 +21,8 @@ const Index = () => {
     <PageTransition>
       <div className="min-h-screen">
         <SEOHead 
-          title="Delta7 Tecnologia - Soluções Completas em TI | GLPI, Zabbix, Proxmox"
-          description="Especialistas em infraestrutura de TI com GLPI, Zabbix, Proxmox, PfSense e Wazuh. Monitoramento 24x7, virtualização, segurança e backup para empresas."
+          title="Delta7 Tecnologia em Paragominas-PA | Suporte de TI e Cloud"
+          description="Empresa de TI em Paragominas-PA: suporte técnico, monitoramento 24x7, cloud, segurança e backup em nuvem para empresas no Pará e em todo o Brasil."
         />
         <StructuredData />
         <Navigation />
