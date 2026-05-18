@@ -5,7 +5,7 @@ export const ABOUT_DELTA7_SUP = `A Delta7 Tecnologia é parceira estratégica de
 
 Há mais de 10 anos entregamos suporte técnico especializado, monitoramento 24/7, gestão de servidores Windows e Linux, hipervisores, antivírus corporativo e infraestrutura de redes. Nossa metodologia transforma TI em vantagem competitiva — você foca no seu negócio, nós cuidamos da tecnologia.
 
-Atendemos remotamente em todo o Brasil e presencialmente em Parauapebas-PA e região, com equipe certificada e processos padronizados.`;
+Atendemos remotamente em todo o Brasil e presencialmente em Paragominas-PA e região, com equipe certificada e processos padronizados.`;
 
 // Paleta Navy & Slate — mesma do backup para manter identidade visual
 export const SUP_COLORS = {
@@ -57,7 +57,7 @@ export const SUP_QUOTE = {
   author: 'Delta7 Tecnologia',
 };
 
-export const SUP_NOT_INCLUDED = `Nesta proposta não estão inclusos: hardware (servidores, computadores, switches, racks), licenças de software (Windows, Office, antivírus, etc.), cabeamento estruturado, plantão 24h fora do horário comercial, deslocamento para fora de Parauapebas-PA e projetos sob demanda — estes serão cobrados como hora técnica avulsa ou em proposta separada.`;
+export const SUP_NOT_INCLUDED = `Nesta proposta não estão inclusos: hardware (servidores, computadores, switches, racks), licenças de software (Windows, Office, antivírus, etc.), cabeamento estruturado, plantão 24h fora do horário comercial, deslocamento para fora de Paragominas-PA e projetos sob demanda — estes serão cobrados como hora técnica avulsa ou em proposta separada.`;
 
 export const SUP_CONTRACT_TEXT = `Durante a vigência do contrato, a Delta7 Tecnologia prestará serviços de assistência e suporte técnico, com o objetivo de manter a continuidade da operação de TI do cliente.
 
@@ -75,7 +75,7 @@ export const SUP_CONTRACT_REQUIREMENTS: string[] = [
   'Painel on-line do cliente com histórico de ocorrências',
   'Atendimento extra de segunda a sexta das 18:01 às 21:59 — cobrança extra de R$ 200,00 por hora',
   'Plantão 24h e finais de semana — não inclusos (hora técnica avulsa)',
-  'Visitas presenciais fora de Parauapebas-PA — orçadas separadamente',
+  'Visitas presenciais fora de Paragominas-PA — orçadas separadamente',
 ];
 
 export const SUP_SLA: { priority: string; description: string; response: string; color: string }[] = [
@@ -102,7 +102,7 @@ export const SUP_CATALOG: SupCatalogItem[] = [
   { description: 'Gestão de firewall / UTM', unit_price: 200, unit_label: 'mês' },
   { description: 'Gestão de Active Directory', unit_price: 250, unit_label: 'mês' },
   { description: 'Hora técnica avulsa (fora do escopo)', unit_price: 180, unit_label: 'hora' },
-  { description: 'Visita presencial em Parauapebas-PA', unit_price: 150, unit_label: 'visita' },
+  { description: 'Visita presencial em Paragominas-PA', unit_price: 150, unit_label: 'visita' },
 ];
 
 export const SUP_SETUP_FEE_DEFAULT = 0;

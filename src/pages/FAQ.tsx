@@ -16,7 +16,7 @@ const groups: Group[] = [
     title: 'Suporte Técnico',
     items: [
       { q: 'Qual o tempo de resposta para chamados de suporte?', a: 'Nosso SLA padrão é de até 4 horas para o primeiro contato. Clientes com contrato premium contam com resposta em até 30 minutos e atendimento 24/7.' },
-      { q: 'Vocês fazem atendimento presencial ou apenas remoto?', a: 'Atendemos presencialmente em Parauapebas-PA e região, e remotamente em todo o Brasil com ferramentas seguras como AnyDesk e RustDesk.' },
+      { q: 'Vocês fazem atendimento presencial ou apenas remoto?', a: 'Atendemos presencialmente em Paragominas-PA e região, e remotamente em todo o Brasil com ferramentas seguras como AnyDesk e RustDesk.' },
       { q: 'É possível contratar suporte avulso, sem mensalidade?', a: 'Sim. Trabalhamos com pacotes de horas técnicas avulsas, ideais para empresas que precisam de demandas pontuais sem contrato mensal.' },
       { q: 'Quais sistemas operacionais vocês suportam?', a: 'Damos suporte a Windows, Windows Server, Linux (várias distribuições), macOS, além de virtualização Proxmox/VMware e ambientes em nuvem.' },
     ],

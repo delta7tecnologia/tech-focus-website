@@ -2,7 +2,7 @@
 
 > MSP brasileira especializada em infraestrutura de TI, suporte gerenciado, monitoramento (Zabbix/Grafana), virtualização (Proxmox), segurança (PfSense/Wazuh) e backup em nuvem para pequenas e médias empresas.
 
-A Delta7 Tecnologia atende clientes em Parauapebas-PA e em todo o Brasil via suporte remoto, oferecendo soluções completas de TI, cloud e segurança da informação.
+A Delta7 Tecnologia atende clientes em Paragominas-PA e em todo o Brasil via suporte remoto, oferecendo soluções completas de TI, cloud e segurança da informação.
 
 ## Pages
 
