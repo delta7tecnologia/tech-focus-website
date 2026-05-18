@@ -36,24 +36,19 @@ const AdminSeo = () => {
     setLoading(true);
     setError(null);
     try {
-      const { data: res, error: err } = await supabase.functions.invoke('gsc-performance', {
-        method: 'GET' as any,
-        body: undefined,
-        // pass days via query string by appending to function name
+      const { data: { session } } = await supabase.auth.getSession();
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/gsc-performance?days=${days}`;
+      const r = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        },
       });
-      // supabase-js doesn't support query params directly; use fetch fallback
-      throw new Error('fallback');
-    } catch {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/gsc-performance?days=${days}`;
-        const r = await fetch(url, { headers: { Authorization: `Bearer ${session?.access_token}` } });
-        const json = await r.json();
-        if (!r.ok) throw new Error(json.error || 'Erro ao carregar');
-        setData(json);
-      } catch (e: any) {
-        setError(e.message || 'Erro');
-      }
+      const json = await r.json();
+      if (!r.ok) throw new Error(json.error || 'Erro ao carregar');
+      setData(json);
+    } catch (e: any) {
+      setError(e.message || 'Erro desconhecido');
     } finally {
       setLoading(false);
     }
