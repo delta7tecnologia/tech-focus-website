@@ -1,8 +1,18 @@
 User-agent: Googlebot
 Allow: /
+Disallow: /reset-password
+Disallow: /assinar/
+Disallow: /assinar-os/
+Disallow: /assinar-proposta/
+Disallow: /assinar-suporte/
 
 User-agent: Bingbot
 Allow: /
+Disallow: /reset-password
+Disallow: /assinar/
+Disallow: /assinar-os/
+Disallow: /assinar-proposta/
+Disallow: /assinar-suporte/
 
 User-agent: Twitterbot
 Allow: /
@@ -12,5 +22,10 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /reset-password
+Disallow: /assinar/
+Disallow: /assinar-os/
+Disallow: /assinar-proposta/
+Disallow: /assinar-suporte/
 
 Sitemap: https://delta7tecnologia.com.br/sitemap.xml
