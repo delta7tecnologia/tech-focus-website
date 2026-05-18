@@ -56,7 +56,7 @@ const Contact = () => {
     {
       icon: <MapPin className="w-5 h-5" />,
       title: "Localização",
-      value: "Parauapebas, Pará - Brasil",
+      value: "Paragominas, Pará - Brasil",
       link: null
     },
     {

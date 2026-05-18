@@ -143,7 +143,7 @@ const Footer = () => {
               <li className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-blue-400 mt-0.5" />
                 <div>
-                  <p className="text-gray-300">Parauapebas, Pará - Brasil</p>
+                  <p className="text-gray-300">Paragominas, Pará - Brasil</p>
                   <p className="text-sm text-gray-500">Atendimento remoto nacional</p>
                 </div>
               </li>
