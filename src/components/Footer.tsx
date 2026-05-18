@@ -45,7 +45,7 @@ const Footer = () => {
               alt="Delta7 Tecnologia" 
               className="h-10 w-auto"
             />
-            <p className="text-gray-400 leading-relaxed">
+            <p className="text-gray-300 leading-relaxed">
               Especialistas em soluções de TI para empresas. 
               Mais de 10 anos transformando tecnologia em vantagem competitiva.
             </p>
@@ -85,7 +85,7 @@ const Footer = () => {
                 <li key={service.name}>
                   <a 
                     href={service.href}
-                    className="text-gray-400 hover:text-white transition-colors"
+                    className="text-gray-300 hover:text-white transition-colors"
                   >
                     {service.name}
                   </a>
@@ -103,14 +103,14 @@ const Footer = () => {
                   {link.href.startsWith('/') && !link.href.includes('#') ? (
                     <Link 
                       to={link.href}
-                      className="text-gray-400 hover:text-white transition-colors"
+                      className="text-gray-300 hover:text-white transition-colors"
                     >
                       {link.name}
                     </Link>
                   ) : (
                     <a 
                       href={link.href}
-                      className="text-gray-400 hover:text-white transition-colors"
+                      className="text-gray-300 hover:text-white transition-colors"
                     >
                       {link.name}
                     </a>
@@ -135,14 +135,14 @@ const Footer = () => {
               </li>
               <li className="flex items-start gap-3">
                 <Mail className="w-5 h-5 text-blue-400 mt-0.5" />
-                <a href="mailto:contato@delta7tecnologia.com.br" className="text-gray-400 hover:text-white transition-colors text-sm">
+                <a href="mailto:contato@delta7tecnologia.com.br" className="text-gray-300 hover:text-white transition-colors text-sm">
                   contato@delta7tecnologia.com.br
                 </a>
               </li>
               <li className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-blue-400 mt-0.5" />
                 <div>
-                  <p className="text-gray-400">Parauapebas, Pará - Brasil</p>
+                  <p className="text-gray-300">Parauapebas, Pará - Brasil</p>
                   <p className="text-sm text-gray-500">Atendimento remoto nacional</p>
                 </div>
               </li>
@@ -150,7 +150,7 @@ const Footer = () => {
 
             {/* Portal Link */}
             <div className="mt-8 p-4 bg-white/5 rounded-xl border border-white/10">
-              <p className="text-sm text-gray-400 mb-2">Já é cliente?</p>
+              <p className="text-sm text-gray-300 mb-2">Já é cliente?</p>
               <a 
                 href="https://www.app.delta7tecnologia.com.br/front/login.php"
                 className="text-blue-400 hover:text-blue-300 font-medium transition-colors"

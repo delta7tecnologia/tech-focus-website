@@ -96,7 +96,7 @@ const UsefulLinksSection = () => {
                     <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
                       {link.title}
                     </h3>
-                    <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-blue-600 transition-colors" />
+                    <ExternalLink className="w-4 h-4 text-gray-600 group-hover:text-blue-600 transition-colors" />
                   </div>
                   {link.description && (
                     <p className="text-sm text-gray-600 mt-1">{link.description}</p>

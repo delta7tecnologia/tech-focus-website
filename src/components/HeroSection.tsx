@@ -151,7 +151,7 @@ const HeroSection = () => {
               ].map((stat, i) => (
                 <div key={i} className="text-center sm:text-left">
                   <div className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">{stat.value}</div>
-                  <div className="text-sm text-gray-400 mt-1">{stat.label}</div>
+                  <div className="text-sm text-gray-300 mt-1">{stat.label}</div>
                 </div>
               ))}
             </motion.div>
@@ -177,7 +177,7 @@ const HeroSection = () => {
                     {card.icon}
                   </div>
                   <h3 className="font-semibold text-white mb-2">{card.title}</h3>
-                  <p className="text-sm text-gray-400">{card.desc}</p>
+                  <p className="text-sm text-gray-300">{card.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -202,7 +202,7 @@ const HeroSection = () => {
                     {card.icon}
                   </div>
                   <h3 className="font-semibold text-white mb-2">{card.title}</h3>
-                  <p className={`text-sm ${card.special ? 'text-blue-100' : 'text-gray-400'}`}>{card.desc}</p>
+                  <p className={`text-sm ${card.special ? 'text-blue-100' : 'text-gray-300'}`}>{card.desc}</p>
                 </motion.div>
               ))}
             </div>

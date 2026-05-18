@@ -38,7 +38,7 @@ const Breadcrumbs = ({ items }: BreadcrumbsProps) => {
         <ol className="flex flex-wrap items-center gap-1.5 text-sm text-gray-500">
           {allItems.map((item, index) => (
             <li key={index} className="flex items-center gap-1.5">
-              {index > 0 && <ChevronRight className="w-3.5 h-3.5 text-gray-400" />}
+              {index > 0 && <ChevronRight className="w-3.5 h-3.5 text-gray-600" />}
               {item.href && index < allItems.length - 1 ? (
                 <Link to={item.href} className="hover:text-blue-600 transition-colors flex items-center gap-1">
                   {index === 0 && <Home className="w-3.5 h-3.5" />}
