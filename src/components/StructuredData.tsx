@@ -14,12 +14,12 @@ const StructuredData = () => {
     "priceRange": "$$",
     "address": {
       "@type": "PostalAddress",
-      "addressLocality": "Parauapebas",
+      "addressLocality": "Paragominas",
       "addressRegion": "PA",
       "addressCountry": "BR"
     },
     "areaServed": [
-      { "@type": "City", "name": "Parauapebas" },
+      { "@type": "City", "name": "Paragominas" },
       { "@type": "Country", "name": "Brasil" }
     ],
     "contactPoint": {
@@ -99,7 +99,7 @@ const StructuredData = () => {
         "name": "Qual a área de atuação da Delta7?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Nossa sede fica em Parauapebas-PA, mas atendemos clientes em todo o Brasil através de suporte remoto. Para serviços presenciais, atuamos na região do sudeste do Pará."
+          "text": "Nossa sede fica em Paragominas-PA, mas atendemos clientes em todo o Brasil através de suporte remoto. Para serviços presenciais, atuamos na região do sudeste do Pará e região metropolitana de Belém."
         }
       }
     ]
