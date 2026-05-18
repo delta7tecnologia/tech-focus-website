@@ -20,6 +20,17 @@ const SEOHead = ({ title, description }: SEOHeadProps) => {
     const ogDesc = document.querySelector('meta[property="og:description"]');
     if (ogDesc) ogDesc.setAttribute('content', description);
 
+    const absoluteUrl = `https://delta7tecnologia.com.br${location.pathname}`;
+
+    // og:url — keep in sync with current route
+    let ogUrl = document.querySelector('meta[property="og:url"]') as HTMLMetaElement | null;
+    if (!ogUrl) {
+      ogUrl = document.createElement('meta');
+      ogUrl.setAttribute('property', 'og:url');
+      document.head.appendChild(ogUrl);
+    }
+    ogUrl.setAttribute('content', absoluteUrl);
+
     // Canonical
     let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
     if (!canonical) {
@@ -27,7 +38,7 @@ const SEOHead = ({ title, description }: SEOHeadProps) => {
       canonical.setAttribute('rel', 'canonical');
       document.head.appendChild(canonical);
     }
-    canonical.setAttribute('href', `https://delta7tecnologia.com.br${location.pathname}`);
+    canonical.setAttribute('href', absoluteUrl);
   }, [title, description, location.pathname]);
 
   return null;
