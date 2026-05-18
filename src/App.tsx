@@ -13,6 +13,7 @@ import Ferramentas from "./pages/Ferramentas";
 import VideoInstitucional from "./pages/VideoInstitucional";
 import LinksUteis from "./pages/LinksUteis";
 import AreaTecnica from "./pages/AreaTecnica";
+import FAQ from "./pages/FAQ";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
 import SignReport from "./pages/SignReport";
@@ -38,6 +39,7 @@ import AdminReports from "./pages/admin/AdminReports";
 import AdminServiceOrders from "./pages/admin/AdminServiceOrders";
 import AdminProposals from "./pages/admin/AdminProposals";
 import AdminItSupportProposals from "./pages/admin/AdminItSupportProposals";
+import AdminSeo from "./pages/admin/AdminSeo";
 import ValidateProposal from "./pages/ValidateProposal";
 import SignItSupportProposal from "./pages/SignItSupportProposal";
 import ValidateItSupportProposal from "./pages/ValidateItSupportProposal";
@@ -60,6 +62,7 @@ const App = () => (
             <Route path="/video-institucional" element={<VideoInstitucional />} />
             <Route path="/links-uteis" element={<LinksUteis />} />
             <Route path="/area-tecnica" element={<AreaTecnica />} />
+            <Route path="/faq" element={<FAQ />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/assinar/:token" element={<SignReport />} />
             <Route path="/assinar-os/:token" element={<SignServiceOrder />} />
@@ -87,6 +90,7 @@ const App = () => (
               <Route path="ordens-servico" element={<AdminServiceOrders />} />
               <Route path="propostas" element={<AdminProposals />} />
               <Route path="propostas-suporte" element={<AdminItSupportProposals />} />
+              <Route path="seo" element={<AdminSeo />} />
               <Route path="configuracoes" element={<AdminSettings />} />
             </Route>
             

@@ -19,6 +19,7 @@ import {
   ClipboardList,
   HardDriveUpload,
   LifeBuoy,
+  TrendingUp,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -63,6 +64,7 @@ const sections: MenuSection[] = [
   {
     label: 'Sistema',
     items: [
+      { name: 'SEO / Search Console', icon: TrendingUp, path: '/admin/seo' },
       { name: 'Configurações', icon: Settings, path: '/admin/configuracoes' },
     ],
   },
