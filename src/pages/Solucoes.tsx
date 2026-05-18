@@ -127,6 +127,35 @@ const Solucoes = () => {
         title="Soluções de TI para Empresas | Delta7 Tecnologia"
         description="Conheça todas as soluções de TI da Delta7: infraestrutura, segurança, cloud, backup, desenvolvimento web e automação com IA para sua empresa."
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Service",
+          "serviceType": "Soluções de TI Gerenciada",
+          "provider": {
+            "@type": "LocalBusiness",
+            "name": "Delta7 Tecnologia",
+            "url": "https://delta7tecnologia.com.br"
+          },
+          "areaServed": { "@type": "Country", "name": "Brasil" },
+          "url": "https://delta7tecnologia.com.br/solucoes",
+          "description": "Infraestrutura, segurança, cloud, backup, monitoramento, desenvolvimento web e automação com IA para empresas.",
+          "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Serviços Delta7",
+            "itemListElement": [
+              { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Suporte Técnico Gerenciado" } },
+              { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Cloud e Virtualização" } },
+              { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Segurança da Informação" } },
+              { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Backup em Nuvem" } },
+              { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Monitoramento 24x7" } },
+              { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Desenvolvimento Web" } },
+              { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Automação com IA" } }
+            ]
+          }
+        }) }}
+      />
       <Navigation />
 
       {/* Hero Section */}
