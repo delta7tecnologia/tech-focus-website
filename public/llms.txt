@@ -1,0 +1,20 @@
+# Delta7 Tecnologia
+
+> MSP brasileira especializada em infraestrutura de TI, suporte gerenciado, monitoramento (Zabbix/Grafana), virtualização (Proxmox), segurança (PfSense/Wazuh) e backup em nuvem para pequenas e médias empresas.
+
+A Delta7 Tecnologia atende clientes em Parauapebas-PA e em todo o Brasil via suporte remoto, oferecendo soluções completas de TI, cloud e segurança da informação.
+
+## Pages
+
+- [Início](/): Visão geral da Delta7 Tecnologia, serviços e diferenciais.
+- [Soluções](/solucoes): Catálogo completo de serviços de TI, cloud, segurança e automação.
+- [Depoimentos](/depoimentos): Avaliações e cases de clientes.
+- [Portfólio](/portfolio): Projetos realizados e download do portfólio em PDF.
+- [Links Úteis](/links-uteis): Portal de acesso remoto (AnyDesk, RustDesk) e ferramentas para clientes.
+- [Ferramentas](/ferramentas): Utilitários de suporte e diagnóstico.
+- [Vídeo Institucional](/video-institucional): História, missão, visão e valores da empresa.
+- [Área Técnica](/area-tecnica): Portal dos técnicos parceiros.
+
+## Optional
+
+- [Sitemap](/sitemap.xml): Lista completa de páginas indexáveis.
