@@ -13,6 +13,7 @@ import Ferramentas from "./pages/Ferramentas";
 import VideoInstitucional from "./pages/VideoInstitucional";
 import LinksUteis from "./pages/LinksUteis";
 import AreaTecnica from "./pages/AreaTecnica";
+import FAQ from "./pages/FAQ";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
 import SignReport from "./pages/SignReport";
