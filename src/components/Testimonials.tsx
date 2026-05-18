@@ -57,19 +57,19 @@ const Testimonials = () => {
                 <Star key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
               ))}
             </div>
-            <div className="text-sm text-gray-400">4.9/5 de avaliação</div>
+            <div className="text-sm text-gray-300">4.9/5 de avaliação</div>
           </div>
           <div className="text-center">
             <div className="text-3xl font-bold text-white">98%</div>
-            <div className="text-sm text-gray-400">Taxa de satisfação</div>
+            <div className="text-sm text-gray-300">Taxa de satisfação</div>
           </div>
           <div className="text-center">
             <div className="text-3xl font-bold text-white">200+</div>
-            <div className="text-sm text-gray-400">Clientes ativos</div>
+            <div className="text-sm text-gray-300">Clientes ativos</div>
           </div>
           <div className="text-center">
             <div className="text-3xl font-bold text-white">15min</div>
-            <div className="text-sm text-gray-400">Tempo médio de resposta</div>
+            <div className="text-sm text-gray-300">Tempo médio de resposta</div>
           </div>
         </motion.div>
 
@@ -102,7 +102,7 @@ const Testimonials = () => {
                     </div>
                     <div>
                       <div className="font-semibold text-white">{testimonial.client_name}</div>
-                      <div className="text-sm text-gray-400">
+                      <div className="text-sm text-gray-300">
                         {testimonial.position && `${testimonial.position} • `}{testimonial.company}
                       </div>
                     </div>
@@ -114,7 +114,7 @@ const Testimonials = () => {
         </div>
 
         {testimonials.length === 0 && (
-          <div className="text-center text-gray-400 py-12">
+          <div className="text-center text-gray-300 py-12">
             Nenhuma avaliação disponível no momento.
           </div>
         )}
@@ -126,7 +126,7 @@ const Testimonials = () => {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
         >
-          <p className="text-gray-400 mb-4">Junte-se a mais de 200 empresas satisfeitas</p>
+          <p className="text-gray-300 mb-4">Junte-se a mais de 200 empresas satisfeitas</p>
           <a 
             href="https://wa.me/5591982370332?text=Olá! Gostaria de saber mais sobre os serviços da Delta7."
             className="inline-flex items-center gap-2 bg-white text-blue-600 font-semibold px-6 py-3 rounded-full hover:bg-blue-50 transition-colors"
