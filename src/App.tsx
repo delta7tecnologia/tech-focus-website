@@ -62,6 +62,7 @@ const App = () => (
             <Route path="/video-institucional" element={<VideoInstitucional />} />
             <Route path="/links-uteis" element={<LinksUteis />} />
             <Route path="/area-tecnica" element={<AreaTecnica />} />
+            <Route path="/faq" element={<FAQ />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/assinar/:token" element={<SignReport />} />
             <Route path="/assinar-os/:token" element={<SignServiceOrder />} />
