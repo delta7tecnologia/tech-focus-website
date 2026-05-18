@@ -90,6 +90,7 @@ const App = () => (
               <Route path="ordens-servico" element={<AdminServiceOrders />} />
               <Route path="propostas" element={<AdminProposals />} />
               <Route path="propostas-suporte" element={<AdminItSupportProposals />} />
+              <Route path="seo" element={<AdminSeo />} />
               <Route path="configuracoes" element={<AdminSettings />} />
             </Route>
             
