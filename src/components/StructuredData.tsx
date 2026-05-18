@@ -8,7 +8,7 @@ const StructuredData = () => {
     "url": "https://delta7tecnologia.com.br",
     "logo": "https://delta7tecnologia.com.br/logo.png",
     "image": "https://delta7tecnologia.com.br/logo.png",
-    "description": "MSP especializada em infraestrutura de TI, suporte gerenciado, cloud, segurança e backup para empresas.",
+    "description": "MSP em Paragominas-PA especializada em suporte técnico de TI, cloud, segurança e backup em nuvem para empresas no Pará e em todo o Brasil.",
     "foundingDate": "2014",
     "telephone": "+55-91-98237-0332",
     "priceRange": "$$",
@@ -16,10 +16,22 @@ const StructuredData = () => {
       "@type": "PostalAddress",
       "addressLocality": "Paragominas",
       "addressRegion": "PA",
+      "postalCode": "68625-000",
       "addressCountry": "BR"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": -2.9967,
+      "longitude": -47.3536
     },
     "areaServed": [
       { "@type": "City", "name": "Paragominas" },
+      { "@type": "City", "name": "Ipixuna do Pará" },
+      { "@type": "City", "name": "Ulianópolis" },
+      { "@type": "City", "name": "Dom Eliseu" },
+      { "@type": "City", "name": "Tomé-Açu" },
+      { "@type": "City", "name": "Belém" },
+      { "@type": "State", "name": "Pará" },
       { "@type": "Country", "name": "Brasil" }
     ],
     "contactPoint": {
