@@ -14,6 +14,7 @@ A Delta7 Tecnologia atende clientes em Parauapebas-PA e em todo o Brasil via sup
 - [Ferramentas](/ferramentas): Utilitários de suporte e diagnóstico.
 - [Vídeo Institucional](/video-institucional): História, missão, visão e valores da empresa.
 - [Área Técnica](/area-tecnica): Portal dos técnicos parceiros.
+- [FAQ](/faq): Perguntas frequentes sobre suporte, cloud, segurança e backup.
 
 ## Optional
 
