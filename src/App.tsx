@@ -39,6 +39,7 @@ import AdminReports from "./pages/admin/AdminReports";
 import AdminServiceOrders from "./pages/admin/AdminServiceOrders";
 import AdminProposals from "./pages/admin/AdminProposals";
 import AdminItSupportProposals from "./pages/admin/AdminItSupportProposals";
+import AdminSeo from "./pages/admin/AdminSeo";
 import ValidateProposal from "./pages/ValidateProposal";
 import SignItSupportProposal from "./pages/SignItSupportProposal";
 import ValidateItSupportProposal from "./pages/ValidateItSupportProposal";
