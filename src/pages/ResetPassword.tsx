@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Lock, Eye, EyeOff, CheckCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import SEOHead from '@/components/SEOHead';
 
 const ResetPassword = () => {
   const [password, setPassword] = useState('');
