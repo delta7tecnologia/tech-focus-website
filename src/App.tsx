@@ -53,6 +53,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <StructuredData />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/solucoes" element={<Solucoes />} />
