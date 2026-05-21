@@ -4,42 +4,71 @@ import { useLocation } from 'react-router-dom';
 interface SEOHeadProps {
   title: string;
   description: string;
+  noindex?: boolean;
+  jsonLd?: Record<string, any> | Record<string, any>[];
 }
 
-const SEOHead = ({ title, description }: SEOHeadProps) => {
+const SEOHead = ({ title, description, noindex, jsonLd }: SEOHeadProps) => {
   const location = useLocation();
 
   useEffect(() => {
     document.title = title;
-    const metaDesc = document.querySelector('meta[name="description"]');
-    if (metaDesc) metaDesc.setAttribute('content', description);
 
-    const ogTitle = document.querySelector('meta[property="og:title"]');
-    if (ogTitle) ogTitle.setAttribute('content', title);
+    const setMeta = (selector: string, attr: 'name' | 'property', key: string, content: string) => {
+      let el = document.querySelector(selector) as HTMLMetaElement | null;
+      if (!el) {
+        el = document.createElement('meta');
+        el.setAttribute(attr, key);
+        document.head.appendChild(el);
+      }
+      el.setAttribute('content', content);
+    };
 
-    const ogDesc = document.querySelector('meta[property="og:description"]');
-    if (ogDesc) ogDesc.setAttribute('content', description);
+    setMeta('meta[name="description"]', 'name', 'description', description);
+    setMeta('meta[property="og:title"]', 'property', 'og:title', title);
+    setMeta('meta[property="og:description"]', 'property', 'og:description', description);
 
     const absoluteUrl = `https://delta7tecnologia.com.br${location.pathname}`;
+    setMeta('meta[property="og:url"]', 'property', 'og:url', absoluteUrl);
 
-    // og:url — keep in sync with current route
-    let ogUrl = document.querySelector('meta[property="og:url"]') as HTMLMetaElement | null;
-    if (!ogUrl) {
-      ogUrl = document.createElement('meta');
-      ogUrl.setAttribute('property', 'og:url');
-      document.head.appendChild(ogUrl);
-    }
-    ogUrl.setAttribute('content', absoluteUrl);
-
-    // Canonical
-    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
     if (!canonical) {
       canonical = document.createElement('link');
       canonical.setAttribute('rel', 'canonical');
       document.head.appendChild(canonical);
     }
     canonical.setAttribute('href', absoluteUrl);
-  }, [title, description, location.pathname]);
+
+    // Robots
+    let robots = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
+    if (noindex) {
+      if (!robots) {
+        robots = document.createElement('meta');
+        robots.setAttribute('name', 'robots');
+        document.head.appendChild(robots);
+      }
+      robots.setAttribute('content', 'noindex, nofollow');
+    } else if (robots) {
+      robots.setAttribute('content', 'index, follow');
+    }
+
+    // Route-scoped JSON-LD
+    const SCRIPT_ID = 'seo-head-jsonld';
+    const existing = document.getElementById(SCRIPT_ID);
+    if (existing) existing.remove();
+    if (jsonLd) {
+      const script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.id = SCRIPT_ID;
+      script.text = JSON.stringify(jsonLd);
+      document.head.appendChild(script);
+    }
+
+    return () => {
+      const s = document.getElementById(SCRIPT_ID);
+      if (s) s.remove();
+    };
+  }, [title, description, location.pathname, noindex, JSON.stringify(jsonLd)]);
 
   return null;
 };
