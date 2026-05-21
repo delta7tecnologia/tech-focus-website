@@ -5,6 +5,8 @@ Disallow: /assinar/
 Disallow: /assinar-os/
 Disallow: /assinar-proposta/
 Disallow: /assinar-suporte/
+Disallow: /loja
+Disallow: /termos-uso
 
 User-agent: Bingbot
 Allow: /
@@ -13,6 +15,8 @@ Disallow: /assinar/
 Disallow: /assinar-os/
 Disallow: /assinar-proposta/
 Disallow: /assinar-suporte/
+Disallow: /loja
+Disallow: /termos-uso
 
 User-agent: Twitterbot
 Allow: /
@@ -27,5 +31,7 @@ Disallow: /assinar/
 Disallow: /assinar-os/
 Disallow: /assinar-proposta/
 Disallow: /assinar-suporte/
+Disallow: /loja
+Disallow: /termos-uso
 
 Sitemap: https://delta7tecnologia.com.br/sitemap.xml
