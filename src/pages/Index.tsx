@@ -24,7 +24,7 @@ const Index = () => {
           title="Delta7 Tecnologia em Paragominas-PA | Suporte de TI e Cloud"
           description="Empresa de TI em Paragominas-PA: suporte técnico, monitoramento 24x7, cloud, segurança e backup em nuvem para empresas no Pará e em todo o Brasil."
         />
-        <StructuredData />
+        
         <Navigation />
         <HeroSection />
         <ClientsSection />
