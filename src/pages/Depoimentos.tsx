@@ -45,9 +45,9 @@ const Depoimentos = () => {
             },
             review: testimonials.slice(0, 10).map((t: any) => ({
               "@type": "Review",
-              author: { "@type": "Person", name: t.name || t.author || "Cliente" },
+              author: { "@type": "Person", name: t.client_name || "Cliente" },
               reviewRating: { "@type": "Rating", ratingValue: t.rating || 5, bestRating: 5 },
-              reviewBody: t.testimonial || t.message || t.content || "",
+              reviewBody: t.content || "",
             })),
           }}
         />
