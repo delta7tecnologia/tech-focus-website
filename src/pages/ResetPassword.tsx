@@ -62,6 +62,11 @@ const ResetPassword = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center p-4">
+      <SEOHead
+        title="Redefinir senha | Delta7 Tecnologia"
+        description="Defina uma nova senha para acessar a área técnica da Delta7 Tecnologia."
+        noindex
+      />
       <Card className="w-full max-w-md shadow-2xl">
         <CardHeader className="text-center">
           <img src={logoDark} alt="Delta7" className="h-12 mx-auto mb-4" />
