@@ -9,11 +9,14 @@ import { useToast } from '@/hooks/use-toast';
 import delta7Logo from '@/assets/delta7-logo.png';
 import { generateAdvancedReportPdf, type AdvancedReportData } from '@/utils/reportPdfAdvanced';
 import { generateReportPdf, type ReportData } from '@/utils/reportPdf';
+import { useSEO } from '@/hooks/useSEO';
 
 const formatDateTime = (iso?: string | null) =>
   iso ? new Date(iso).toLocaleString('pt-BR') : '—';
 
 const ValidateReport = () => {
+  useSEO({ title: 'Validar laudo técnico | Delta7 Tecnologia', description: 'Valide a autenticidade de um laudo técnico emitido pela Delta7 Tecnologia.', noindex: true });
+
   const { hash } = useParams<{ hash: string }>();
   const { toast } = useToast();
   const [downloading, setDownloading] = useState(false);

@@ -11,10 +11,13 @@ import SignaturePad from '@/components/tech/reports/SignaturePad';
 import { downloadCommercialProposalPdf } from '@/utils/commercialProposalPdf';
 import { formatBRL } from '@/lib/proposalContent';
 import delta7Logo from '@/assets/delta7-logo.png';
+import { useSEO } from '@/hooks/useSEO';
 
 const ROLE_LABEL: Record<string, string> = { cliente: 'Cliente', responsavel: 'Responsável / Decisor' };
 
 const SignProposal = () => {
+  useSEO({ title: 'Assinar proposta comercial | Delta7 Tecnologia', description: 'Página segura para revisar e assinar digitalmente a proposta comercial da Delta7 Tecnologia.', noindex: true });
+
   const { token } = useParams<{ token: string }>();
   const { toast } = useToast();
   const [signature, setSignature] = useState('');

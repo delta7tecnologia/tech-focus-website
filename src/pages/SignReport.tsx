@@ -14,10 +14,13 @@ import {
   formatSignatureDate,
 } from '@/utils/reportSignatures';
 import delta7Logo from '@/assets/delta7-logo.png';
+import { useSEO } from '@/hooks/useSEO';
 
 const ROLE_LABEL: Record<string, string> = { cliente: 'Cliente', gestor: 'Gestor / Supervisor' };
 
 const SignReport = () => {
+  useSEO({ title: 'Assinar laudo técnico | Delta7 Tecnologia', description: 'Página segura para assinar digitalmente o laudo técnico emitido pela Delta7 Tecnologia.', noindex: true });
+
   const { token } = useParams<{ token: string }>();
   const { toast } = useToast();
   const [signature, setSignature] = useState('');

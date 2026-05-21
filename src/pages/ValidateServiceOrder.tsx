@@ -11,6 +11,7 @@ import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import delta7Logo from '@/assets/delta7-logo.png';
 import { downloadServiceOrderPdf, type SOEvidence } from '@/utils/serviceOrderPdf';
+import { useSEO } from '@/hooks/useSEO';
 
 const formatDateTime = (iso?: string | null) =>
   iso ? new Date(iso).toLocaleString('pt-BR') : '—';
@@ -28,6 +29,8 @@ const VISIT_LABEL: Record<string, string> = {
 };
 
 const ValidateServiceOrder = () => {
+  useSEO({ title: 'Validar ordem de serviço | Delta7 Tecnologia', description: 'Valide a autenticidade de uma ordem de serviço emitida pela Delta7 Tecnologia.', noindex: true });
+
   const { hash } = useParams<{ hash: string }>();
   const { toast } = useToast();
   const [downloading, setDownloading] = useState(false);

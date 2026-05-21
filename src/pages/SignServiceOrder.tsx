@@ -10,6 +10,7 @@ import { Loader2, FileSignature, CheckCircle2, XCircle, ShieldCheck, MapPin } fr
 import SignaturePad from '@/components/tech/reports/SignaturePad';
 import delta7Logo from '@/assets/delta7-logo.png';
 import QRCode from 'qrcode';
+import { useSEO } from '@/hooks/useSEO';
 
 const ROLE_LABEL: Record<string, string> = {
   responsavel: 'Responsável no local',
@@ -17,6 +18,8 @@ const ROLE_LABEL: Record<string, string> = {
 };
 
 const SignServiceOrder = () => {
+  useSEO({ title: 'Assinar ordem de serviço | Delta7 Tecnologia', description: 'Página segura para assinar digitalmente a ordem de serviço emitida pela Delta7 Tecnologia.', noindex: true });
+
   const { token } = useParams<{ token: string }>();
   const { toast } = useToast();
   const [signature, setSignature] = useState('');
