@@ -2,7 +2,7 @@ import React from 'react';
 import Navigation from '@/components/Navigation';
 import HeroSection from '@/components/HeroSection';
 import SEOHead from '@/components/SEOHead';
-import StructuredData from '@/components/StructuredData';
+
 import ClientsSection from '@/components/ClientsSection';
 import ServicesSection from '@/components/ServicesSection';
 
