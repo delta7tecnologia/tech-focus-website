@@ -2,7 +2,7 @@ import React from 'react';
 import Navigation from '@/components/Navigation';
 import HeroSection from '@/components/HeroSection';
 import SEOHead from '@/components/SEOHead';
-import StructuredData from '@/components/StructuredData';
+
 import ClientsSection from '@/components/ClientsSection';
 import ServicesSection from '@/components/ServicesSection';
 
@@ -24,7 +24,7 @@ const Index = () => {
           title="Delta7 Tecnologia em Paragominas-PA | Suporte de TI e Cloud"
           description="Empresa de TI em Paragominas-PA: suporte técnico, monitoramento 24x7, cloud, segurança e backup em nuvem para empresas no Pará e em todo o Brasil."
         />
-        <StructuredData />
+        
         <Navigation />
         <HeroSection />
         <ClientsSection />

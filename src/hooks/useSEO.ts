@@ -1,14 +1,17 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-interface SEOHeadProps {
+interface UseSEOOptions {
   title: string;
   description: string;
   noindex?: boolean;
-  jsonLd?: Record<string, any> | Record<string, any>[];
 }
 
-const SEOHead = ({ title, description, noindex, jsonLd }: SEOHeadProps) => {
+/**
+ * Hook variant of SEOHead. Useful for pages with multiple early returns
+ * where mounting a component conditionally would skip metadata updates.
+ */
+export const useSEO = ({ title, description, noindex }: UseSEOOptions) => {
   const location = useLocation();
 
   useEffect(() => {
@@ -39,7 +42,6 @@ const SEOHead = ({ title, description, noindex, jsonLd }: SEOHeadProps) => {
     }
     canonical.setAttribute('href', absoluteUrl);
 
-    // Robots
     let robots = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
     if (noindex) {
       if (!robots) {
@@ -51,26 +53,5 @@ const SEOHead = ({ title, description, noindex, jsonLd }: SEOHeadProps) => {
     } else if (robots) {
       robots.setAttribute('content', 'index, follow');
     }
-
-    // Route-scoped JSON-LD
-    const SCRIPT_ID = 'seo-head-jsonld';
-    const existing = document.getElementById(SCRIPT_ID);
-    if (existing) existing.remove();
-    if (jsonLd) {
-      const script = document.createElement('script');
-      script.type = 'application/ld+json';
-      script.id = SCRIPT_ID;
-      script.text = JSON.stringify(jsonLd);
-      document.head.appendChild(script);
-    }
-
-    return () => {
-      const s = document.getElementById(SCRIPT_ID);
-      if (s) s.remove();
-    };
-  }, [title, description, location.pathname, noindex, JSON.stringify(jsonLd)]);
-
-  return null;
+  }, [title, description, location.pathname, noindex]);
 };
-
-export default SEOHead;

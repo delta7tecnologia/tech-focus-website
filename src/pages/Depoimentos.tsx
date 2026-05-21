@@ -32,6 +32,24 @@ const Depoimentos = () => {
         <SEOHead
           title="Depoimentos de Clientes | Delta7 Tecnologia"
           description="Veja o que nossos clientes falam sobre os serviços da Delta7 Tecnologia. Mais de 50 avaliações positivas no Google com nota 4.9/5."
+          jsonLd={{
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            name: "Delta7 Tecnologia",
+            url: "https://delta7tecnologia.com.br",
+            aggregateRating: {
+              "@type": "AggregateRating",
+              ratingValue: "4.9",
+              bestRating: "5",
+              ratingCount: Math.max(testimonials.length, 50),
+            },
+            review: testimonials.slice(0, 10).map((t: any) => ({
+              "@type": "Review",
+              author: { "@type": "Person", name: t.client_name || "Cliente" },
+              reviewRating: { "@type": "Rating", ratingValue: t.rating || 5, bestRating: 5 },
+              reviewBody: t.content || "",
+            })),
+          }}
         />
         <Navigation />
 

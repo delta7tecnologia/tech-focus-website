@@ -15,6 +15,14 @@ const Portfolio = () => {
         <SEOHead
           title="Portfólio e Cases de Sucesso | Delta7 Tecnologia"
           description="Conheça os projetos e cases de sucesso da Delta7 Tecnologia. Modernização de infraestrutura, adequação LGPD, backup e muito mais."
+          jsonLd={{
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            name: "Portfólio Delta7 Tecnologia",
+            url: "https://delta7tecnologia.com.br/portfolio",
+            description: "Cases de sucesso e projetos executados pela Delta7 Tecnologia em infraestrutura, cloud, segurança e suporte de TI.",
+            isPartOf: { "@type": "WebSite", name: "Delta7 Tecnologia", url: "https://delta7tecnologia.com.br" },
+          }}
         />
         <Navigation />
 

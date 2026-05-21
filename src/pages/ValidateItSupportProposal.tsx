@@ -9,10 +9,13 @@ import { useToast } from '@/hooks/use-toast';
 import logoDark from '@/assets/logo.png';
 import { downloadItSupportProposalPdf } from '@/utils/itSupportProposalPdf';
 import { formatBRL } from '@/lib/itSupportContent';
+import { useSEO } from '@/hooks/useSEO';
 
 const fmt = (iso?: string | null) => (iso ? new Date(iso).toLocaleString('pt-BR') : '—');
 
 const ValidateItSupportProposal = () => {
+  useSEO({ title: 'Validar proposta de suporte de TI | Delta7 Tecnologia', description: 'Valide a autenticidade de uma proposta de suporte de TI emitida pela Delta7 Tecnologia.', noindex: true });
+
   const { hash } = useParams<{ hash: string }>();
   const { toast } = useToast();
   const [downloading, setDownloading] = useState(false);
