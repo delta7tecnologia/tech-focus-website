@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Checkbox } from '@/components/ui/checkbox';
 import ItSupportItemsEditor, { type SupEditableItem } from './ItSupportItemsEditor';
 import ItSupportProposalSignatureLinksManager from './ItSupportProposalSignatureLinksManager';
+import ClientShowcasePicker, { fetchFeaturedClients, type FeaturedClient } from '@/components/tech/proposals/ClientShowcasePicker';
 import {
   SUP_SETUP_FEE_DEFAULT,
   SUP_VALIDITY_DAYS_DEFAULT,
