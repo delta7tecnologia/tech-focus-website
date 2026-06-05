@@ -154,6 +154,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
       setup_total: activationFee,
       sections: sections as any,
       show_altatek_logo: showAltatekLogo,
+      featured_clients: featuredClients as any,
     };
   };
 
