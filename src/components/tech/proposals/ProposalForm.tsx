@@ -101,6 +101,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
         integrityHash: proposal?.integrity_hash || 'previa-sem-hash-de-integridade'.padEnd(64, '0'),
         sections,
         showAltatekLogo,
+        featuredClients,
         template,
       });
       setPreviewPages(pages);
