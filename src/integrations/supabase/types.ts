@@ -166,6 +166,7 @@ export type Database = {
           created_at: string
           created_by: string
           discount: number
+          featured_clients: Json
           generated_at: string
           id: string
           integrity_hash: string | null
@@ -196,6 +197,7 @@ export type Database = {
           created_at?: string
           created_by: string
           discount?: number
+          featured_clients?: Json
           generated_at?: string
           id?: string
           integrity_hash?: string | null
@@ -226,6 +228,7 @@ export type Database = {
           created_at?: string
           created_by?: string
           discount?: number
+          featured_clients?: Json
           generated_at?: string
           id?: string
           integrity_hash?: string | null
@@ -348,6 +351,7 @@ export type Database = {
           created_at: string
           created_by: string
           discount: number
+          featured_clients: Json
           generated_at: string
           id: string
           integrity_hash: string | null
@@ -379,6 +383,7 @@ export type Database = {
           created_at?: string
           created_by: string
           discount?: number
+          featured_clients?: Json
           generated_at?: string
           id?: string
           integrity_hash?: string | null
@@ -410,6 +415,7 @@ export type Database = {
           created_at?: string
           created_by?: string
           discount?: number
+          featured_clients?: Json
           generated_at?: string
           id?: string
           integrity_hash?: string | null
@@ -1204,6 +1210,7 @@ export type Database = {
           created_at: string
           created_by: string
           discount: number
+          featured_clients: Json
           generated_at: string
           id: string
           integrity_hash: string | null
@@ -1243,6 +1250,7 @@ export type Database = {
           created_at: string
           created_by: string
           discount: number
+          featured_clients: Json
           generated_at: string
           id: string
           integrity_hash: string | null

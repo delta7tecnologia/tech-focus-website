@@ -1,0 +1,2 @@
+ALTER TABLE public.commercial_proposals ADD COLUMN IF NOT EXISTS featured_clients jsonb NOT NULL DEFAULT '[]'::jsonb;
+ALTER TABLE public.it_support_proposals ADD COLUMN IF NOT EXISTS featured_clients jsonb NOT NULL DEFAULT '[]'::jsonb;
