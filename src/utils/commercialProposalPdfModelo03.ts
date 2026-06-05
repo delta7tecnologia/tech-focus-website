@@ -277,6 +277,7 @@ function drawClientesIdentificacao(
 
   // Clientes em destaque
   if (S.showClients && r.featuredClients && r.featuredClients.length > 0) {
+    console.log('[M03] clients:', r.featuredClients.length);
     y = sectionTitle(doc, 'Confianca', 'Clientes que confiam na Delta7', y);
     t(doc, 'Algumas das empresas que confiam na Delta7 para gestao e suporte de TI:', ML, y, { size: 8.5, color: MUTED });
     y += 5;
@@ -288,6 +289,7 @@ function drawClientesIdentificacao(
     let col = 0;
     let rowY = y;
     for (let i = 0; i < clients.length; i++) {
+      console.log('[M03] client', i, clients[i].name);
       const cx = ML + col * cellW;
       // Borda da celula
       fillRect(doc, cx + 1, rowY, cellW - 2, cellH, WHITE);
