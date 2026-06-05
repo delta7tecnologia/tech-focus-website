@@ -122,11 +122,9 @@ function t(
 }
 
 //  Cabecalho de pagina interna 
-function drawPageHeader(doc: jsPDF, propNum: string, logoDataUrl: string) {
-  // Logo
-  try {
-    doc.addImage(logoDataUrl, 'PNG', ML, 8, 28, 10);
-  } catch {}
+function drawPageHeader(doc: jsPDF, propNum: string, _logoDataUrl: string) {
+  // Logo (usa alias pre-cacheado)
+  try { doc.addImage('LOGO_DARK', 'PNG', ML, 8, 28, 10); } catch {}
   // Numero da proposta
   t(doc, 'Proposta Comercial', ML + CW, 12, { size: 7, color: MUTED, align: 'right' });
   t(doc, `No ${propNum}`, ML + CW, 16, { size: 10, style: 'bold', color: NAVY, align: 'right' });
@@ -156,18 +154,14 @@ function drawCover(doc: jsPDF, r: CommercialProposalPdfData) {
   fillRect(doc, 0, 0, PW, PH, NAVY);
 
   //  Logo Delta7 (canto superior esquerdo) 
-  try {
-    doc.addImage(DELTA7_LOGO_DATA_URL, 'PNG', ML, 16, 36, 14);
-  } catch {}
+  try { doc.addImage('LOGO_WHITE', 'PNG', ML, 16, 36, 14); } catch {}
 
   //  Altatek badge (canto superior direito) 
   if (r.showAltatekLogo) {
     // Fundo branco
     fillRect(doc, ML + CW - 36, 14, 36, 18, WHITE);
     t(doc, 'REVENDA AUTORIZADA', ML + CW - 18, 19.5, { size: 5.5, color: MUTED, align: 'center' });
-    try {
-      doc.addImage(ALTATEK_LOGO_DATA_URL, 'PNG', ML + CW - 33, 21, 30, 9);
-    } catch {}
+    try { doc.addImage('ALTATEK', 'PNG', ML + CW - 33, 21, 30, 9); } catch {}
   } else {
     // so o texto Delta7
     t(doc, 'DELTA7 TECNOLOGIA', ML + CW, 20, { size: 7, color: [148, 163, 184], align: 'right' });
@@ -649,6 +643,13 @@ async function drawAceite(doc: jsPDF, r: CommercialProposalPdfData): Promise<voi
 export async function buildModelo03(r: CommercialProposalPdfData): Promise<jsPDF> {
   const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
   const S: ProposalSections = { ...DEFAULT_SECTIONS, ...(r.sections || {}) };
+
+  // Pre-cache logos com alias para jsPDF reusar sem re-decodificar PNG
+  try { doc.addImage(DELTA7_LOGO_DARK_DATA_URL, 'PNG', -999, -999, 1, 1, 'LOGO_DARK', 'FAST'); } catch {}
+  try { doc.addImage(DELTA7_LOGO_DATA_URL, 'PNG', -999, -999, 1, 1, 'LOGO_WHITE', 'FAST'); } catch {}
+  if (r.showAltatekLogo) {
+    try { doc.addImage(ALTATEK_LOGO_DATA_URL, 'PNG', -999, -999, 1, 1, 'ALTATEK', 'FAST'); } catch {}
+  }
 
   // Pagina 1: Capa
   drawCover(doc, r);
