@@ -224,10 +224,14 @@ function buildHtml(r: CommercialProposalPdfData): string {
         <td style="vertical-align:middle;"><img src="${DELTA7_LOGO_DATA_URL}" alt="Delta7" style="height:70px;display:block;" /></td>
         <td style="vertical-align:middle;text-align:right;">
           <div style="font-size:10px;color:${C.goldLight};letter-spacing:3px;text-transform:uppercase;">Delta7 Tecnologia</div>
-          ${r.showAltatekLogo ? `<div style="margin-top:10px;display:inline-block;background:white;padding:6px 10px;border-radius:4px;">
-            <div style="font-size:6px;letter-spacing:2px;text-transform:uppercase;color:#64748b;font-weight:700;margin-bottom:3px;text-align:center;">REVENDA AUTORIZADA</div>
-            <img src="${ALTATEK_LOGO_DATA_URL}" alt="Altatek" style="height:18px;display:block;" />
-          </div>` : ''}
+          ${r.showAltatekLogo ? `<table style="display:inline-table;margin-top:10px;border-collapse:collapse;background:white;border-radius:4px;">
+            <tr>
+              <td style="padding:6px 10px;text-align:center;vertical-align:middle;">
+                <div style="font-size:6px;letter-spacing:2px;text-transform:uppercase;color:#64748b;font-weight:700;margin-bottom:3px;">REVENDA AUTORIZADA</div>
+                <img src="${ALTATEK_LOGO_DATA_URL}" alt="Altatek" style="height:18px;display:block;margin:0 auto;" />
+              </td>
+            </tr>
+          </table>` : ''}
         </td>
       </tr>
     </table>
