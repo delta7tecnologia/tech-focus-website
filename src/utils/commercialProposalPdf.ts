@@ -94,7 +94,7 @@ const iconCircle = (name: string, size = 44) => {
 // que faz o html2canvas distribuir espaços irregulares entre palavras.
 const htmlParas = (text: string, style = '') =>
   text.split(/\n\n+/).map(p =>
-    `<p style="margin:0 0 10px 0;line-height:1.65;${style}">${escapeHtml(p.trim()).replace(/\n/g, '<br/>')}</p>`
+    `<p style="margin:0 0 10px 0;line-height:1.65;word-spacing:0;${style}">${escapeHtml(p.trim()).replace(/\n/g, '<br/>')}</p>`
   ).join('') + '<div style="margin-bottom:-10px;"></div>';
 
 const sectionTitle = (eyebrow: string, title: string, mt = 26) => `
@@ -118,32 +118,34 @@ const kpiCard = (value: string, label: string) => `
   </div>`;
 
 const benefitCard = (icon: string, title: string, text: string) => `
-  <td style="width:25%;padding:8px;vertical-align:top;">
+  <td style="width:174px;padding:8px;vertical-align:top;">
     <div style="background:white;border:1px solid #e7e2d2;border-radius:6px;padding:14px 12px;height:100%;box-sizing:border-box;">
       ${iconCircle(icon, 38)}
-      <div style="font-size:11px;font-weight:800;color:${C.navy};margin-top:10px;letter-spacing:0.2px;">${escapeHtml(title)}</div>
-      <div style="font-size:10px;color:${C.muted};line-height:1.5;margin-top:4px;">${escapeHtml(text)}</div>
+      <div style="font-size:11px;font-weight:700;color:${C.navy};margin-top:10px;word-spacing:0;letter-spacing:0;">${escapeHtml(title)}</div>
+      <div style="font-size:10px;color:${C.muted};line-height:1.5;margin-top:4px;word-spacing:0;">${escapeHtml(text)}</div>
     </div>
   </td>`;
 
 const infraRow = (icon: string, title: string, text: string) => `
-  <td style="width:25%;padding:6px;vertical-align:top;">
+  <td style="width:174px;padding:6px;vertical-align:top;">
     <div style="background:${C.paper};border:1px solid #e7e2d2;border-radius:6px;padding:14px;height:100%;box-sizing:border-box;">
       ${iconCircle(icon, 36)}
-      <div style="font-size:11px;font-weight:800;color:${C.navy};margin-top:10px;">${escapeHtml(title)}</div>
-      <div style="font-size:10px;color:${C.muted};line-height:1.5;margin-top:4px;">${escapeHtml(text)}</div>
+      <div style="font-size:11px;font-weight:700;color:${C.navy};margin-top:10px;word-spacing:0;letter-spacing:0;">${escapeHtml(title)}</div>
+      <div style="font-size:10px;color:${C.muted};line-height:1.5;margin-top:4px;word-spacing:0;">${escapeHtml(text)}</div>
     </div>
   </td>`;
 
 const numberedItem = (n: string, title: string, text: string) => `
-  <td style="width:50%;padding:10px;vertical-align:top;">
-    <div style="display:flex;gap:14px;align-items:flex-start;">
-      <div style="font-size:34px;font-weight:800;color:${C.gold};line-height:0.9;font-family:Georgia,serif;letter-spacing:-1px;flex-shrink:0;width:46px;">${n}</div>
-      <div style="flex:1;border-left:1px solid #e7e2d2;padding-left:14px;">
-        <div style="font-size:12px;font-weight:800;color:${C.navy};">${escapeHtml(title)}</div>
-        <div style="font-size:10.5px;color:${C.muted};line-height:1.55;margin-top:4px;">${escapeHtml(text)}</div>
-      </div>
-    </div>
+  <td style="width:299px;padding:10px;vertical-align:top;">
+    <table style="width:100%;border-collapse:collapse;">
+      <tr>
+        <td style="width:46px;vertical-align:top;font-size:34px;font-weight:800;color:${C.gold};line-height:0.9;font-family:Georgia,serif;letter-spacing:-1px;">${n}</td>
+        <td style="vertical-align:top;border-left:1px solid #e7e2d2;padding-left:14px;">
+          <div style="font-size:12px;font-weight:700;color:${C.navy};word-spacing:0;letter-spacing:0;">${escapeHtml(title)}</div>
+          <div style="font-size:10.5px;color:${C.muted};line-height:1.55;margin-top:4px;word-spacing:0;">${escapeHtml(text)}</div>
+        </td>
+      </tr>
+    </table>
   </td>`;
 
 const chip = (text: string) => `
@@ -222,9 +224,9 @@ function buildHtml(r: CommercialProposalPdfData): string {
         <td style="vertical-align:middle;"><img src="${DELTA7_LOGO_DATA_URL}" alt="Delta7" style="height:70px;display:block;" /></td>
         <td style="vertical-align:middle;text-align:right;">
           <div style="font-size:10px;color:${C.goldLight};letter-spacing:3px;text-transform:uppercase;">Delta7 Tecnologia</div>
-          ${r.showAltatekLogo ? `<div style="margin-top:14px;display:inline-block;padding:8px 12px;border-radius:6px;border:1px solid rgba(255,255,255,0.25);">
-            <div style="font-size:7px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.6);font-weight:600;margin-bottom:5px;text-align:center;">Revenda Autorizada</div>
-            <img src="${ALTATEK_LOGO_MODELO01_DATA_URL}" alt="Altatek" style="height:26px;display:block;margin:0 auto;" />
+          ${r.showAltatekLogo ? `<div style="margin-top:10px;display:inline-block;background:white;padding:6px 10px;border-radius:4px;">
+            <div style="font-size:6px;letter-spacing:2px;text-transform:uppercase;color:#64748b;font-weight:700;margin-bottom:3px;text-align:center;">REVENDA AUTORIZADA</div>
+            <img src="${ALTATEK_LOGO_DATA_URL}" alt="Altatek" style="height:18px;display:block;" />
           </div>` : ''}
         </td>
       </tr>
@@ -294,7 +296,7 @@ function buildHtml(r: CommercialProposalPdfData): string {
     ${sectionTitle('Cliente', 'Identificação do Cliente')}
     <table style="width:100%;border-collapse:collapse;font-size:11px;border:1px solid #e7e2d2;border-radius:6px;overflow:hidden;">
       <tr>
-        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};width:25%;border-bottom:1px solid #eae3cf;">Razão Social</td>
+        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};width:170px;border-bottom:1px solid #eae3cf;">Razão Social</td>
         <td style="padding:9px 12px;color:${C.ink};border-bottom:1px solid #eae3cf;" colspan="3">${escapeHtml(r.clientName)}</td>
       </tr>
       <tr>
@@ -316,7 +318,7 @@ function buildHtml(r: CommercialProposalPdfData): string {
     ${sectionTitle('Delta7', 'Executivo Responsável')}
     <table style="width:100%;border-collapse:collapse;font-size:11px;border:1px solid #e7e2d2;border-radius:6px;overflow:hidden;">
       <tr>
-        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};width:25%;">Executivo de Vendas</td>
+        <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};width:170px;">Executivo de Vendas</td>
         <td style="padding:9px 12px;color:${C.ink};">${escapeHtml(r.salesRepName)}</td>
         <td style="padding:9px 12px;background:${C.cream};font-weight:700;color:${C.navy};width:18%;">E-mail</td>
         <td style="padding:9px 12px;color:${C.ink};">${escapeHtml(r.salesRepEmail || '—')}</td>
@@ -515,7 +517,7 @@ function buildHtmlMinimal(r: CommercialProposalPdfData): string {
           <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:${MUTED};">Proposta Comercial</div>
           <div style="font-size:11px;color:${INK};margin-top:6px;font-weight:600;">Nº ${escapeHtml(r.proposalNumber)}</div>
           ${r.showAltatekLogo ? `<div style="margin-top:14px;display:inline-block;background:${NAVY};padding:8px 12px;border-radius:6px;">
-            <div style="font-size:7px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.6);font-weight:600;margin-bottom:5px;text-align:center;">Revenda Autorizada</div>
+            <div style="font-size:7px;letter-spacing:2px;text-transform:uppercase;color:#94a3b8;font-weight:600;margin-bottom:5px;text-align:center;">Revenda Autorizada</div>
             <img src="${ALTATEK_LOGO_DATA_URL}" alt="Altatek" style="height:22px;display:block;margin:0 auto;" />
           </div>` : ''}
         </td>
@@ -590,7 +592,7 @@ function buildHtmlMinimal(r: CommercialProposalPdfData): string {
       <table style="width:100%;border-collapse:collapse;">
         <tr>
           ${INFRA_HIGHLIGHTS.map(h => `
-            <td style="width:25%;padding:0 12px 0 0;vertical-align:top;">
+            <td style="width:150px;padding:0 12px 0 0;vertical-align:top;">
               <div style="border-top:2px solid ${NAVY};padding-top:14px;">
                 <div style="font-size:11.5px;font-weight:600;color:${NAVY};">${escapeHtml(h.title)}</div>
                 <div style="font-size:10.5px;color:${MUTED};line-height:1.55;margin-top:6px;">${escapeHtml(h.text)}</div>
@@ -618,7 +620,7 @@ function buildHtmlMinimal(r: CommercialProposalPdfData): string {
     ${section(N(5), 'Cliente & Executivo', `
       <table style="width:100%;border-collapse:collapse;">
         <tr>
-          <td style="width:50%;padding:0 24px 0 0;vertical-align:top;border-top:1px solid ${LINE};padding-top:16px;">
+          <td style="width:307px;padding:0 24px 0 0;vertical-align:top;border-top:1px solid ${LINE};padding-top:16px;">
             <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:${MUTED};margin-bottom:10px;">Cliente</div>
             <div style="font-size:13px;font-weight:600;color:${NAVY};">${escapeHtml(r.clientName)}</div>
             <div style="font-size:10.5px;color:${INK};margin-top:8px;line-height:1.7;">
@@ -628,7 +630,7 @@ function buildHtmlMinimal(r: CommercialProposalPdfData): string {
               ${r.clientAddress ? `<div><span style="color:${MUTED};">Endereço:</span> ${escapeHtml(r.clientAddress)}</div>` : ''}
             </div>
           </td>
-          <td style="width:50%;padding:0;vertical-align:top;border-top:1px solid ${LINE};padding-top:16px;">
+          <td style="width:307px;padding:0;vertical-align:top;border-top:1px solid ${LINE};padding-top:16px;">
             <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:${MUTED};margin-bottom:10px;">Executivo Delta7</div>
             <div style="font-size:13px;font-weight:600;color:${NAVY};">${escapeHtml(r.salesRepName)}</div>
             <div style="font-size:10.5px;color:${INK};margin-top:8px;line-height:1.7;">
