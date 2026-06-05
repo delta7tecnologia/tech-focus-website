@@ -90,6 +90,13 @@ const iconCircle = (name: string, size = 44) => {
   return `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${C.cream};border:1.5px solid ${C.navy};box-sizing:border-box;padding:${pad}px;"><img src="${dataUrl}" width="${inner}" height="${inner}" style="display:block;" alt="" /></div>`;
 };
 
+// Converte texto com \n\n em parágrafos HTML separados — evita white-space:pre-line
+// que faz o html2canvas distribuir espaços irregulares entre palavras.
+const htmlParas = (text: string, style = '') =>
+  text.split(/\n\n+/).map(p =>
+    `<p style="margin:0 0 10px 0;line-height:1.65;${style}">${escapeHtml(p.trim()).replace(/\n/g, '<br/>')}</p>`
+  ).join('') + '<div style="margin-bottom:-10px;"></div>';
+
 const sectionTitle = (eyebrow: string, title: string, mt = 26) => `
   <div style="margin:${mt}px 0 14px;">
     <div style="font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:${C.gold};margin-bottom:4px;">${eyebrow}</div>
@@ -203,7 +210,7 @@ function buildHtml(r: CommercialProposalPdfData): string {
     </tr>`).join('') || `<tr><td colspan="4" style="padding:16px;text-align:center;color:${C.muted};font-style:italic;">Nenhum item configurado</td></tr>`;
 
   return `
-<div style="width:794px;font-family:'Helvetica',Arial,sans-serif;color:${C.ink};background:white;font-size:11px;">
+<div style="width:794px;font-family:'Helvetica',Arial,sans-serif;color:${C.ink};background:white;font-size:11px;word-spacing:0;font-kerning:none;-webkit-font-smoothing:antialiased;">
 
   <!-- ============ CAPA ============ -->
   <div style="width:794px;height:1123px;background:linear-gradient(135deg,${C.navy} 0%,${C.navyDeep} 100%);color:white;padding:80px 60px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;page-break-after:always;position:relative;overflow:hidden;">
@@ -214,8 +221,8 @@ function buildHtml(r: CommercialProposalPdfData): string {
       <img src="${DELTA7_LOGO_DATA_URL}" alt="Delta7" style="height:70px;" />
       <div style="text-align:right;">
         <div style="font-size:10px;color:${C.goldLight};letter-spacing:3px;text-transform:uppercase;">Delta7 Tecnologia</div>
-        ${r.showAltatekLogo ? `<div style="margin-top:14px;display:inline-block;background:rgba(255,255,255,0.95);padding:8px 12px;border-radius:6px;border:1px solid ${C.gold};">
-          <div style="font-size:7px;letter-spacing:2px;text-transform:uppercase;color:${C.navy};font-weight:700;margin-bottom:4px;text-align:center;">Revenda Autorizada</div>
+        ${r.showAltatekLogo ? `<div style="margin-top:14px;display:inline-block;padding:8px 12px;border-radius:6px;border:1px solid rgba(255,255,255,0.25);">
+          <div style="font-size:7px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.6);font-weight:600;margin-bottom:5px;text-align:center;">Revenda Autorizada</div>
           <img src="${ALTATEK_LOGO_MODELO01_DATA_URL}" alt="Altatek" style="height:26px;display:block;" />
         </div>` : ''}
       </div>
@@ -247,23 +254,23 @@ function buildHtml(r: CommercialProposalPdfData): string {
   </div>
 
   <!-- ============ CONTEÚDO ============ -->
-  <div style="padding:38px 46px;box-sizing:border-box;">
+  <div style="padding:44px 54px;box-sizing:border-box;">
 
     <!-- Header de página -->
-    <table style="width:100%;border-bottom:2px solid ${C.navy};padding-bottom:0;margin-bottom:8px;border-collapse:collapse;">
+    <table style="width:100%;border-bottom:2px solid ${C.navy};padding-bottom:0;margin-bottom:10px;border-collapse:collapse;">
       <tr>
-        <td style="vertical-align:bottom;padding-bottom:12px;"><img src="${DELTA7_LOGO_DARK_DATA_URL}" alt="Delta7" style="height:42px;display:block;" /></td>
-        <td style="vertical-align:bottom;padding-bottom:12px;text-align:right;">
-          <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:${C.gold};font-weight:700;">Proposta Comercial</div>
-          <div style="font-weight:800;color:${C.navy};font-size:13px;margin-top:3px;">Nº ${escapeHtml(r.proposalNumber)}</div>
+        <td style="vertical-align:bottom;padding-bottom:14px;"><img src="${DELTA7_LOGO_DARK_DATA_URL}" alt="Delta7" style="height:40px;display:block;" /></td>
+        <td style="vertical-align:bottom;padding-bottom:14px;text-align:right;">
+          <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:${C.gold};font-weight:600;">Proposta Comercial</div>
+          <div style="font-weight:700;color:${C.navy};font-size:13px;margin-top:3px;">Nº ${escapeHtml(r.proposalNumber)}</div>
           <div style="color:${C.muted};margin-top:2px;font-size:10px;">${fmtDate(r.generatedAt)}</div>
         </td>
       </tr>
     </table>
-    <div style="height:2px;background:${C.gold};width:60px;margin-bottom:6px;"></div>
+    <div style="height:2px;background:${C.gold};width:48px;margin-bottom:8px;"></div>
 
     ${S.showAbout ? `<div data-keep="1">${sectionTitle('Quem somos', 'Sobre a Delta7 Tecnologia', 18)}
-    <p style="margin:0;line-height:1.75;text-align:justify;color:${C.ink};white-space:pre-line;">${escapeHtml(ABOUT_DELTA7)}</p>
+    ${htmlParas(ABOUT_DELTA7, `color:${C.ink};`)}
     ${kpisHtml}</div>` : ''}
 
     ${S.showBenefits ? `<div data-keep="1">${sectionTitle('Vantagens', 'Por que Backup Online')}
@@ -393,12 +400,12 @@ function buildHtml(r: CommercialProposalPdfData): string {
         <strong style="color:${C.navy};letter-spacing:0.5px;">Não inclusos:</strong> ${escapeHtml(NOT_INCLUDED)}
       </div>
 
-      ${r.notes ? `<div style="margin-top:14px;padding:13px 16px;background:${C.paper};border-left:3px solid ${C.navy};border-radius:3px;font-size:11px;line-height:1.6;text-align:justify;white-space:pre-line;color:${C.ink};"><strong style="color:${C.navy};display:block;margin-bottom:4px;letter-spacing:0.5px;">Observações</strong>${escapeHtml(r.notes)}</div>` : ''}
+      ${r.notes ? `<div style="margin-top:14px;padding:13px 16px;background:${C.paper};border-left:3px solid ${C.navy};border-radius:3px;font-size:11px;color:${C.ink};"><strong style="color:${C.navy};display:block;margin-bottom:6px;letter-spacing:0.3px;">Observações</strong>${htmlParas(r.notes, `color:${C.ink};font-size:11px;`)}</div>` : ''}
     </div>
 
     <div id="prop-suporte-block" style="break-inside:avoid;page-break-inside:avoid;">
       ${sectionTitle('Atendimento', 'Suporte Técnico')}
-      <p style="margin:0 0 12px 0;line-height:1.7;text-align:justify;color:${C.ink};white-space:pre-line;">${escapeHtml(SUPPORT_TEXT)}</p>
+      ${htmlParas(SUPPORT_TEXT, `color:${C.ink};`)}
       ${S.showSupportReqs ? `<p style="margin:14px 0 10px 0;font-weight:800;color:${C.navy};font-size:11px;letter-spacing:0.3px;">Requisitos para a prestação dos serviços</p>
       <div style="font-size:10.5px;">
         ${supportReqHtml}
@@ -416,14 +423,14 @@ function buildHtml(r: CommercialProposalPdfData): string {
       </p>
       <table style="width:100%;border-collapse:collapse;margin-top:30px;">
         <tr>
-          <td style="width:48%;padding-top:54px;border-top:1.5px solid ${C.navy};text-align:center;font-size:11px;font-weight:800;color:${C.navy};">
+          <td style="width:48%;padding-top:54px;border-top:1.5px solid ${C.navy};text-align:center;font-size:11px;font-weight:700;color:${C.navy};word-spacing:normal;letter-spacing:0;">
             ${escapeHtml(r.clientName)}<br/>
-            <span style="font-weight:500;color:${C.muted};font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;">Cliente</span>
+            <span style="font-weight:400;color:${C.muted};font-size:9px;letter-spacing:1px;text-transform:uppercase;">Cliente</span>
           </td>
           <td style="width:4%;"></td>
-          <td style="width:48%;padding-top:54px;border-top:1.5px solid ${C.navy};text-align:center;font-size:11px;font-weight:800;color:${C.navy};">
+          <td style="width:48%;padding-top:54px;border-top:1.5px solid ${C.navy};text-align:center;font-size:11px;font-weight:700;color:${C.navy};word-spacing:normal;letter-spacing:0;">
             Delta7 Tecnologia<br/>
-            <span style="font-weight:500;color:${C.muted};font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;">${escapeHtml(r.salesRepName)} — Executivo de Vendas</span>
+            <span style="font-weight:400;color:${C.muted};font-size:9px;letter-spacing:1px;text-transform:uppercase;">${escapeHtml(r.salesRepName)} &mdash; Executivo de Vendas</span>
           </td>
         </tr>
       </table>
@@ -491,7 +498,7 @@ function buildHtmlMinimal(r: CommercialProposalPdfData): string {
     </tr>`).join('') || `<tr><td colspan="4" style="padding:14px 0;text-align:center;color:${MUTED};font-style:italic;font-size:11px;">Nenhum item configurado</td></tr>`;
 
   return `
-<div style="width:794px;font-family:'Helvetica',Arial,sans-serif;color:${INK};background:white;font-size:11px;line-height:1.6;">
+<div style="width:794px;font-family:'Helvetica',Arial,sans-serif;color:${INK};background:white;font-size:11px;line-height:1.6;word-spacing:0;font-kerning:none;-webkit-font-smoothing:antialiased;">
 
   <!-- ============ CAPA MINIMALISTA ============ -->
   <div style="width:794px;height:1123px;background:white;padding:80px 70px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;page-break-after:always;border-top:6px solid ${NAVY};">
@@ -501,8 +508,8 @@ function buildHtmlMinimal(r: CommercialProposalPdfData): string {
       <div style="text-align:right;">
         <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:${MUTED};">Proposta Comercial</div>
         <div style="font-size:11px;color:${INK};margin-top:6px;font-weight:600;">Nº ${escapeHtml(r.proposalNumber)}</div>
-        ${r.showAltatekLogo ? `<div style="margin-top:14px;display:inline-block;padding:6px 10px;border:1px solid ${LINE};border-radius:4px;">
-          <div style="font-size:7px;letter-spacing:2px;text-transform:uppercase;color:${MUTED};font-weight:600;margin-bottom:3px;text-align:center;">Revenda Autorizada</div>
+        ${r.showAltatekLogo ? `<div style="margin-top:14px;display:inline-block;background:${NAVY};padding:8px 12px;border-radius:6px;">
+          <div style="font-size:7px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.6);font-weight:600;margin-bottom:5px;text-align:center;">Revenda Autorizada</div>
           <img src="${ALTATEK_LOGO_DATA_URL}" alt="Altatek" style="height:22px;display:block;" />
         </div>` : ''}
       </div>
@@ -545,7 +552,7 @@ function buildHtmlMinimal(r: CommercialProposalPdfData): string {
     </div>
 
     ${S.showAbout ? section('01', 'A Delta7 Tecnologia', `
-      <p style="margin:0;color:${INK};text-align:justify;white-space:pre-line;font-size:11.5px;line-height:1.75;">${escapeHtml(ABOUT_DELTA7)}</p>
+      ${htmlParas(ABOUT_DELTA7, `color:${INK};font-size:11.5px;`)}
       <table style="width:100%;margin-top:28px;border-collapse:collapse;">
         <tr>
           ${DELTA7_KPIS.map(k => `
@@ -664,13 +671,13 @@ function buildHtmlMinimal(r: CommercialProposalPdfData): string {
           <strong style="color:${NAVY};font-weight:600;">Não inclusos:</strong> ${escapeHtml(NOT_INCLUDED)}
         </div>
 
-        ${r.notes ? `<div style="margin-top:14px;padding:14px 0;border-top:1px solid ${LINE};font-size:11px;color:${INK};line-height:1.65;white-space:pre-line;"><strong style="color:${NAVY};font-weight:600;display:block;margin-bottom:4px;">Observações</strong>${escapeHtml(r.notes)}</div>` : ''}
+        ${r.notes ? `<div style="margin-top:14px;padding:14px 0;border-top:1px solid ${LINE};font-size:11px;color:${INK};"><strong style="color:${NAVY};font-weight:600;display:block;margin-bottom:6px;">Observações</strong>${htmlParas(r.notes, `color:${INK};font-size:11px;`)}</div>` : ''}
       `)}
     </div>
 
     <div id="prop-suporte-block" style="break-inside:avoid;page-break-inside:avoid;">
       ${section(N(7), 'Suporte Técnico', `
-        <p style="margin:0;color:${INK};text-align:justify;white-space:pre-line;font-size:11px;line-height:1.7;">${escapeHtml(SUPPORT_TEXT)}</p>
+        ${htmlParas(SUPPORT_TEXT, `color:${INK};font-size:11px;`)}
         ${S.showSupportReqs ? `<table style="width:100%;border-collapse:collapse;margin-top:18px;">
           ${SUPPORT_REQUIREMENTS.map(t => `
             <tr>
@@ -775,7 +782,7 @@ async function buildPdf(data: CommercialProposalPdfData): Promise<jsPDF> {
     tryPushAcross('prop-suporte-block', 8);
     tryPushAcross('prop-aceite-block', 12);
 
-    const canvas = await html2canvas(node, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+    const canvas = await html2canvas(node, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false, allowTaint: true, foreignObjectRendering: false });
     const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
     const pageW = pdf.internal.pageSize.getWidth();
     const pageH = pdf.internal.pageSize.getHeight();
@@ -870,7 +877,7 @@ export async function previewCommercialProposalPdf(data: CommercialProposalPdfDa
     tryPushAcross('prop-suporte-block', 8);
     tryPushAcross('prop-aceite-block', 12);
 
-    const canvas = await html2canvas(node, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+    const canvas = await html2canvas(node, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false, allowTaint: true, foreignObjectRendering: false });
     const slicePxPerMM = canvas.width / pageWidthMM;
     const slicePageH = Math.round(pageHeightMM * slicePxPerMM);
     const pages: string[] = [];
