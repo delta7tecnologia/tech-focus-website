@@ -213,7 +213,7 @@ function buildHtml(r: CommercialProposalPdfData): string {
 <div style="width:794px;font-family:'Helvetica',Arial,sans-serif;color:${C.ink};background:white;font-size:11px;word-spacing:0;font-kerning:none;-webkit-font-smoothing:antialiased;">
 
   <!-- ============ CAPA ============ -->
-  <div style="width:794px;height:1123px;background:linear-gradient(135deg,${C.navy} 0%,${C.navyDeep} 100%);color:white;padding:80px 60px;box-sizing:border-box;page-break-after:always;position:relative;overflow:hidden;">
+  <div style="width:794px;height:1123px;background:linear-gradient(135deg,${C.navy} 0%,${C.navyDeep} 100%);color:white;padding:80px 60px;box-sizing:border-box;page-break-after:always;position:relative;">
     <!-- Pattern de pontos dourados -->
     <div style="position:absolute;inset:0;opacity:0.06;background-image:radial-gradient(${C.gold} 1.2px, transparent 1.2px);background-size:18px 18px;"></div>
 
@@ -793,7 +793,14 @@ async function buildPdf(data: CommercialProposalPdfData): Promise<jsPDF> {
     tryPushAcross('prop-suporte-block', 8);
     tryPushAcross('prop-aceite-block', 12);
 
-    const canvas = await html2canvas(node, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false, allowTaint: true, foreignObjectRendering: false });
+    const oncloneFix = (_doc: Document, el: HTMLElement) => {
+      el.querySelectorAll<HTMLElement>('*').forEach((n) => {
+        n.style.wordSpacing = '0px';
+        n.style.letterSpacing = 'normal';
+        if (n.style.textAlign === 'justify') n.style.textAlign = 'left';
+      });
+    };
+    const canvas = await html2canvas(node, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false, allowTaint: true, foreignObjectRendering: false, onclone: oncloneFix });
     const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
     const pageW = pdf.internal.pageSize.getWidth();
     const pageH = pdf.internal.pageSize.getHeight();
@@ -888,7 +895,14 @@ export async function previewCommercialProposalPdf(data: CommercialProposalPdfDa
     tryPushAcross('prop-suporte-block', 8);
     tryPushAcross('prop-aceite-block', 12);
 
-    const canvas = await html2canvas(node, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false, allowTaint: true, foreignObjectRendering: false });
+    const oncloneFix2 = (_doc: Document, el: HTMLElement) => {
+      el.querySelectorAll<HTMLElement>('*').forEach((n) => {
+        n.style.wordSpacing = '0px';
+        n.style.letterSpacing = 'normal';
+        if (n.style.textAlign === 'justify') n.style.textAlign = 'left';
+      });
+    };
+    const canvas = await html2canvas(node, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false, allowTaint: true, foreignObjectRendering: false, onclone: oncloneFix2 });
     const slicePxPerMM = canvas.width / pageWidthMM;
     const slicePageH = Math.round(pageHeightMM * slicePxPerMM);
     const pages: string[] = [];
