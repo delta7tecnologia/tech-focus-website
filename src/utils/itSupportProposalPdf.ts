@@ -703,7 +703,7 @@ function buildHtmlMinimal(r: ItSupportProposalPdfData): string {
     </div>` : ''}
 
     <div id="prop-aceite-block" style="break-inside:avoid;page-break-inside:avoid;margin-top:40px;">
-      ${eyebrow('09')}
+      ${eyebrow(N(9))}
       ${h2('Aceite')}
       <p style="font-size:10.5px;color:${MUTED};margin:0 0 24px 0;line-height:1.65;">
         Declaro estar de acordo com os termos, valores e condições apresentados nesta proposta de Suporte de TI, emitida em ${fmtDate(r.generatedAt)} com validade de ${r.validityDays} dias e vigência de ${r.contractMonths} meses.
