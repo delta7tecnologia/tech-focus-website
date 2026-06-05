@@ -20,6 +20,11 @@ import {
   DEFAULT_SECTIONS,
   type ProposalSections,
 } from '@/lib/proposalContent';
+import {
+  renderFeaturedClientsModelo01,
+  renderFeaturedClientsModelo02,
+  type FeaturedClientPdf,
+} from './proposalClientsBlock';
 
 export interface ProposalItem {
   description: string;
