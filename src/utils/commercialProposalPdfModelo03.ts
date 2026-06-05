@@ -311,23 +311,29 @@ function drawClientesIdentificacao(
     }
     if (col > 0) rowY += cellH + 1;
     y = rowY + 4;
+    console.log('[M03] clients done, y:', y);
   }
 
   // Identificacao do cliente
+  console.log('[M03] drawInfoTable cliente...');
   y = sectionTitle(doc, 'Cliente', 'Identificacao do Cliente', y);
+  console.log('[M03] sectionTitle done');
   const tableRows = [
     ['Razao Social', r.clientName, '', ''],
     ['CNPJ / CPF', r.clientDocument || '-', 'Contato', r.clientContact || '-'],
     ['E-mail', r.clientEmail || '-', 'Endereco', r.clientAddress || '-'],
   ];
   y = drawInfoTable(doc, tableRows, y);
+  console.log('[M03] drawInfoTable done');
   y += 6;
 
   // Executivo Responsavel
+  console.log('[M03] executivo...');
   y = sectionTitle(doc, 'Delta7', 'Executivo Responsavel', y);
   drawInfoTable(doc, [
     ['Executivo de Vendas', r.salesRepName, 'E-mail', r.salesRepEmail || '-'],
   ], y);
+  console.log('[M03] drawClientesIdentificacao complete');
 }
 
 /** Tabela de info (label / valor) */
