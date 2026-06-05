@@ -75,11 +75,14 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
   const [previewTemplate, setPreviewTemplate] = useState<'modelo01' | 'modelo02' | 'modelo03'>('modelo03');
 
   const handlePreview = async (template: 'modelo01' | 'modelo02' | 'modelo03') => {
+    console.log('[Preview] clicked:', template);
     const err = validateForm();
     if (err) {
+      console.log('[Preview] validation error:', err);
       toast({ title: 'Nao foi possivel gerar a previa', description: err, variant: 'destructive' });
       return;
     }
+    console.log('[Preview] validation ok, building PDF...');
     setPreviewLoading(template);
     setPreviewTemplate(template);
     try {
@@ -106,12 +109,15 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
       };
       let pages: string[];
       if (template === 'modelo03') {
+        console.log('[Preview] calling previewModelo03...');
         pages = await previewModelo03(pdfData);
+        console.log('[Preview] previewModelo03 done, pages:', pages.length);
       } else {
         pages = await previewCommercialProposalPdf({ ...pdfData, template });
       }
       setPreviewPages(pages);
     } catch (e: any) {
+      console.error('[Preview] error:', e);
       toast({ title: 'Erro na previa', description: e.message, variant: 'destructive' });
     } finally {
       setPreviewLoading(false);
