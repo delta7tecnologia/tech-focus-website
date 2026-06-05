@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Checkbox } from '@/components/ui/checkbox';
 import ProposalItemsEditor, { type EditableItem } from './ProposalItemsEditor';
 import ProposalSignatureLinksManager from './ProposalSignatureLinksManager';
+import ClientShowcasePicker, { fetchFeaturedClients, type FeaturedClient } from './ClientShowcasePicker';
 import {
   ACTIVATION_FEE_DEFAULT,
   VALIDITY_DAYS_DEFAULT,
@@ -56,6 +57,14 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
     ...DEFAULT_SECTIONS,
     ...(proposal?.sections || {}),
   });
+  const [featuredClients, setFeaturedClients] = useState<FeaturedClient[]>(
+    Array.isArray(proposal?.featured_clients) ? proposal.featured_clients : [],
+  );
+  const featuredClientIds = featuredClients.map((c) => c.id);
+  const handleFeaturedClientsChange = async (ids: string[]) => {
+    const list = await fetchFeaturedClients(ids);
+    setFeaturedClients(list);
+  };
 
   const toggleSection = (key: keyof ProposalSections) =>
     setSections((s) => ({ ...s, [key]: !s[key] }));
@@ -92,6 +101,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
         integrityHash: proposal?.integrity_hash || 'previa-sem-hash-de-integridade'.padEnd(64, '0'),
         sections,
         showAltatekLogo,
+        featuredClients,
         template,
       });
       setPreviewPages(pages);
@@ -144,6 +154,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
       setup_total: activationFee,
       sections: sections as any,
       show_altatek_logo: showAltatekLogo,
+      featured_clients: featuredClients as any,
     };
   };
 
@@ -212,6 +223,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
             integrityHash: data.integrity_hash || '',
             sections: (data.sections as ProposalSections) || sections,
             showAltatekLogo: data.show_altatek_logo ?? showAltatekLogo,
+            featuredClients: (Array.isArray(data.featured_clients) ? data.featured_clients : featuredClients) as any,
           });
         } catch (pdfErr: any) {
           console.error('Falha ao gerar PDF após salvar proposta:', pdfErr);
@@ -349,6 +361,15 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
               </div>
             </label>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-6">
+          <ClientShowcasePicker
+            selectedIds={featuredClientIds}
+            onChange={handleFeaturedClientsChange}
+          />
         </CardContent>
       </Card>
 

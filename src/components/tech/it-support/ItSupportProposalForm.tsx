@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Checkbox } from '@/components/ui/checkbox';
 import ItSupportItemsEditor, { type SupEditableItem } from './ItSupportItemsEditor';
 import ItSupportProposalSignatureLinksManager from './ItSupportProposalSignatureLinksManager';
+import ClientShowcasePicker, { fetchFeaturedClients, type FeaturedClient } from '@/components/tech/proposals/ClientShowcasePicker';
 import {
   SUP_SETUP_FEE_DEFAULT,
   SUP_VALIDITY_DAYS_DEFAULT,
@@ -56,6 +57,14 @@ const ItSupportProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
     ...SUP_DEFAULT_SECTIONS,
     ...(proposal?.sections || {}),
   });
+  const [featuredClients, setFeaturedClients] = useState<FeaturedClient[]>(
+    Array.isArray(proposal?.featured_clients) ? proposal.featured_clients : [],
+  );
+  const featuredClientIds = featuredClients.map((c) => c.id);
+  const handleFeaturedClientsChange = async (ids: string[]) => {
+    const list = await fetchFeaturedClients(ids);
+    setFeaturedClients(list);
+  };
 
   const toggleSection = (key: keyof SupProposalSections) =>
     setSections((s) => ({ ...s, [key]: !s[key] }));
@@ -106,6 +115,7 @@ const ItSupportProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
       setup_total: setupFee,
       sections: sections as any,
       show_altatek_logo: showAltatekLogo,
+      featured_clients: featuredClients as any,
     };
   };
 
@@ -128,6 +138,7 @@ const ItSupportProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
     integrityHash: overrideHash ?? (p.integrity_hash || ''),
     sections: (p.sections as SupProposalSections) || sections,
     showAltatekLogo: p.show_altatek_logo ?? showAltatekLogo,
+    featuredClients: (Array.isArray(p.featured_clients) ? p.featured_clients : featuredClients) as any,
     template,
   });
 
@@ -330,6 +341,15 @@ const ItSupportProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
               </div>
             </label>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-6">
+          <ClientShowcasePicker
+            selectedIds={featuredClientIds}
+            onChange={handleFeaturedClientsChange}
+          />
         </CardContent>
       </Card>
 

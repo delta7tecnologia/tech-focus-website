@@ -21,6 +21,11 @@ import {
   SUP_DEFAULT_SECTIONS,
   type SupProposalSections,
 } from '@/lib/itSupportContent';
+import {
+  renderFeaturedClientsModelo01,
+  renderFeaturedClientsModelo02,
+  type FeaturedClientPdf,
+} from './proposalClientsBlock';
 
 export interface SupProposalItem {
   description: string;
@@ -55,6 +60,7 @@ export interface ItSupportProposalPdfData {
   sections?: SupProposalSections;
   template?: 'modelo01' | 'modelo02';
   showAltatekLogo?: boolean;
+  featuredClients?: FeaturedClientPdf[];
 }
 
 export type ProposalTemplate = 'modelo01' | 'modelo02';
@@ -279,6 +285,9 @@ function buildHtml(r: ItSupportProposalPdfData): string {
     ${S.showIdealFor ? `<div data-keep="1">${sectionTitle('Perfil ideal', 'Esta solução é ideal se...')}
     ${idealHtml}</div>` : ''}
 
+    ${S.showClients ? renderFeaturedClientsModelo01(r.featuredClients, C, sectionTitle) : ''}
+
+
     <div data-keep="1">
     ${sectionTitle('Cliente', 'Identificação do Cliente')}
     <table style="width:100%;border-collapse:collapse;font-size:11px;border:1px solid #e2e8f0;border-radius:6px;overflow:hidden;">
@@ -468,6 +477,9 @@ function buildHtmlMinimal(r: ItSupportProposalPdfData): string {
   const MUTED = '#64748b';
   const LINE = '#e2e8f0';
 
+  const off = S.showClients ? 1 : 0;
+  const N = (n: number) => String(n + off).padStart(2, '0');
+
   const eyebrow = (txt: string) => `<div style="font-size:9px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:${MUTED};margin-bottom:6px;">${escapeHtml(txt)}</div>`;
   const h2 = (txt: string) => `<h2 style="font-size:20px;font-weight:600;color:${NAVY};margin:0 0 14px 0;letter-spacing:-0.4px;">${escapeHtml(txt)}</h2>`;
   const section = (eb: string, title: string, body: string, mt = 24) =>
@@ -595,7 +607,9 @@ function buildHtmlMinimal(r: ItSupportProposalPdfData): string {
       </table>
     `) : ''}
 
-    ${section('06', 'Cliente & Executivo', `
+    ${S.showClients ? renderFeaturedClientsModelo02(r.featuredClients, { navy: NAVY, ink: INK, muted: MUTED, line: LINE }, '06', section) : ''}
+
+    ${section(N(6), 'Cliente & Executivo', `
       <table style="width:100%;border-collapse:collapse;">
         <tr>
           <td style="width:50%;padding:0 24px 0 0;vertical-align:top;border-top:1px solid ${LINE};padding-top:16px;">
@@ -623,7 +637,7 @@ function buildHtmlMinimal(r: ItSupportProposalPdfData): string {
     `)}
 
     <div id="prop-financ-block" style="break-inside:avoid;page-break-inside:avoid;">
-      ${section('07', 'Investimento mensal', `
+      ${section(N(7), 'Investimento mensal', `
         <table style="width:100%;border-collapse:collapse;margin-top:8px;">
           <thead>
             <tr>
@@ -671,7 +685,7 @@ function buildHtmlMinimal(r: ItSupportProposalPdfData): string {
     </div>
 
     <div id="prop-suporte-block" style="break-inside:avoid;page-break-inside:avoid;">
-      ${section('08', 'Termos do contrato', `
+      ${section(N(8), 'Termos do contrato', `
         <p style="margin:0;color:${INK};text-align:justify;white-space:pre-line;font-size:11px;line-height:1.7;">${escapeHtml(SUP_CONTRACT_TEXT)}</p>
         ${S.showSupportReqs ? `<table style="width:100%;border-collapse:collapse;margin-top:18px;">
           ${SUP_CONTRACT_REQUIREMENTS.map(t => `
@@ -689,7 +703,7 @@ function buildHtmlMinimal(r: ItSupportProposalPdfData): string {
     </div>` : ''}
 
     <div id="prop-aceite-block" style="break-inside:avoid;page-break-inside:avoid;margin-top:40px;">
-      ${eyebrow('09')}
+      ${eyebrow(N(9))}
       ${h2('Aceite')}
       <p style="font-size:10.5px;color:${MUTED};margin:0 0 24px 0;line-height:1.65;">
         Declaro estar de acordo com os termos, valores e condições apresentados nesta proposta de Suporte de TI, emitida em ${fmtDate(r.generatedAt)} com validade de ${r.validityDays} dias e vigência de ${r.contractMonths} meses.

@@ -81,6 +81,7 @@ const SignProposal = () => {
         integrityHash: p.integrity_hash || '',
         sections: p.sections || undefined,
         showAltatekLogo: p.show_altatek_logo ?? false,
+        featuredClients: Array.isArray(p.featured_clients) ? p.featured_clients : [],
         template,
       });
     } catch (e: any) {
