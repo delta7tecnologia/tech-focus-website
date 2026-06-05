@@ -123,8 +123,9 @@ function t(
 
 //  Cabecalho de pagina interna 
 function drawPageHeader(doc: jsPDF, propNum: string, _logoDataUrl: string) {
-  // Logo (usa alias pre-cacheado)
-  try { doc.addImage('LOGO_DARK', 'PNG', ML, 8, 28, 10); } catch {}
+  // Logo como texto estilizado (sem addImage para nao travar)
+  t(doc, 'Delta7', ML, 16, { size: 13, style: 'bold', color: NAVY });
+  t(doc, 'SOLUCOES EM TECNOLOGIA', ML, 20, { size: 5, color: SLATE });
   // Numero da proposta
   t(doc, 'Proposta Comercial', ML + CW, 12, { size: 7, color: MUTED, align: 'right' });
   t(doc, `No ${propNum}`, ML + CW, 16, { size: 10, style: 'bold', color: NAVY, align: 'right' });
@@ -153,17 +154,19 @@ function drawCover(doc: jsPDF, r: CommercialProposalPdfData) {
   // Fundo navy
   fillRect(doc, 0, 0, PW, PH, NAVY);
 
-  //  Logo Delta7 (canto superior esquerdo) 
-  try { doc.addImage('LOGO_WHITE', 'PNG', ML, 16, 36, 14); } catch {}
+  //  Logo Delta7 como texto (sem addImage)
+  doc.setFontSize(22);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(255, 255, 255);
+  doc.text('Delta7', ML, 26);
+  t(doc, 'SOLUCOES EM TECNOLOGIA', ML, 31, { size: 6, color: [148, 163, 184] });
 
-  //  Altatek badge (canto superior direito) 
+  //  Altatek badge (canto superior direito)
   if (r.showAltatekLogo) {
-    // Fundo branco
     fillRect(doc, ML + CW - 36, 14, 36, 18, WHITE);
     t(doc, 'REVENDA AUTORIZADA', ML + CW - 18, 19.5, { size: 5.5, color: MUTED, align: 'center' });
-    try { doc.addImage('ALTATEK', 'PNG', ML + CW - 33, 21, 30, 9); } catch {}
+    t(doc, 'Altatech', ML + CW - 18, 26, { size: 9, style: 'bold', color: NAVY, align: 'center' });
   } else {
-    // so o texto Delta7
     t(doc, 'DELTA7 TECNOLOGIA', ML + CW, 20, { size: 7, color: [148, 163, 184], align: 'right' });
   }
 
@@ -293,20 +296,10 @@ function drawClientesIdentificacao(
       doc.rect(cx + 1, rowY, cellW - 2, cellH);
 
       const c = clients[i];
-      if (c.logo_url) {
-        try {
-          doc.addImage(c.logo_url, 'PNG', cx + 3, rowY + 2, cellW - 8, cellH - 4);
-        } catch {
-          t(doc, truncate(doc, c.name, cellW - 6), cx + cellW / 2, rowY + cellH / 2 + 2, {
-            size: 7, style: 'bold', color: NAVY, align: 'center',
-          });
-        }
-      } else {
-        const name = truncate(doc, c.name, cellW - 6);
-        t(doc, name, cx + cellW / 2, rowY + cellH / 2 + 2, {
-          size: 7, style: 'bold', color: NAVY, align: 'center',
-        });
-      }
+      const name = truncate(doc, c.name, cellW - 6);
+      t(doc, name, cx + cellW / 2, rowY + cellH / 2 + 2, {
+        size: 7, style: 'bold', color: NAVY, align: 'center',
+      });
 
       col++;
       if (col >= colCount) {
@@ -613,14 +606,18 @@ async function drawAceite(doc: jsPDF, r: CommercialProposalPdfData): Promise<voi
   doc.setLineWidth(0.3);
   doc.rect(ML, y, CW, 34);
 
-  // QR Code
+  // QR Code (pequeno, gerado dinamicamente)
   try {
     const qrDataUrl = await QRCode.toDataURL(validationUrl, {
-      margin: 1, width: 160, errorCorrectionLevel: 'M',
+      margin: 1, width: 120, errorCorrectionLevel: 'L',
       color: { dark: '#0a1f44', light: '#ffffff' },
     });
     doc.addImage(qrDataUrl, 'PNG', ML + 3, y + 3, 28, 28);
-  } catch {}
+  } catch {
+    // Se falhar, mostra um placeholder
+    fillRect(doc, ML + 3, y + 3, 28, 28, CREAM);
+    t(doc, 'QR', ML + 17, y + 19, { size: 10, style: 'bold', color: NAVY, align: 'center' });
+  }
 
   // Hash info
   t(doc, 'HASH DE LEGITIMIDADE SHA-256', ML + 35, y + 7, { size: 7, style: 'bold', color: MUTED });
@@ -639,35 +636,39 @@ async function drawAceite(doc: jsPDF, r: CommercialProposalPdfData): Promise<voi
   t(doc, 'VALIDAR PROPOSTA  |  Escaneie para verificar autenticidade', ML + 17, y + 31.5, { size: 6, color: SLATE, align: 'center' });
 }
 
+// Yield para o browser respirar entre operacoes pesadas
+const yieldToUI = () => new Promise<void>(resolve => setTimeout(resolve, 0));
+
 //  MONTAGEM FINAL 
 export async function buildModelo03(r: CommercialProposalPdfData): Promise<jsPDF> {
   const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
   const S: ProposalSections = { ...DEFAULT_SECTIONS, ...(r.sections || {}) };
 
-  // Pre-cache logos com alias para jsPDF reusar sem re-decodificar PNG
-  try { doc.addImage(DELTA7_LOGO_DARK_DATA_URL, 'PNG', -999, -999, 1, 1, 'LOGO_DARK', 'FAST'); } catch {}
-  try { doc.addImage(DELTA7_LOGO_DATA_URL, 'PNG', -999, -999, 1, 1, 'LOGO_WHITE', 'FAST'); } catch {}
-  if (r.showAltatekLogo) {
-    try { doc.addImage(ALTATEK_LOGO_DATA_URL, 'PNG', -999, -999, 1, 1, 'ALTATEK', 'FAST'); } catch {}
-  }
+  // Sem pre-cache de imagens - usa texto no lugar das logos para evitar travamento
+  // As logos PNG de 20KB bloqueiam a thread principal no browser
 
   // Pagina 1: Capa
   drawCover(doc, r);
+  await yieldToUI();
 
   // Pagina 2: Sobre + Beneficios (se habilitados)
   if (S.showAbout || S.showBenefits) {
     drawSobreBeneficios(doc, r, S);
+    await yieldToUI();
   }
 
   // Pagina 3: Clientes + Identificacao
   drawClientesIdentificacao(doc, r, S);
+  await yieldToUI();
 
   // Pagina 4: Investimento
   drawInvestimento(doc, r);
+  await yieldToUI();
 
   // Pagina 5: Suporte (se habilitado)
   if (S.showSupportReqs || S.showQuote) {
     drawSuporte(doc, r, S);
+    await yieldToUI();
   }
 
   // Ultima pagina: Aceite
