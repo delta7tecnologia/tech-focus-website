@@ -473,6 +473,9 @@ function buildHtmlMinimal(r: CommercialProposalPdfData): string {
   const MUTED = '#64748b';
   const LINE = '#e2e8f0';
 
+  const off = S.showClients ? 1 : 0;
+  const N = (n: number) => String(n + off).padStart(2, '0');
+
   const eyebrow = (txt: string) => `<div style="font-size:9px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:${MUTED};margin-bottom:6px;">${escapeHtml(txt)}</div>`;
   const h2 = (txt: string) => `<h2 style="font-size:20px;font-weight:600;color:${NAVY};margin:0 0 14px 0;letter-spacing:-0.4px;">${escapeHtml(txt)}</h2>`;
   const hr = () => `<div style="height:1px;background:${LINE};margin:22px 0;"></div>`;
