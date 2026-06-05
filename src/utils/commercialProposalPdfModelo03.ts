@@ -689,11 +689,8 @@ export async function downloadModelo03(r: CommercialProposalPdfData): Promise<vo
 
 export async function previewModelo03(r: CommercialProposalPdfData): Promise<string[]> {
   const doc = await buildModelo03(r);
-  const totalPages = (doc as any).internal.getNumberOfPages();
-  const pages: string[] = [];
-  for (let i = 1; i <= totalPages; i++) {
-    doc.setPage(i);
-    pages.push(doc.output('datauristring'));
-  }
-  return pages;
+  // Retorna o PDF inteiro como uma unica "pagina" para o preview
+  // (evita chamar output() N vezes o que e muito lento)
+  const dataUri = doc.output('datauristring');
+  return [dataUri];
 }

@@ -426,12 +426,22 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
           <div className="flex-1 overflow-auto bg-gray-200 p-4">
             <div className="mx-auto max-w-3xl space-y-4">
               {previewPages?.map((src, i) => (
-                <img
-                  key={i}
-                  src={src}
-                  alt={`Pagina ${i + 1}`}
-                  className="w-full block bg-white shadow-lg rounded"
-                />
+                src.startsWith('data:application/pdf') ? (
+                  <iframe
+                    key={i}
+                    src={src}
+                    className="w-full bg-white shadow-lg rounded"
+                    style={{ height: '80vh' }}
+                    title="Previa PDF"
+                  />
+                ) : (
+                  <img
+                    key={i}
+                    src={src}
+                    alt={`Pagina ${i + 1}`}
+                    className="w-full block bg-white shadow-lg rounded"
+                  />
+                )
               ))}
             </div>
           </div>
