@@ -149,6 +149,48 @@ function sectionTitle(doc: jsPDF, eyebrow: string, title: string, y: number): nu
   return y + 5;
 }
 
+//  CAPA IMPRESSAO (sem fundo escuro, economica em tinta) 
+function drawCoverPrint(doc: jsPDF, r: CommercialProposalPdfData) {
+  // Borda superior navy fina
+  fillRect(doc, 0, 0, PW, 4, NAVY);
+
+  // Logo como texto
+  t(doc, 'Delta7', ML, 20, { size: 20, style: 'bold', color: NAVY });
+  t(doc, 'SOLUCOES EM TECNOLOGIA', ML, 26, { size: 6, color: SLATE });
+
+  // Altatek
+  if (r.showAltatekLogo) {
+    t(doc, 'Revenda Autorizada Altatech', ML + CW, 20, { size: 8, color: SLATE, align: 'right' });
+  }
+
+  hline(doc, ML, 32, CW, NAVY, 0.8);
+  fillRect(doc, ML, 32.5, 20, 1, SLATE);
+
+  // Tag
+  t(doc, 'P R O P O S T A   C O M E R C I A L', ML, 45, { size: 8, color: SLATE });
+
+  // Titulo
+  doc.setFontSize(42);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...NAVY);
+  doc.text('BACKUP', ML, 72);
+  doc.setFont('helvetica', 'bolditalic');
+  doc.setTextColor(...SLATE);
+  doc.text('Online.', ML, 90);
+
+  t(doc, 'Continuidade do seu negocio protegida com tecnologia de verdade.', ML, 104, { size: 12, color: INK });
+
+  hline(doc, ML, PH - 48, CW, SLATE, 0.4);
+
+  t(doc, 'PREPARADO PARA', ML, PH - 41, { size: 7, color: MUTED });
+  t(doc, r.clientName, ML, PH - 34, { size: 13, style: 'bold', color: NAVY });
+  t(doc, 'Proposta n\u00ba ' + r.proposalNumber, ML, PH - 27, { size: 9, color: SLATE });
+
+  t(doc, 'EMITIDA EM', ML + CW, PH - 41, { size: 7, color: MUTED, align: 'right' });
+  t(doc, fmtDate(r.generatedAt), ML + CW, PH - 34, { size: 13, style: 'bold', color: NAVY, align: 'right' });
+  t(doc, 'Validade: ' + r.validityDays + ' dias', ML + CW, PH - 27, { size: 9, color: SLATE, align: 'right' });
+}
+
 //  CAPA 
 function drawCover(doc: jsPDF, r: CommercialProposalPdfData) {
   // Fundo navy
@@ -649,7 +691,11 @@ export async function buildModelo03(r: CommercialProposalPdfData): Promise<jsPDF
 
   // Pagina 1: Capa
   console.log('[M03] drawCover...');
-  drawCover(doc, r);
+  if (r.printMode) {
+    drawCoverPrint(doc, r);
+  } else {
+    drawCover(doc, r);
+  }
   await yieldToUI();
   console.log('[M03] drawCover done');
 
@@ -692,7 +738,8 @@ export async function buildModelo03(r: CommercialProposalPdfData): Promise<jsPDF
 
 export async function downloadModelo03(r: CommercialProposalPdfData): Promise<void> {
   const doc = await buildModelo03(r);
-  const filename = `Proposta_${r.proposalNumber}_Modelo03.pdf`;
+  const suffix = r.printMode ? '_Impressao' : '';
+  const filename = `Proposta_${r.proposalNumber}${suffix}.pdf`;
   try {
     const blob = doc.output('blob') as Blob;
     const url = URL.createObjectURL(blob);

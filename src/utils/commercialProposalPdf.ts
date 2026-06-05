@@ -58,6 +58,7 @@ export interface CommercialProposalPdfData {
   template?: 'modelo01' | 'modelo02';
   showAltatekLogo?: boolean;
   featuredClients?: FeaturedClientPdf[];
+  printMode?: boolean;
 }
 
 export type ProposalTemplate = 'modelo01' | 'modelo02';

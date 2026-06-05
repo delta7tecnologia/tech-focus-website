@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { FilePlus, Edit, Trash2, FileDown, Loader2, Lock, FileText } from 'lucide-react';
 import ProposalForm from './ProposalForm';
-import { downloadCommercialProposalPdf } from '@/utils/commercialProposalPdf';
+import { downloadModelo03 } from '@/utils/commercialProposalPdfModelo03';
 import { formatBRL } from '@/lib/proposalContent';
 import type { EditableItem } from './ProposalItemsEditor';
 
@@ -52,29 +52,31 @@ const CommercialProposals: React.FC = () => {
     onError: (e: any) => toast({ title: 'Erro ao excluir', description: e.message, variant: 'destructive' }),
   });
 
-  const handleDownload = async (p: any, template: 'modelo01' | 'modelo02' = 'modelo01') => {
-    setDownloading(p.id);
+  const buildPdfData = (p: any) => ({
+    proposalNumber: p.proposal_number,
+    generatedAt: p.generated_at,
+    validityDays: p.validity_days,
+    clientName: p.client_name,
+    clientDocument: p.client_document || undefined,
+    clientContact: p.client_contact || undefined,
+    clientEmail: p.client_email || undefined,
+    clientAddress: p.client_address || undefined,
+    salesRepName: p.sales_rep_name,
+    salesRepEmail: p.sales_rep_email || undefined,
+    items: (p.items as EditableItem[]) || [],
+    activationFee: Number(p.activation_fee) || 0,
+    discount: Number(p.discount) || 0,
+    notes: p.notes || undefined,
+    integrityHash: p.integrity_hash || '',
+    sections: p.sections || undefined,
+    showAltatekLogo: p.show_altatek_logo ?? false,
+    featuredClients: Array.isArray(p.featured_clients) ? p.featured_clients : [],
+  });
+
+  const handleDownload = async (p: any, print = false) => {
+    setDownloading(p.id + (print ? '-print' : ''));
     try {
-      await downloadCommercialProposalPdf({
-        proposalNumber: p.proposal_number,
-        generatedAt: p.generated_at,
-        validityDays: p.validity_days,
-        clientName: p.client_name,
-        clientDocument: p.client_document || undefined,
-        clientContact: p.client_contact || undefined,
-        clientEmail: p.client_email || undefined,
-        clientAddress: p.client_address || undefined,
-        salesRepName: p.sales_rep_name,
-        salesRepEmail: p.sales_rep_email || undefined,
-        items: (p.items as EditableItem[]) || [],
-        activationFee: Number(p.activation_fee) || 0,
-        discount: Number(p.discount) || 0,
-        notes: p.notes || undefined,
-        integrityHash: p.integrity_hash || '',
-        sections: p.sections || undefined,
-        showAltatekLogo: p.show_altatek_logo ?? false,
-        template,
-      });
+      await downloadModelo03({ ...buildPdfData(p), printMode: print });
     } catch (e: any) {
       toast({ title: 'Erro ao gerar PDF', description: e.message, variant: 'destructive' });
     } finally {
@@ -130,16 +132,16 @@ const CommercialProposals: React.FC = () => {
                     {p.integrity_hash && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button size="icon" variant="ghost" disabled={downloading === p.id} title="Baixar PDF">
-                            {downloading === p.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileDown className="w-4 h-4" />}
+                          <Button size="icon" variant="ghost" disabled={downloading === p.id || downloading === p.id + '-print'} title="Baixar PDF">
+                            {(downloading === p.id || downloading === p.id + '-print') ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileDown className="w-4 h-4" />}
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleDownload(p, 'modelo01')}>
-                            Modelo 01 — Premium (com QR)
+                          <DropdownMenuItem onClick={() => handleDownload(p, false)}>
+                            Baixar PDF
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleDownload(p, 'modelo02')}>
-                            Modelo 02 — Editorial (impressão)
+                          <DropdownMenuItem onClick={() => handleDownload(p, true)}>
+                            Versão para impressão
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
