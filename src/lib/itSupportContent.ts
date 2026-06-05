@@ -116,6 +116,7 @@ export interface SupProposalSections {
   showInfra: boolean;
   showSla: boolean;
   showIdealFor: boolean;
+  showClients: boolean;
   showQuote: boolean;
   showSupportReqs: boolean;
 }
@@ -126,6 +127,7 @@ export const SUP_DEFAULT_SECTIONS: SupProposalSections = {
   showInfra: true,
   showSla: true,
   showIdealFor: true,
+  showClients: true,
   showQuote: true,
   showSupportReqs: true,
 };
@@ -136,6 +138,7 @@ export const SUP_COMPACT_SECTIONS: SupProposalSections = {
   showInfra: false,
   showSla: true,
   showIdealFor: false,
+  showClients: true,
   showQuote: false,
   showSupportReqs: false,
 };
@@ -146,6 +149,7 @@ export const SUP_MINIMAL_SECTIONS: SupProposalSections = {
   showInfra: false,
   showSla: false,
   showIdealFor: false,
+  showClients: false,
   showQuote: false,
   showSupportReqs: false,
 };
@@ -156,6 +160,7 @@ export const SUP_SECTION_LABELS: { key: keyof SupProposalSections; label: string
   { key: 'showInfra', label: 'Stack monitorada (4 cards)', hint: '~⅓ página' },
   { key: 'showSla', label: 'SLA por prioridade', hint: '~⅓ página' },
   { key: 'showIdealFor', label: 'Perfil ideal (4 numerais)', hint: '~⅓ página' },
+  { key: 'showClients', label: 'Clientes em destaque', hint: '~¼ página' },
   { key: 'showQuote', label: 'Citação institucional', hint: '~⅙ página' },
   { key: 'showSupportReqs', label: 'Requisitos do contrato', hint: '~½ página' },
 ];
