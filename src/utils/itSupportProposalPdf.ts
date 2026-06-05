@@ -685,7 +685,7 @@ function buildHtmlMinimal(r: ItSupportProposalPdfData): string {
     </div>
 
     <div id="prop-suporte-block" style="break-inside:avoid;page-break-inside:avoid;">
-      ${section('08', 'Termos do contrato', `
+      ${section(N(8), 'Termos do contrato', `
         <p style="margin:0;color:${INK};text-align:justify;white-space:pre-line;font-size:11px;line-height:1.7;">${escapeHtml(SUP_CONTRACT_TEXT)}</p>
         ${S.showSupportReqs ? `<table style="width:100%;border-collapse:collapse;margin-top:18px;">
           ${SUP_CONTRACT_REQUIREMENTS.map(t => `
