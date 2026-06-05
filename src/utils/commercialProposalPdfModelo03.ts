@@ -124,10 +124,11 @@ function t(
 
 //  Cabecalho de pagina interna 
 function drawPageHeader(doc: jsPDF, propNum: string, _logoDataUrl: string) {
-  // Logo JPEG comprimido (6KB, rapido - nao trava browser)
+  // Logo JPEG comprimido (6KB)
   try {
-    doc.addImage('LOGO_DARK', 'JPEG', ML, 6, 30, 9);
-  } catch {
+    doc.addImage(DELTA7_LOGO_DARK_SMALL, 'JPEG', ML, 6, 30, 9);
+  } catch(e) {
+    console.warn('[M03] logo header failed:', e);
     t(doc, 'Delta7', ML, 16, { size: 13, style: 'bold', color: NAVY });
   }
   // Numero da proposta
@@ -200,10 +201,11 @@ function drawCover(doc: jsPDF, r: CommercialProposalPdfData) {
   // Fundo navy
   fillRect(doc, 0, 0, PW, PH, NAVY);
 
-  //  Logo Delta7 JPEG branca sobre navy
+  //  Logo Delta7 JPEG sobre navy
   try {
-    doc.addImage('LOGO_WHITE', 'JPEG', ML, 12, 36, 11);
-  } catch {
+    doc.addImage(DELTA7_LOGO_WHITE_SMALL, 'JPEG', ML, 12, 36, 11);
+  } catch(e) {
+    console.warn('[M03] logo cover failed:', e);
     doc.setFontSize(22); doc.setFont('helvetica', 'bold');
     doc.setTextColor(255, 255, 255);
     doc.text('Delta7', ML, 26);
@@ -693,8 +695,7 @@ export async function buildModelo03(r: CommercialProposalPdfData): Promise<jsPDF
   const S: ProposalSections = { ...DEFAULT_SECTIONS, ...(r.sections || {}) };
 
   // Pre-cache logos JPEG (6KB cada, 1-3ms - nao trava browser)
-  try { doc.addImage(DELTA7_LOGO_DARK_SMALL, 'JPEG', -999, -999, 1, 1, 'LOGO_DARK', 'FAST'); } catch {}
-  try { doc.addImage(DELTA7_LOGO_WHITE_SMALL, 'JPEG', -999, -999, 1, 1, 'LOGO_WHITE', 'FAST'); } catch {}
+  // Sem alias - passa dataUrl direto em cada chamada
 
   // Pagina 1: Capa
   console.log('[M03] drawCover...');
