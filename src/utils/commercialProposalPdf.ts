@@ -213,22 +213,24 @@ function buildHtml(r: CommercialProposalPdfData): string {
 <div style="width:794px;font-family:'Helvetica',Arial,sans-serif;color:${C.ink};background:white;font-size:11px;word-spacing:0;font-kerning:none;-webkit-font-smoothing:antialiased;">
 
   <!-- ============ CAPA ============ -->
-  <div style="width:794px;height:1123px;background:linear-gradient(135deg,${C.navy} 0%,${C.navyDeep} 100%);color:white;padding:80px 60px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;page-break-after:always;position:relative;overflow:hidden;">
+  <div style="width:794px;height:1123px;background:linear-gradient(135deg,${C.navy} 0%,${C.navyDeep} 100%);color:white;padding:80px 60px;box-sizing:border-box;page-break-after:always;position:relative;overflow:hidden;">
     <!-- Pattern de pontos dourados -->
     <div style="position:absolute;inset:0;opacity:0.06;background-image:radial-gradient(${C.gold} 1.2px, transparent 1.2px);background-size:18px 18px;"></div>
 
-    <div style="position:relative;display:flex;justify-content:space-between;align-items:center;">
-      <img src="${DELTA7_LOGO_DATA_URL}" alt="Delta7" style="height:70px;" />
-      <div style="text-align:right;">
-        <div style="font-size:10px;color:${C.goldLight};letter-spacing:3px;text-transform:uppercase;">Delta7 Tecnologia</div>
-        ${r.showAltatekLogo ? `<div style="margin-top:14px;display:inline-block;padding:8px 12px;border-radius:6px;border:1px solid rgba(255,255,255,0.25);">
-          <div style="font-size:7px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.6);font-weight:600;margin-bottom:5px;text-align:center;">Revenda Autorizada</div>
-          <img src="${ALTATEK_LOGO_MODELO01_DATA_URL}" alt="Altatek" style="height:26px;display:block;" />
-        </div>` : ''}
-      </div>
-    </div>
+    <table style="position:relative;width:100%;border-collapse:collapse;">
+      <tr>
+        <td style="vertical-align:middle;"><img src="${DELTA7_LOGO_DATA_URL}" alt="Delta7" style="height:70px;display:block;" /></td>
+        <td style="vertical-align:middle;text-align:right;">
+          <div style="font-size:10px;color:${C.goldLight};letter-spacing:3px;text-transform:uppercase;">Delta7 Tecnologia</div>
+          ${r.showAltatekLogo ? `<div style="margin-top:14px;display:inline-block;padding:8px 12px;border-radius:6px;border:1px solid rgba(255,255,255,0.25);">
+            <div style="font-size:7px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.6);font-weight:600;margin-bottom:5px;text-align:center;">Revenda Autorizada</div>
+            <img src="${ALTATEK_LOGO_MODELO01_DATA_URL}" alt="Altatek" style="height:26px;display:block;margin:0 auto;" />
+          </div>` : ''}
+        </td>
+      </tr>
+    </table>
 
-    <div style="position:relative;text-align:left;">
+    <div style="position:relative;text-align:left;margin-top:280px;">
       <div style="width:60px;height:2px;background:${C.gold};margin-bottom:24px;"></div>
       <div style="font-size:11px;letter-spacing:8px;color:${C.goldLight};margin-bottom:18px;font-weight:600;">PROPOSTA COMERCIAL</div>
       <div style="font-size:78px;font-weight:800;line-height:0.95;letter-spacing:-2px;">BACKUP</div>
@@ -239,18 +241,21 @@ function buildHtml(r: CommercialProposalPdfData): string {
       </div>
     </div>
 
-    <div style="position:relative;border-top:1px solid ${C.gold};padding-top:22px;display:flex;justify-content:space-between;font-size:11px;color:#dfe4ef;">
-      <div>
-        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:${C.goldLight};margin-bottom:6px;">Preparado para</div>
-        <div style="font-weight:700;color:white;font-size:15px;">${escapeHtml(r.clientName)}</div>
-        <div style="margin-top:4px;color:#b9c2d6;">Proposta nº ${escapeHtml(r.proposalNumber)}</div>
-      </div>
-      <div style="text-align:right;">
-        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:${C.goldLight};margin-bottom:6px;">Emitida em</div>
-        <div style="font-weight:700;color:white;font-size:13px;">${fmtDate(r.generatedAt)}</div>
-        <div style="margin-top:4px;color:#b9c2d6;">Validade: ${r.validityDays} dias</div>
-      </div>
-    </div>
+    <table style="position:absolute;bottom:80px;left:60px;right:60px;width:674px;border-collapse:collapse;border-top:1px solid ${C.gold};">
+      <tr>
+        <td style="padding-top:22px;font-size:11px;color:#dfe4ef;vertical-align:top;">
+          <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:${C.goldLight};margin-bottom:6px;">Preparado para</div>
+          <div style="font-weight:700;color:white;font-size:15px;">${escapeHtml(r.clientName)}</div>
+          <div style="margin-top:4px;color:#b9c2d6;">Proposta nº ${escapeHtml(r.proposalNumber)}</div>
+        </td>
+        <td style="padding-top:22px;font-size:11px;color:#dfe4ef;vertical-align:top;text-align:right;">
+          <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:${C.goldLight};margin-bottom:6px;">Emitida em</div>
+          <div style="font-weight:700;color:white;font-size:13px;">${fmtDate(r.generatedAt)}</div>
+          <div style="margin-top:4px;color:#b9c2d6;">Validade: ${r.validityDays} dias</div>
+        </td>
+      </tr>
+    </table>
+  </div>
   </div>
 
   <!-- ============ CONTEÚDO ============ -->
@@ -501,21 +506,23 @@ function buildHtmlMinimal(r: CommercialProposalPdfData): string {
 <div style="width:794px;font-family:'Helvetica',Arial,sans-serif;color:${INK};background:white;font-size:11px;line-height:1.6;word-spacing:0;font-kerning:none;-webkit-font-smoothing:antialiased;">
 
   <!-- ============ CAPA MINIMALISTA ============ -->
-  <div style="width:794px;height:1123px;background:white;padding:80px 70px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;page-break-after:always;border-top:6px solid ${NAVY};">
+  <div style="width:794px;height:1123px;background:white;padding:80px 70px;box-sizing:border-box;page-break-after:always;border-top:6px solid ${NAVY};position:relative;">
 
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-      <img src="${DELTA7_LOGO_DARK_DATA_URL}" alt="Delta7" style="height:54px;" />
-      <div style="text-align:right;">
-        <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:${MUTED};">Proposta Comercial</div>
-        <div style="font-size:11px;color:${INK};margin-top:6px;font-weight:600;">Nº ${escapeHtml(r.proposalNumber)}</div>
-        ${r.showAltatekLogo ? `<div style="margin-top:14px;display:inline-block;background:${NAVY};padding:8px 12px;border-radius:6px;">
-          <div style="font-size:7px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.6);font-weight:600;margin-bottom:5px;text-align:center;">Revenda Autorizada</div>
-          <img src="${ALTATEK_LOGO_DATA_URL}" alt="Altatek" style="height:22px;display:block;" />
-        </div>` : ''}
-      </div>
-    </div>
+    <table style="width:100%;border-collapse:collapse;">
+      <tr>
+        <td style="vertical-align:top;"><img src="${DELTA7_LOGO_DARK_DATA_URL}" alt="Delta7" style="height:54px;display:block;" /></td>
+        <td style="vertical-align:top;text-align:right;">
+          <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:${MUTED};">Proposta Comercial</div>
+          <div style="font-size:11px;color:${INK};margin-top:6px;font-weight:600;">Nº ${escapeHtml(r.proposalNumber)}</div>
+          ${r.showAltatekLogo ? `<div style="margin-top:14px;display:inline-block;background:${NAVY};padding:8px 12px;border-radius:6px;">
+            <div style="font-size:7px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.6);font-weight:600;margin-bottom:5px;text-align:center;">Revenda Autorizada</div>
+            <img src="${ALTATEK_LOGO_DATA_URL}" alt="Altatek" style="height:22px;display:block;margin:0 auto;" />
+          </div>` : ''}
+        </td>
+      </tr>
+    </table>
 
-    <div>
+    <div style="margin-top:240px;">
       <div style="font-size:10px;letter-spacing:6px;text-transform:uppercase;color:${MUTED};margin-bottom:24px;">Backup Online · Continuidade</div>
       <div style="font-size:64px;font-weight:300;color:${NAVY};line-height:1.05;letter-spacing:-2px;">
         Tecnologia<br/>
@@ -530,26 +537,30 @@ function buildHtmlMinimal(r: CommercialProposalPdfData): string {
       </div>
     </div>
 
-    <div style="display:flex;justify-content:space-between;font-size:10px;color:${MUTED};border-top:1px solid ${LINE};padding-top:18px;">
-      <div>
-        <div style="letter-spacing:2px;text-transform:uppercase;font-size:8.5px;">Preparado para</div>
-        <div style="color:${INK};font-weight:600;font-size:13px;margin-top:4px;">${escapeHtml(r.clientName)}</div>
-      </div>
-      <div style="text-align:right;">
-        <div style="letter-spacing:2px;text-transform:uppercase;font-size:8.5px;">Emitida em</div>
-        <div style="color:${INK};font-weight:600;font-size:13px;margin-top:4px;">${fmtDate(r.generatedAt)}</div>
-        <div style="margin-top:2px;">Validade ${r.validityDays} dias</div>
-      </div>
-    </div>
+    <table style="position:absolute;bottom:80px;left:70px;right:70px;width:654px;border-collapse:collapse;border-top:1px solid ${LINE};">
+      <tr>
+        <td style="padding-top:18px;font-size:10px;color:${MUTED};vertical-align:top;">
+          <div style="letter-spacing:2px;text-transform:uppercase;font-size:8.5px;">Preparado para</div>
+          <div style="color:${INK};font-weight:600;font-size:13px;margin-top:4px;">${escapeHtml(r.clientName)}</div>
+        </td>
+        <td style="padding-top:18px;font-size:10px;color:${MUTED};vertical-align:top;text-align:right;">
+          <div style="letter-spacing:2px;text-transform:uppercase;font-size:8.5px;">Emitida em</div>
+          <div style="color:${INK};font-weight:600;font-size:13px;margin-top:4px;">${fmtDate(r.generatedAt)}</div>
+          <div style="margin-top:2px;">Validade ${r.validityDays} dias</div>
+        </td>
+      </tr>
+    </table>
   </div>
 
   <!-- ============ MIOLO ============ -->
   <div style="padding:50px 70px;box-sizing:border-box;">
 
-    <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;border-bottom:1px solid ${LINE};">
-      <img src="${DELTA7_LOGO_DARK_DATA_URL}" alt="Delta7" style="height:30px;" />
-      <div style="font-size:10px;color:${MUTED};letter-spacing:1.5px;text-transform:uppercase;">Proposta nº ${escapeHtml(r.proposalNumber)}</div>
-    </div>
+    <table style="width:100%;border-collapse:collapse;padding-bottom:14px;border-bottom:1px solid ${LINE};">
+      <tr>
+        <td style="vertical-align:middle;padding-bottom:14px;"><img src="${DELTA7_LOGO_DARK_DATA_URL}" alt="Delta7" style="height:30px;display:block;" /></td>
+        <td style="vertical-align:middle;padding-bottom:14px;text-align:right;font-size:10px;color:${MUTED};letter-spacing:1.5px;text-transform:uppercase;">Proposta nº ${escapeHtml(r.proposalNumber)}</td>
+      </tr>
+    </table>
 
     ${S.showAbout ? section('01', 'A Delta7 Tecnologia', `
       ${htmlParas(ABOUT_DELTA7, `color:${INK};font-size:11.5px;`)}
