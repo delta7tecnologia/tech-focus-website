@@ -669,7 +669,7 @@ function buildHtmlMinimal(r: CommercialProposalPdfData): string {
     </div>
 
     <div id="prop-suporte-block" style="break-inside:avoid;page-break-inside:avoid;">
-      ${section('07', 'Suporte Técnico', `
+      ${section(N(7), 'Suporte Técnico', `
         <p style="margin:0;color:${INK};text-align:justify;white-space:pre-line;font-size:11px;line-height:1.7;">${escapeHtml(SUPPORT_TEXT)}</p>
         ${S.showSupportReqs ? `<table style="width:100%;border-collapse:collapse;margin-top:18px;">
           ${SUPPORT_REQUIREMENTS.map(t => `
