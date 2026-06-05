@@ -49,10 +49,10 @@ const fmtDate = (iso?: string) =>
 
 /** Trunca texto para caber em maxW mm com a fonte atual */
 function truncate(doc: jsPDF, text: string, maxW: number): string {
-  while (doc.getTextWidth(text) > maxW && text.length > 3) {
-    text = text.slice(0, -2) + '...';
-  }
-  return text;
+  if (!text) return '';
+  // Usa splitTextToSize que e mais seguro que loop com getTextWidth
+  const lines = doc.splitTextToSize(text, maxW);
+  return lines[0] || text.substring(0, 20);
 }
 
 /** Quebra texto em linhas que cabem em maxW */
