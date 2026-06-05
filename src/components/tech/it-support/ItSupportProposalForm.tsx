@@ -138,6 +138,7 @@ const ItSupportProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
     integrityHash: overrideHash ?? (p.integrity_hash || ''),
     sections: (p.sections as SupProposalSections) || sections,
     showAltatekLogo: p.show_altatek_logo ?? showAltatekLogo,
+    featuredClients: (Array.isArray(p.featured_clients) ? p.featured_clients : featuredClients) as any,
     template,
   });
 
