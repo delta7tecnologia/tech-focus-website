@@ -345,6 +345,15 @@ const ItSupportProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
       </Card>
 
       <Card>
+        <CardContent className="p-6">
+          <ClientShowcasePicker
+            selectedIds={featuredClientIds}
+            onChange={handleFeaturedClientsChange}
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
         <CardContent className="p-6 space-y-4">
           <h3 className="text-lg font-bold text-blue-900">Observações</h3>
           <Textarea rows={4} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Informações adicionais para o cliente (opcional)" />
