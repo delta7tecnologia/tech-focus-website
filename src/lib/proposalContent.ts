@@ -110,12 +110,13 @@ export const VALIDITY_DAYS_DEFAULT = 15;
 
 // ============ Controle de seções do PDF ============
 export interface ProposalSections {
-  showAbout: boolean;        // Sobre a Delta7 + KPIs
-  showBenefits: boolean;     // 8 cards de benefícios
-  showInfra: boolean;        // 4 cards de infraestrutura
-  showIdealFor: boolean;     // 4 numerais "ideal para"
-  showQuote: boolean;        // Citação institucional
-  showSupportReqs: boolean;  // Lista de requisitos de suporte
+  showAbout: boolean;
+  showBenefits: boolean;
+  showInfra: boolean;
+  showIdealFor: boolean;
+  showClients: boolean;
+  showQuote: boolean;
+  showSupportReqs: boolean;
 }
 
 export const DEFAULT_SECTIONS: ProposalSections = {
@@ -123,6 +124,7 @@ export const DEFAULT_SECTIONS: ProposalSections = {
   showBenefits: true,
   showInfra: true,
   showIdealFor: true,
+  showClients: true,
   showQuote: true,
   showSupportReqs: true,
 };
@@ -132,6 +134,7 @@ export const COMPACT_SECTIONS: ProposalSections = {
   showBenefits: false,
   showInfra: false,
   showIdealFor: false,
+  showClients: true,
   showQuote: false,
   showSupportReqs: false,
 };
@@ -141,6 +144,7 @@ export const MINIMAL_SECTIONS: ProposalSections = {
   showBenefits: false,
   showInfra: false,
   showIdealFor: false,
+  showClients: false,
   showQuote: false,
   showSupportReqs: false,
 };
@@ -150,6 +154,7 @@ export const SECTION_LABELS: { key: keyof ProposalSections; label: string; hint:
   { key: 'showBenefits', label: 'Cards de benefícios (8)', hint: '~½ página' },
   { key: 'showInfra', label: 'Cards de infraestrutura (4)', hint: '~⅓ página' },
   { key: 'showIdealFor', label: 'Perfil ideal (4 numerais)', hint: '~⅓ página' },
+  { key: 'showClients', label: 'Clientes em destaque', hint: '~¼ página' },
   { key: 'showQuote', label: 'Citação institucional', hint: '~⅙ página' },
   { key: 'showSupportReqs', label: 'Requisitos de suporte', hint: '~½ página' },
 ];
