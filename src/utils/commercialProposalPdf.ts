@@ -592,7 +592,9 @@ function buildHtmlMinimal(r: CommercialProposalPdfData): string {
       </table>
     `) : ''}
 
-    ${section('05', 'Cliente & Executivo', `
+    ${S.showClients ? renderFeaturedClientsModelo02(r.featuredClients, { navy: NAVY, ink: INK, muted: MUTED, line: LINE }, '05', section) : ''}
+
+    ${section(S.showClients ? '06' : '05', 'Cliente & Executivo', `
       <table style="width:100%;border-collapse:collapse;">
         <tr>
           <td style="width:50%;padding:0 24px 0 0;vertical-align:top;border-top:1px solid ${LINE};padding-top:16px;">
