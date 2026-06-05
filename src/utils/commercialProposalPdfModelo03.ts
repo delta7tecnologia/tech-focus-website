@@ -7,6 +7,7 @@
 import jsPDF from 'jspdf';
 import QRCode from 'qrcode';
 import { DELTA7_LOGO_DATA_URL, DELTA7_LOGO_DARK_DATA_URL } from '@/assets/delta7LogoBase64';
+import { DELTA7_LOGO_DARK_SMALL, DELTA7_LOGO_WHITE_SMALL } from '@/assets/delta7LogoSmallBase64';
 import { ALTATEK_LOGO_DATA_URL } from '@/assets/altatekLogoBase64';
 import {
   ABOUT_DELTA7,
@@ -123,9 +124,12 @@ function t(
 
 //  Cabecalho de pagina interna 
 function drawPageHeader(doc: jsPDF, propNum: string, _logoDataUrl: string) {
-  // Logo como texto estilizado (sem addImage para nao travar)
-  t(doc, 'Delta7', ML, 16, { size: 13, style: 'bold', color: NAVY });
-  t(doc, 'SOLUÇÕES EM TECNOLOGIA', ML, 20, { size: 5, color: SLATE });
+  // Logo JPEG comprimido (6KB, rapido - nao trava browser)
+  try {
+    doc.addImage('LOGO_DARK', 'JPEG', ML, 6, 30, 9);
+  } catch {
+    t(doc, 'Delta7', ML, 16, { size: 13, style: 'bold', color: NAVY });
+  }
   // Numero da proposta
   t(doc, 'Proposta Comercial', ML + CW, 12, { size: 7, color: MUTED, align: 'right' });
   t(doc, `Nº ${propNum}`, ML + CW, 16, { size: 10, style: 'bold', color: NAVY, align: 'right' });
@@ -196,12 +200,14 @@ function drawCover(doc: jsPDF, r: CommercialProposalPdfData) {
   // Fundo navy
   fillRect(doc, 0, 0, PW, PH, NAVY);
 
-  //  Logo Delta7 como texto (sem addImage)
-  doc.setFontSize(22);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(255, 255, 255);
-  doc.text('Delta7', ML, 26);
-  t(doc, 'SOLUÇÕES EM TECNOLOGIA', ML, 31, { size: 6, color: [148, 163, 184] });
+  //  Logo Delta7 JPEG branca sobre navy
+  try {
+    doc.addImage('LOGO_WHITE', 'JPEG', ML, 12, 36, 11);
+  } catch {
+    doc.setFontSize(22); doc.setFont('helvetica', 'bold');
+    doc.setTextColor(255, 255, 255);
+    doc.text('Delta7', ML, 26);
+  }
 
   //  Altatek badge (canto superior direito)
   if (r.showAltatekLogo) {
@@ -686,8 +692,9 @@ export async function buildModelo03(r: CommercialProposalPdfData): Promise<jsPDF
   const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
   const S: ProposalSections = { ...DEFAULT_SECTIONS, ...(r.sections || {}) };
 
-  // Sem pre-cache de imagens - usa texto no lugar das logos para evitar travamento
-  // As logos PNG de 20KB bloqueiam a thread principal no browser
+  // Pre-cache logos JPEG (6KB cada, 1-3ms - nao trava browser)
+  try { doc.addImage(DELTA7_LOGO_DARK_SMALL, 'JPEG', -999, -999, 1, 1, 'LOGO_DARK', 'FAST'); } catch {}
+  try { doc.addImage(DELTA7_LOGO_WHITE_SMALL, 'JPEG', -999, -999, 1, 1, 'LOGO_WHITE', 'FAST'); } catch {}
 
   // Pagina 1: Capa
   console.log('[M03] drawCover...');
