@@ -57,6 +57,14 @@ const ItSupportProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
     ...SUP_DEFAULT_SECTIONS,
     ...(proposal?.sections || {}),
   });
+  const [featuredClients, setFeaturedClients] = useState<FeaturedClient[]>(
+    Array.isArray(proposal?.featured_clients) ? proposal.featured_clients : [],
+  );
+  const featuredClientIds = featuredClients.map((c) => c.id);
+  const handleFeaturedClientsChange = async (ids: string[]) => {
+    const list = await fetchFeaturedClients(ids);
+    setFeaturedClients(list);
+  };
 
   const toggleSection = (key: keyof SupProposalSections) =>
     setSections((s) => ({ ...s, [key]: !s[key] }));
