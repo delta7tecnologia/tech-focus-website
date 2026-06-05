@@ -77,7 +77,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
   const handlePreview = async (template: 'modelo01' | 'modelo02' | 'modelo03') => {
     const err = validateForm();
     if (err) {
-      toast({ title: 'Não foi possível gerar a prévia', description: err, variant: 'destructive' });
+      toast({ title: 'Nao foi possivel gerar a previa', description: err, variant: 'destructive' });
       return;
     }
     setPreviewLoading(template);
@@ -85,7 +85,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
     try {
       const payload = buildPayload();
       const pdfData = {
-        proposalNumber: proposal?.proposal_number || 'PRÉVIA',
+        proposalNumber: proposal?.proposal_number || 'PREVIA',
         generatedAt: new Date().toISOString(),
         validityDays: payload.validity_days,
         clientName: payload.client_name,
@@ -112,7 +112,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
       }
       setPreviewPages(pages);
     } catch (e: any) {
-      toast({ title: 'Erro na prévia', description: e.message, variant: 'destructive' });
+      toast({ title: 'Erro na previa', description: e.message, variant: 'destructive' });
     } finally {
       setPreviewLoading(false);
     }
@@ -120,7 +120,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
 
   const docValidation = validateDocument(clientDocument);
 
-  // Pré-preenche executivo com dados do perfil logado
+  // Pre-preenche executivo com dados do perfil logado
   useEffect(() => {
     if (isEdit || !user) return;
     (async () => {
@@ -135,9 +135,9 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
 
   const validateForm = (): string | null => {
     if (!clientName.trim()) return 'Informe o nome do cliente.';
-    if (clientDocument && !docValidation.valid) return docValidation.message || 'Documento inválido.';
+    if (clientDocument && !docValidation.valid) return docValidation.message || 'Documento invalido.';
     if (!salesRepName.trim()) return 'Informe o executivo de vendas.';
-    if (items.length === 0) return 'Adicione pelo menos um item ao cenário.';
+    if (items.length === 0) return 'Adicione pelo menos um item ao cenario.';
     return null;
   };
 
@@ -233,10 +233,10 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
           };
           await downloadModelo03(pdfData);
         } catch (pdfErr: any) {
-          console.error('Falha ao gerar PDF após salvar proposta:', pdfErr);
+          console.error('Falha ao gerar PDF apos salvar proposta:', pdfErr);
           toast({
             title: 'Proposta salva, mas falhou ao gerar PDF',
-            description: `${pdfErr?.message || 'Erro desconhecido'}. Você pode baixar o PDF novamente pela lista de propostas.`,
+            description: `${pdfErr?.message || 'Erro desconhecido'}. Voce pode baixar o PDF novamente pela lista de propostas.`,
             variant: 'destructive',
           });
         }
@@ -246,7 +246,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
     onError: (e: any) => {
       const msg = e?.message || String(e) || 'Erro desconhecido';
       const hint = /load failed|failed to fetch|network/i.test(msg)
-        ? ' Verifique sua conexão e tente novamente.'
+        ? ' Verifique sua conexao e tente novamente.'
         : '';
       toast({ title: 'Erro ao salvar proposta', description: msg + hint, variant: 'destructive' });
     },
@@ -256,10 +256,10 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
     <div className="space-y-6">
       <Card>
         <CardContent className="p-6 space-y-4">
-          <h3 className="text-lg font-bold text-blue-900">Identificação do Cliente</h3>
+          <h3 className="text-lg font-bold text-blue-900">Identificacao do Cliente</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div className="md:col-span-2">
-              <Label>Nome / Razão Social *</Label>
+              <Label>Nome / Razao Social *</Label>
               <Input value={clientName} onChange={(e) => setClientName(e.target.value)} required />
             </div>
             <div>
@@ -278,7 +278,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
                 <p className="text-xs text-red-600 mt-1">{docValidation.message}</p>
               )}
               {clientDocument && docValidation.valid && !docValidation.empty && (
-                <p className="text-xs text-green-700 mt-1">{docValidation.type.toUpperCase()} válido</p>
+                <p className="text-xs text-green-700 mt-1">{docValidation.type.toUpperCase()} valido</p>
               )}
             </div>
             <div>
@@ -290,7 +290,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
               <Input type="email" value={clientEmail} onChange={(e) => setClientEmail(e.target.value)} />
             </div>
             <div>
-              <Label>Endereço</Label>
+              <Label>Endereco</Label>
               <Input value={clientAddress} onChange={(e) => setClientAddress(e.target.value)} />
             </div>
           </div>
@@ -319,7 +319,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
 
       <Card>
         <CardContent className="p-6 space-y-4">
-          <h3 className="text-lg font-bold text-blue-900">Cenário com Backup Online</h3>
+          <h3 className="text-lg font-bold text-blue-900">Cenario com Backup Online</h3>
           <ProposalItemsEditor
             items={items}
             onChange={setItems}
@@ -335,13 +335,13 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
         <CardContent className="p-6 space-y-4">
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div>
-              <h3 className="text-lg font-bold text-blue-900">Conteúdo do PDF</h3>
-              <p className="text-xs text-gray-500 mt-1">Marque as seções que deseja incluir. Quanto menos seções, mais curto o documento.</p>
+              <h3 className="text-lg font-bold text-blue-900">Conteudo do PDF</h3>
+              <p className="text-xs text-gray-500 mt-1">Marque as secoes que deseja incluir. Quanto menos secoes, mais curto o documento.</p>
             </div>
             <div className="flex gap-2">
               <Button type="button" size="sm" variant="outline" onClick={() => setSections(MINIMAL_SECTIONS)}>Apenas comercial</Button>
               <Button type="button" size="sm" variant="outline" onClick={() => setSections(COMPACT_SECTIONS)}>Enxuta</Button>
-              <Button type="button" size="sm" variant="outline" onClick={() => setSections(DEFAULT_SECTIONS)}>Padrão</Button>
+              <Button type="button" size="sm" variant="outline" onClick={() => setSections(DEFAULT_SECTIONS)}>Padrao</Button>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pt-2">
@@ -364,7 +364,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
               <Checkbox checked={showAltatekLogo} onCheckedChange={(v) => setShowAltatekLogo(!!v)} />
               <div className="flex-1">
                 <div className="text-sm font-medium text-gray-800">Exibir selo "Revenda Autorizada Altatek"</div>
-                <div className="text-xs text-gray-500">Inclui a logo Altatek na capa do PDF (use apenas para clientes em que essa parceria é relevante).</div>
+                <div className="text-xs text-gray-500">Inclui a logo Altatek na capa do PDF (use apenas para clientes em que essa parceria e relevante).</div>
               </div>
             </label>
           </div>
@@ -382,8 +382,8 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
 
       <Card>
         <CardContent className="p-6 space-y-4">
-          <h3 className="text-lg font-bold text-blue-900">Observações</h3>
-          <Textarea rows={4} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Informações adicionais para o cliente (opcional)" />
+          <h3 className="text-lg font-bold text-blue-900">Observacoes</h3>
+          <Textarea rows={4} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Informacoes adicionais para o cliente (opcional)" />
         </CardContent>
       </Card>
 
@@ -395,15 +395,15 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
         <Button variant="outline" onClick={onClose} disabled={saveMutation.isPending}>Cancelar</Button>
         <Button variant="outline" onClick={() => handlePreview('modelo01')} disabled={!!previewLoading || saveMutation.isPending}>
           {previewLoading === 'modelo01' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Eye className="w-4 h-4 mr-2" />}
-          Prévia · Modelo 01
+          Previa - Modelo 01
         </Button>
         <Button variant="outline" onClick={() => handlePreview('modelo02')} disabled={!!previewLoading || saveMutation.isPending}>
           {previewLoading === 'modelo02' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Eye className="w-4 h-4 mr-2" />}
-          Prévia · Modelo 02
+          Previa - Modelo 02
         </Button>
         <Button variant="outline" onClick={() => handlePreview('modelo03')} disabled={!!previewLoading || saveMutation.isPending} className="border-blue-700 text-blue-700">
           {previewLoading === 'modelo03' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Eye className="w-4 h-4 mr-2" />}
-          Prévia · Modelo 03 ✦
+          Previa - Modelo 03
         </Button>
         <Button variant="outline" onClick={() => saveMutation.mutate({ finalize: false })} disabled={saveMutation.isPending}>
           {saveMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
@@ -419,9 +419,9 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
         <DialogContent className="max-w-5xl w-[95vw] h-[90vh] flex flex-col p-0">
           <DialogHeader className="px-6 py-3 border-b flex-row items-center justify-between gap-4 space-y-0">
             <DialogTitle className="text-blue-900">
-              Prévia · {previewTemplate === 'modelo03' ? 'Modelo 03 (Novo ✦)' : previewTemplate === 'modelo02' ? 'Modelo 02 (Editorial)' : 'Modelo 01 (Premium)'} {previewPages ? `· ${previewPages.length} página(s)` : ''}
+              Previa - {previewTemplate === 'modelo03' ? 'Modelo 03 (Novo)' : previewTemplate === 'modelo02' ? 'Modelo 02 (Editorial)' : 'Modelo 01 (Premium)'} {previewPages ? `- ${previewPages.length} pagina(s)` : ''}
             </DialogTitle>
-            <span className="text-xs text-gray-500 mr-8">Visualização aproximada — finalize para baixar o PDF</span>
+            <span className="text-xs text-gray-500 mr-8">Visualizacao aproximada - finalize para baixar o PDF</span>
           </DialogHeader>
           <div className="flex-1 overflow-auto bg-gray-200 p-4">
             <div className="mx-auto max-w-3xl space-y-4">
@@ -429,7 +429,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
                 <img
                   key={i}
                   src={src}
-                  alt={`Página ${i + 1}`}
+                  alt={`Pagina ${i + 1}`}
                   className="w-full block bg-white shadow-lg rounded"
                 />
               ))}

@@ -1,6 +1,6 @@
 /**
- * Modelo 03 — Gerador de PDF usando jsPDF puro (sem html2canvas).
- * Texto 100% limpo, sem espaçamentos irregulares.
+ * Modelo 03 - Gerador de PDF usando jsPDF puro (sem html2canvas).
+ * Texto 100% limpo, sem espacamentos irregulares.
  * Design: Navy + Slate, tipografia Helvetica (similar ao Inter).
  */
 
@@ -25,7 +25,7 @@ import {
 import type { FeaturedClientPdf } from './proposalClientsBlock';
 import type { CommercialProposalPdfData } from './commercialProposalPdf';
 
-// ─── Cores ────────────────────────────────────────────────────────────────────
+//  Cores 
 const NAVY   = [10, 31, 68]   as [number, number, number];
 const SLATE  = [71, 85, 105]  as [number, number, number];
 const INK    = [26, 37, 64]   as [number, number, number];
@@ -35,22 +35,22 @@ const PAPER  = [248, 250, 252] as [number, number, number];
 const BORDER = [226, 232, 240] as [number, number, number];
 const WHITE  = [255, 255, 255] as [number, number, number];
 
-// ─── Dimensões A4 ─────────────────────────────────────────────────────────────
+//  Dimensoes A4 
 const PW = 210; // page width mm
 const PH = 297; // page height mm
 const ML = 18;  // margin left
 const MR = 18;  // margin right
 const CW = PW - ML - MR; // content width = 174mm
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+//  Helpers 
 
 const fmtDate = (iso?: string) =>
-  iso ? new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }) : '—';
+  iso ? new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }) : '-';
 
 /** Trunca texto para caber em maxW mm com a fonte atual */
 function truncate(doc: jsPDF, text: string, maxW: number): string {
   while (doc.getTextWidth(text) > maxW && text.length > 3) {
-    text = text.slice(0, -2) + '…';
+    text = text.slice(0, -2) + '...';
   }
   return text;
 }
@@ -73,7 +73,7 @@ function wrapText(doc: jsPDF, text: string, maxW: number): string[] {
   return lines;
 }
 
-/** Desenha texto com quebra de linha automática e retorna Y final */
+/** Desenha texto com quebra de linha automatica e retorna Y final */
 function drawWrapped(doc: jsPDF, text: string, x: number, y: number, maxW: number, lineH: number): number {
   const lines = wrapText(doc, text, maxW);
   for (const line of lines) {
@@ -83,7 +83,7 @@ function drawWrapped(doc: jsPDF, text: string, x: number, y: number, maxW: numbe
   return y;
 }
 
-/** Desenha um retângulo preenchido */
+/** Desenha um retangulo preenchido */
 function fillRect(doc: jsPDF, x: number, y: number, w: number, h: number, color: [number, number, number]) {
   doc.setFillColor(...color);
   doc.rect(x, y, w, h, 'F');
@@ -121,46 +121,46 @@ function t(
   }
 }
 
-// ─── Cabeçalho de página interna ──────────────────────────────────────────────
+//  Cabecalho de pagina interna 
 function drawPageHeader(doc: jsPDF, propNum: string, logoDataUrl: string) {
   // Logo
   try {
     doc.addImage(logoDataUrl, 'PNG', ML, 8, 28, 10);
   } catch {}
-  // Número da proposta
+  // Numero da proposta
   t(doc, 'Proposta Comercial', ML + CW, 12, { size: 7, color: MUTED, align: 'right' });
-  t(doc, `Nº ${propNum}`, ML + CW, 16, { size: 10, style: 'bold', color: NAVY, align: 'right' });
-  // Linha divisória navy
+  t(doc, `No ${propNum}`, ML + CW, 16, { size: 10, style: 'bold', color: NAVY, align: 'right' });
+  // Linha divisoria navy
   hline(doc, ML, 20, CW, NAVY, 0.6);
   // Barra slate curta
   doc.setFillColor(...SLATE);
   doc.rect(ML, 20.4, 12, 1, 'F');
 }
 
-// ─── Título de seção ──────────────────────────────────────────────────────────
+//  Titulo de secao 
 function sectionTitle(doc: jsPDF, eyebrow: string, title: string, y: number): number {
   // Eyebrow
   t(doc, eyebrow.toUpperCase(), ML, y, { size: 7, color: MUTED });
   y += 4;
-  // Título bold
+  // Titulo bold
   t(doc, title, ML, y, { size: 13, style: 'bold', color: NAVY });
-  // Linha gradiente (simulada com linha sólida SLATE)
+  // Linha gradiente (simulada com linha solida SLATE)
   const titleW = doc.getTextWidth(title) + 4;
   hline(doc, ML + titleW, y - 2.5, CW - titleW, SLATE, 0.4);
   return y + 5;
 }
 
-// ─── CAPA ─────────────────────────────────────────────────────────────────────
+//  CAPA 
 function drawCover(doc: jsPDF, r: CommercialProposalPdfData) {
   // Fundo navy
   fillRect(doc, 0, 0, PW, PH, NAVY);
 
-  // ── Logo Delta7 (canto superior esquerdo) ──
+  //  Logo Delta7 (canto superior esquerdo) 
   try {
     doc.addImage(DELTA7_LOGO_DATA_URL, 'PNG', ML, 16, 36, 14);
   } catch {}
 
-  // ── Altatek badge (canto superior direito) ──
+  //  Altatek badge (canto superior direito) 
   if (r.showAltatekLogo) {
     // Fundo branco
     fillRect(doc, ML + CW - 36, 14, 36, 18, WHITE);
@@ -169,46 +169,46 @@ function drawCover(doc: jsPDF, r: CommercialProposalPdfData) {
       doc.addImage(ALTATEK_LOGO_DATA_URL, 'PNG', ML + CW - 33, 21, 30, 9);
     } catch {}
   } else {
-    // só o texto Delta7
+    // so o texto Delta7
     t(doc, 'DELTA7 TECNOLOGIA', ML + CW, 20, { size: 7, color: [148, 163, 184], align: 'right' });
   }
 
-  // ── Linha decorativa curta ──
+  //  Linha decorativa curta 
   doc.setFillColor(71, 85, 105);
   doc.rect(ML, 80, 20, 1.5, 'F');
 
-  // ── Tag "Proposta Comercial" ──
+  //  Tag "Proposta Comercial" 
   t(doc, 'P R O P O S T A   C O M E R C I A L', ML, 90, { size: 8, color: [148, 163, 184] });
 
-  // ── Título BACKUP ──
+  //  Titulo BACKUP 
   doc.setFontSize(56);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(255, 255, 255);
   doc.text('BACKUP', ML, 118);
 
-  // ── Subtítulo "Online." em slate ──
+  //  Subtitulo "Online." em slate 
   doc.setFontSize(56);
   doc.setFont('helvetica', 'bolditalic');
   doc.setTextColor(71, 85, 105);
   doc.text('Online.', ML, 140);
 
-  // ── Slogan ──
-  t(doc, 'Continuidade do seu negócio', ML, 154, { size: 14, color: [203, 213, 225], style: 'normal' });
+  //  Slogan 
+  t(doc, 'Continuidade do seu negocio', ML, 154, { size: 14, color: [203, 213, 225], style: 'normal' });
   t(doc, 'protegida com tecnologia de verdade.', ML, 161, { size: 14, color: [203, 213, 225], style: 'normal' });
 
-  // ── Rodapé da capa ──
+  //  Rodape da capa 
   hline(doc, ML, PH - 38, CW, [30, 58, 110], 0.5);
 
   t(doc, 'PREPARADO PARA', ML, PH - 31, { size: 7, color: [148, 163, 184] });
   t(doc, r.clientName, ML, PH - 25, { size: 12, style: 'bold', color: WHITE });
-  t(doc, `Proposta nº ${r.proposalNumber}`, ML, PH - 19, { size: 9, color: [185, 194, 214] });
+  t(doc, `Proposta no ${r.proposalNumber}`, ML, PH - 19, { size: 9, color: [185, 194, 214] });
 
   t(doc, 'EMITIDA EM', ML + CW, PH - 31, { size: 7, color: [148, 163, 184], align: 'right' });
   t(doc, fmtDate(r.generatedAt), ML + CW, PH - 25, { size: 12, style: 'bold', color: WHITE, align: 'right' });
   t(doc, `Validade: ${r.validityDays} dias`, ML + CW, PH - 19, { size: 9, color: [185, 194, 214], align: 'right' });
 }
 
-// ─── SOBRE + BENEFÍCIOS ───────────────────────────────────────────────────────
+//  SOBRE + BENEFICIOS 
 function drawSobreBeneficios(doc: jsPDF, r: CommercialProposalPdfData, S: ProposalSections): void {
   doc.addPage();
   drawPageHeader(doc, r.proposalNumber, DELTA7_LOGO_DARK_DATA_URL);
@@ -221,7 +221,7 @@ function drawSobreBeneficios(doc: jsPDF, r: CommercialProposalPdfData, S: Propos
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...MUTED);
     const paraLines = doc.splitTextToSize(ABOUT_DELTA7.replace(/\n\n/g, ' ').replace(/\n/g, ' '), CW);
-    // Só as duas primeiras linhas de parágrafo para economizar espaço
+    // So as duas primeiras linhas de paragrafo para economizar espaco
     const aboutShort = ABOUT_DELTA7.split('\n\n').slice(0, 2).join(' ');
     const lines = doc.splitTextToSize(aboutShort, CW);
     doc.text(lines, ML, y);
@@ -268,7 +268,7 @@ function drawSobreBeneficios(doc: jsPDF, r: CommercialProposalPdfData, S: Propos
   }
 }
 
-// ─── CLIENTES + IDENTIFICAÇÃO ─────────────────────────────────────────────────
+//  CLIENTES + IDENTIFICACAO 
 function drawClientesIdentificacao(
   doc: jsPDF,
   r: CommercialProposalPdfData,
@@ -280,8 +280,8 @@ function drawClientesIdentificacao(
 
   // Clientes em destaque
   if (S.showClients && r.featuredClients && r.featuredClients.length > 0) {
-    y = sectionTitle(doc, 'Confiança', 'Clientes que confiam na Delta7', y);
-    t(doc, 'Algumas das empresas que confiam na Delta7 para gestão e suporte de TI:', ML, y, { size: 8.5, color: MUTED });
+    y = sectionTitle(doc, 'Confianca', 'Clientes que confiam na Delta7', y);
+    t(doc, 'Algumas das empresas que confiam na Delta7 para gestao e suporte de TI:', ML, y, { size: 8.5, color: MUTED });
     y += 5;
 
     const colCount = 5;
@@ -292,7 +292,7 @@ function drawClientesIdentificacao(
     let rowY = y;
     for (let i = 0; i < clients.length; i++) {
       const cx = ML + col * cellW;
-      // Borda da célula
+      // Borda da celula
       fillRect(doc, cx + 1, rowY, cellW - 2, cellH, WHITE);
       doc.setDrawColor(...BORDER);
       doc.setLineWidth(0.3);
@@ -324,20 +324,20 @@ function drawClientesIdentificacao(
     y = rowY + 4;
   }
 
-  // Identificação do cliente
-  y = sectionTitle(doc, 'Cliente', 'Identificação do Cliente', y);
+  // Identificacao do cliente
+  y = sectionTitle(doc, 'Cliente', 'Identificacao do Cliente', y);
   const tableRows = [
-    ['Razão Social', r.clientName, '', ''],
-    ['CNPJ / CPF', r.clientDocument || '—', 'Contato', r.clientContact || '—'],
-    ['E-mail', r.clientEmail || '—', 'Endereço', r.clientAddress || '—'],
+    ['Razao Social', r.clientName, '', ''],
+    ['CNPJ / CPF', r.clientDocument || '-', 'Contato', r.clientContact || '-'],
+    ['E-mail', r.clientEmail || '-', 'Endereco', r.clientAddress || '-'],
   ];
   y = drawInfoTable(doc, tableRows, y);
   y += 6;
 
-  // Executivo Responsável
-  y = sectionTitle(doc, 'Delta7', 'Executivo Responsável', y);
+  // Executivo Responsavel
+  y = sectionTitle(doc, 'Delta7', 'Executivo Responsavel', y);
   drawInfoTable(doc, [
-    ['Executivo de Vendas', r.salesRepName, 'E-mail', r.salesRepEmail || '—'],
+    ['Executivo de Vendas', r.salesRepName, 'E-mail', r.salesRepEmail || '-'],
   ], y);
 }
 
@@ -382,21 +382,21 @@ function drawInfoTable(doc: jsPDF, rows: string[][], y: number): number {
   return y;
 }
 
-// ─── INVESTIMENTO ─────────────────────────────────────────────────────────────
+//  INVESTIMENTO 
 function drawInvestimento(doc: jsPDF, r: CommercialProposalPdfData): void {
   doc.addPage();
   drawPageHeader(doc, r.proposalNumber, DELTA7_LOGO_DARK_DATA_URL);
   let y = 28;
 
-  // Tabela Ativação
-  y = sectionTitle(doc, 'Investimento', 'Configuração inicial', y);
+  // Tabela Ativacao
+  y = sectionTitle(doc, 'Investimento', 'Configuracao inicial', y);
   y = drawItemsTable(doc, [
-    { desc: 'Ativação do Serviço (taxa única)', qty: 1, unit: r.activationFee },
+    { desc: 'Ativacao do Servico (taxa unica)', qty: 1, unit: r.activationFee },
   ], y);
   y += 6;
 
   // Tabela Mensalidade
-  y = sectionTitle(doc, 'Mensalidade', 'Cenário com Backup Online', y);
+  y = sectionTitle(doc, 'Mensalidade', 'Cenario com Backup Online', y);
   const items = r.items.filter(i => i.qty > 0);
   y = drawItemsTable(doc, items.map(i => ({ desc: i.description, qty: i.qty, unit: i.unit_price })), y);
   y += 6;
@@ -416,19 +416,19 @@ function drawInvestimento(doc: jsPDF, r: CommercialProposalPdfData): void {
   }, y);
   y += 4;
 
-  // Não inclusos
+  // Nao inclusos
   fillRect(doc, ML, y, CW, 1, SLATE);
   fillRect(doc, ML, y, 2.5, 10, SLATE);
   fillRect(doc, ML, y, CW, 10, PAPER);
-  t(doc, 'Não inclusos:', ML + 5, y + 6.5, { size: 8.5, style: 'bold', color: NAVY });
-  const niText = truncate(doc, NOT_INCLUDED.replace('Nesta proposta não estão inclusos: ', ''), CW - 40);
+  t(doc, 'Nao inclusos:', ML + 5, y + 6.5, { size: 8.5, style: 'bold', color: NAVY });
+  const niText = truncate(doc, NOT_INCLUDED.replace('Nesta proposta nao estao inclusos: ', ''), CW - 40);
   t(doc, niText, ML + 34, y + 6.5, { size: 8.5, color: INK });
   y += 14;
 
-  // Observações
+  // Observacoes
   if (r.notes) {
     fillRect(doc, ML, y, 2.5, 14, NAVY);
-    t(doc, 'Observações', ML + 5, y + 5.5, { size: 8.5, style: 'bold', color: NAVY });
+    t(doc, 'Observacoes', ML + 5, y + 5.5, { size: 8.5, style: 'bold', color: NAVY });
     const notesLines = doc.splitTextToSize(r.notes, CW - 10);
     doc.setFontSize(8.5);
     doc.setFont('helvetica', 'normal');
@@ -493,11 +493,11 @@ function drawSummaryBox(
     { label: 'Subtotal mensal (itens)', value: formatBRL(data.subtotal) },
   ];
   if (data.discount > 0) {
-    rows.push({ label: '(−) Desconto mensal', value: `− ${formatBRL(data.discount)}` });
+    rows.push({ label: '() Desconto mensal', value: ` ${formatBRL(data.discount)}` });
   }
   rows.push({ label: '= Mensalidade recorrente', value: formatBRL(data.monthly), bold: true });
-  rows.push({ label: '(+) Taxa de Ativação (cobrada uma única vez)', value: formatBRL(data.activation) });
-  rows.push({ label: 'INVESTIMENTO NO 1º MÊS', value: formatBRL(data.firstMonth), highlight: true });
+  rows.push({ label: '(+) Taxa de Ativacao (cobrada uma unica vez)', value: formatBRL(data.activation) });
+  rows.push({ label: 'INVESTIMENTO NO 1o MES', value: formatBRL(data.firstMonth), highlight: true });
 
   // Header do resumo
   fillRect(doc, ML, y, CW, rowH, CREAM);
@@ -522,7 +522,7 @@ function drawSummaryBox(
 
   // Nota
   fillRect(doc, ML, y, CW, 7, PAPER);
-  t(doc, `A partir do 2º mês, o valor recorrente é de ${formatBRL(data.monthly)}/mês.`, ML + 3, y + 4.5, {
+  t(doc, `A partir do 2o mes, o valor recorrente e de ${formatBRL(data.monthly)}/mes.`, ML + 3, y + 4.5, {
     size: 7.5, style: 'italic', color: MUTED,
   });
   y += 7;
@@ -536,15 +536,15 @@ function drawSummaryBox(
   return y;
 }
 
-// ─── SUPORTE ──────────────────────────────────────────────────────────────────
+//  SUPORTE 
 function drawSuporte(doc: jsPDF, r: CommercialProposalPdfData, S: ProposalSections): void {
   doc.addPage();
   drawPageHeader(doc, r.proposalNumber, DELTA7_LOGO_DARK_DATA_URL);
   let y = 28;
 
-  y = sectionTitle(doc, 'Atendimento', 'Suporte Técnico', y);
+  y = sectionTitle(doc, 'Atendimento', 'Suporte Tecnico', y);
 
-  // Parágrafos do SUPPORT_TEXT
+  // Paragrafos do SUPPORT_TEXT
   const paras = SUPPORT_TEXT.split('\n\n');
   for (const para of paras) {
     doc.setFontSize(9);
@@ -556,10 +556,10 @@ function drawSuporte(doc: jsPDF, r: CommercialProposalPdfData, S: ProposalSectio
   }
 
   if (S.showSupportReqs) {
-    t(doc, 'Requisitos para a prestação dos serviços', ML, y, { size: 9.5, style: 'bold', color: NAVY });
+    t(doc, 'Requisitos para a prestacao dos servicos', ML, y, { size: 9.5, style: 'bold', color: NAVY });
     y += 6;
     for (const req of SUPPORT_REQUIREMENTS) {
-      t(doc, '◆', ML, y, { size: 7, color: SLATE });
+      t(doc, '', ML, y, { size: 7, color: SLATE });
       const reqLines = doc.splitTextToSize(req, CW - 8);
       doc.setFontSize(8.5);
       doc.setFont('helvetica', 'normal');
@@ -580,21 +580,21 @@ function drawSuporte(doc: jsPDF, r: CommercialProposalPdfData, S: ProposalSectio
     doc.setFont('helvetica', 'italic');
     doc.setTextColor(...INK);
     doc.text(qLines, ML + 13, y + 8);
-    t(doc, `— ${INSTITUTIONAL_QUOTE.author}`, ML + 13, y + qLines.length * 4.5 + 10, {
+    t(doc, `- ${INSTITUTIONAL_QUOTE.author}`, ML + 13, y + qLines.length * 4.5 + 10, {
       size: 7, color: SLATE,
     });
   }
 }
 
-// ─── ACEITE + HASH ────────────────────────────────────────────────────────────
+//  ACEITE + HASH 
 async function drawAceite(doc: jsPDF, r: CommercialProposalPdfData): Promise<void> {
   doc.addPage();
   drawPageHeader(doc, r.proposalNumber, DELTA7_LOGO_DARK_DATA_URL);
   let y = 28;
 
-  y = sectionTitle(doc, 'Formalização', 'Aceite da Proposta', y);
+  y = sectionTitle(doc, 'Formalizacao', 'Aceite da Proposta', y);
 
-  t(doc, `Declaro estar de acordo com os termos, valores e condições apresentados nesta proposta`, ML, y, { size: 8.5, color: MUTED });
+  t(doc, `Declaro estar de acordo com os termos, valores e condicoes apresentados nesta proposta`, ML, y, { size: 8.5, color: MUTED });
   y += 4.5;
   t(doc, `comercial, emitida em ${fmtDate(r.generatedAt)} com validade de ${r.validityDays} dias.`, ML, y, { size: 8.5, color: MUTED });
   y += 18;
@@ -608,7 +608,7 @@ async function drawAceite(doc: jsPDF, r: CommercialProposalPdfData): Promise<voi
   t(doc, 'Delta7 Tecnologia', ML + CW * 0.775, y, { size: 9, style: 'bold', color: NAVY, align: 'center' });
   y += 4.5;
   t(doc, 'CLIENTE', ML + CW * 0.225, y, { size: 7, color: MUTED, align: 'center' });
-  t(doc, `${r.salesRepName.toUpperCase()} — EXECUTIVO DE VENDAS`, ML + CW * 0.775, y, { size: 7, color: MUTED, align: 'center' });
+  t(doc, `${r.salesRepName.toUpperCase()} - EXECUTIVO DE VENDAS`, ML + CW * 0.775, y, { size: 7, color: MUTED, align: 'center' });
   y += 12;
 
   // QR Code + Hash
@@ -641,35 +641,35 @@ async function drawAceite(doc: jsPDF, r: CommercialProposalPdfData): Promise<voi
   doc.text(r.integrityHash, ML + 36, y + 13.5);
 
   t(doc, `Link: ${validationUrl.substring(0, 70)}${validationUrl.length > 70 ? '...' : ''}`, ML + 35, y + 20, { size: 6.5, color: MUTED });
-  t(doc, 'Documento emitido eletronicamente pela plataforma Delta7. Autenticidade verificável pelo QR Code ou link acima.', ML + 35, y + 25, { size: 6.5, style: 'italic', color: MUTED });
+  t(doc, 'Documento emitido eletronicamente pela plataforma Delta7. Autenticidade verificavel pelo QR Code ou link acima.', ML + 35, y + 25, { size: 6.5, style: 'italic', color: MUTED });
   t(doc, 'VALIDAR PROPOSTA  |  Escaneie para verificar autenticidade', ML + 17, y + 31.5, { size: 6, color: SLATE, align: 'center' });
 }
 
-// ─── MONTAGEM FINAL ───────────────────────────────────────────────────────────
+//  MONTAGEM FINAL 
 export async function buildModelo03(r: CommercialProposalPdfData): Promise<jsPDF> {
   const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
   const S: ProposalSections = { ...DEFAULT_SECTIONS, ...(r.sections || {}) };
 
-  // Página 1: Capa
+  // Pagina 1: Capa
   drawCover(doc, r);
 
-  // Página 2: Sobre + Benefícios (se habilitados)
+  // Pagina 2: Sobre + Beneficios (se habilitados)
   if (S.showAbout || S.showBenefits) {
     drawSobreBeneficios(doc, r, S);
   }
 
-  // Página 3: Clientes + Identificação
+  // Pagina 3: Clientes + Identificacao
   drawClientesIdentificacao(doc, r, S);
 
-  // Página 4: Investimento
+  // Pagina 4: Investimento
   drawInvestimento(doc, r);
 
-  // Página 5: Suporte (se habilitado)
+  // Pagina 5: Suporte (se habilitado)
   if (S.showSupportReqs || S.showQuote) {
     drawSuporte(doc, r, S);
   }
 
-  // Última página: Aceite
+  // Ultima pagina: Aceite
   await drawAceite(doc, r);
 
   return doc;
