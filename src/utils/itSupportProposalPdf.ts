@@ -637,7 +637,7 @@ function buildHtmlMinimal(r: ItSupportProposalPdfData): string {
     `)}
 
     <div id="prop-financ-block" style="break-inside:avoid;page-break-inside:avoid;">
-      ${section('07', 'Investimento mensal', `
+      ${section(N(7), 'Investimento mensal', `
         <table style="width:100%;border-collapse:collapse;margin-top:8px;">
           <thead>
             <tr>
