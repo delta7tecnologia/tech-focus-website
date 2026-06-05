@@ -128,7 +128,7 @@ function drawPageHeader(doc: jsPDF, propNum: string, _logoDataUrl: string) {
   t(doc, 'SOLUÇÕES EM TECNOLOGIA', ML, 20, { size: 5, color: SLATE });
   // Numero da proposta
   t(doc, 'Proposta Comercial', ML + CW, 12, { size: 7, color: MUTED, align: 'right' });
-  t(doc, `No ${propNum}`, ML + CW, 16, { size: 10, style: 'bold', color: NAVY, align: 'right' });
+  t(doc, `Nº ${propNum}`, ML + CW, 16, { size: 10, style: 'bold', color: NAVY, align: 'right' });
   // Linha divisoria navy
   hline(doc, ML, 20, CW, NAVY, 0.6);
   // Barra slate curta
@@ -198,7 +198,7 @@ function drawCover(doc: jsPDF, r: CommercialProposalPdfData) {
 
   t(doc, 'PREPARADO PARA', ML, PH - 31, { size: 7, color: [148, 163, 184] });
   t(doc, r.clientName, ML, PH - 25, { size: 12, style: 'bold', color: WHITE });
-  t(doc, `Proposta no ${r.proposalNumber}`, ML, PH - 19, { size: 9, color: [185, 194, 214] });
+  t(doc, `Proposta nº ${r.proposalNumber}`, ML, PH - 19, { size: 9, color: [185, 194, 214] });
 
   t(doc, 'EMITIDA EM', ML + CW, PH - 31, { size: 7, color: [148, 163, 184], align: 'right' });
   t(doc, fmtDate(r.generatedAt), ML + CW, PH - 25, { size: 12, style: 'bold', color: WHITE, align: 'right' });
@@ -279,7 +279,7 @@ function drawClientesIdentificacao(
   if (S.showClients && r.featuredClients && r.featuredClients.length > 0) {
     console.log('[M03] clients:', r.featuredClients.length);
     y = sectionTitle(doc, 'Confiança', 'Clientes que confiam na Delta7', y);
-    t(doc, 'Algumas das empresas que confiam na Delta7 para gestao e suporte de TI:', ML, y, { size: 8.5, color: MUTED });
+    t(doc, 'Algumas das empresas que confiam na Delta7 para gestão e suporte de TI:', ML, y, { size: 8.5, color: MUTED });
     y += 5;
 
     const colCount = 5;
@@ -415,7 +415,7 @@ function drawInvestimento(doc: jsPDF, r: CommercialProposalPdfData): void {
   fillRect(doc, ML, y, CW, 1, SLATE);
   fillRect(doc, ML, y, 2.5, 10, SLATE);
   fillRect(doc, ML, y, CW, 10, PAPER);
-  t(doc, 'Não incluíos:', ML + 5, y + 6.5, { size: 8.5, style: 'bold', color: NAVY });
+  t(doc, 'Não inclusos:', ML + 5, y + 6.5, { size: 8.5, style: 'bold', color: NAVY });
   const niText = truncate(doc, NOT_INCLUDED.replace('Nesta proposta nao estao inclusos: ', ''), CW - 40);
   t(doc, niText, ML + 34, y + 6.5, { size: 8.5, color: INK });
   y += 14;
@@ -517,7 +517,7 @@ function drawSummaryBox(
 
   // Nota
   fillRect(doc, ML, y, CW, 7, PAPER);
-  t(doc, `A partir do 2o mes, o valor recorrente é de ${formatBRL(data.monthly)}/mes.`, ML + 3, y + 4.5, {
+  t(doc, `A partir do 2º mês, o valor recorrente é de ${formatBRL(data.monthly)}/mes.`, ML + 3, y + 4.5, {
     size: 7.5, style: 'italic', color: MUTED,
   });
   y += 7;
