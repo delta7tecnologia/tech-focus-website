@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Checkbox } from '@/components/ui/checkbox';
 import ProposalItemsEditor, { type EditableItem } from './ProposalItemsEditor';
 import ProposalSignatureLinksManager from './ProposalSignatureLinksManager';
+import ClientShowcasePicker, { fetchFeaturedClients, type FeaturedClient } from './ClientShowcasePicker';
 import {
   ACTIVATION_FEE_DEFAULT,
   VALIDITY_DAYS_DEFAULT,
