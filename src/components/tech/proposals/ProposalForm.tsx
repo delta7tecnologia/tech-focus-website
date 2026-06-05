@@ -26,6 +26,7 @@ import {
 import { validateDocument, formatDocument } from '@/lib/validators/document';
 import { sha256Hex } from '@/utils/reportHash';
 import { downloadCommercialProposalPdf, previewCommercialProposalPdf } from '@/utils/commercialProposalPdf';
+import { downloadModelo03, previewModelo03 } from '@/utils/commercialProposalPdfModelo03';
 
 interface Props {
   proposal?: any;
@@ -70,10 +71,10 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
     setSections((s) => ({ ...s, [key]: !s[key] }));
 
   const [previewPages, setPreviewPages] = useState<string[] | null>(null);
-  const [previewLoading, setPreviewLoading] = useState<false | 'modelo01' | 'modelo02'>(false);
-  const [previewTemplate, setPreviewTemplate] = useState<'modelo01' | 'modelo02'>('modelo01');
+  const [previewLoading, setPreviewLoading] = useState<false | 'modelo01' | 'modelo02' | 'modelo03'>(false);
+  const [previewTemplate, setPreviewTemplate] = useState<'modelo01' | 'modelo02' | 'modelo03'>('modelo03');
 
-  const handlePreview = async (template: 'modelo01' | 'modelo02') => {
+  const handlePreview = async (template: 'modelo01' | 'modelo02' | 'modelo03') => {
     const err = validateForm();
     if (err) {
       toast({ title: 'Não foi possível gerar a prévia', description: err, variant: 'destructive' });
@@ -83,7 +84,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
     setPreviewTemplate(template);
     try {
       const payload = buildPayload();
-      const pages = await previewCommercialProposalPdf({
+      const pdfData = {
         proposalNumber: proposal?.proposal_number || 'PRÉVIA',
         generatedAt: new Date().toISOString(),
         validityDays: payload.validity_days,
@@ -102,8 +103,13 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
         sections,
         showAltatekLogo,
         featuredClients,
-        template,
-      });
+      };
+      let pages: string[];
+      if (template === 'modelo03') {
+        pages = await previewModelo03(pdfData);
+      } else {
+        pages = await previewCommercialProposalPdf({ ...pdfData, template });
+      }
       setPreviewPages(pages);
     } catch (e: any) {
       toast({ title: 'Erro na prévia', description: e.message, variant: 'destructive' });
@@ -205,7 +211,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
       toast({ title: vars.finalize ? 'Proposta gerada' : 'Rascunho salvo' });
       if (vars.finalize) {
         try {
-          await downloadCommercialProposalPdf({
+          const pdfData = {
             proposalNumber: data.proposal_number,
             generatedAt: data.generated_at,
             validityDays: data.validity_days,
@@ -224,7 +230,8 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
             sections: (data.sections as ProposalSections) || sections,
             showAltatekLogo: data.show_altatek_logo ?? showAltatekLogo,
             featuredClients: (Array.isArray(data.featured_clients) ? data.featured_clients : featuredClients) as any,
-          });
+          };
+          await downloadModelo03(pdfData);
         } catch (pdfErr: any) {
           console.error('Falha ao gerar PDF após salvar proposta:', pdfErr);
           toast({
@@ -394,6 +401,10 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
           {previewLoading === 'modelo02' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Eye className="w-4 h-4 mr-2" />}
           Prévia · Modelo 02
         </Button>
+        <Button variant="outline" onClick={() => handlePreview('modelo03')} disabled={!!previewLoading || saveMutation.isPending} className="border-blue-700 text-blue-700">
+          {previewLoading === 'modelo03' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Eye className="w-4 h-4 mr-2" />}
+          Prévia · Modelo 03 ✦
+        </Button>
         <Button variant="outline" onClick={() => saveMutation.mutate({ finalize: false })} disabled={saveMutation.isPending}>
           {saveMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
           Salvar Rascunho
@@ -408,7 +419,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
         <DialogContent className="max-w-5xl w-[95vw] h-[90vh] flex flex-col p-0">
           <DialogHeader className="px-6 py-3 border-b flex-row items-center justify-between gap-4 space-y-0">
             <DialogTitle className="text-blue-900">
-              Prévia · {previewTemplate === 'modelo02' ? 'Modelo 02 (Editorial)' : 'Modelo 01 (Premium)'} {previewPages ? `· ${previewPages.length} página(s)` : ''}
+              Prévia · {previewTemplate === 'modelo03' ? 'Modelo 03 (Novo ✦)' : previewTemplate === 'modelo02' ? 'Modelo 02 (Editorial)' : 'Modelo 01 (Premium)'} {previewPages ? `· ${previewPages.length} página(s)` : ''}
             </DialogTitle>
             <span className="text-xs text-gray-500 mr-8">Visualização aproximada — finalize para baixar o PDF</span>
           </DialogHeader>
