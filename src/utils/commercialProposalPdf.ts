@@ -275,6 +275,9 @@ function buildHtml(r: CommercialProposalPdfData): string {
     ${S.showIdealFor ? `<div data-keep="1">${sectionTitle('Perfil ideal', 'Esta solução é ideal se...')}
     ${idealHtml}</div>` : ''}
 
+    ${S.showClients ? renderFeaturedClientsModelo01(r.featuredClients, C, sectionTitle) : ''}
+
+
     <div data-keep="1">
     ${sectionTitle('Cliente', 'Identificação do Cliente')}
     <table style="width:100%;border-collapse:collapse;font-size:11px;border:1px solid #e7e2d2;border-radius:6px;overflow:hidden;">
