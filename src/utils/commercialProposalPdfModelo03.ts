@@ -125,7 +125,7 @@ function t(
 function drawPageHeader(doc: jsPDF, propNum: string, _logoDataUrl: string) {
   // Logo como texto estilizado (sem addImage para nao travar)
   t(doc, 'Delta7', ML, 16, { size: 13, style: 'bold', color: NAVY });
-  t(doc, 'SOLUCOES EM TECNOLOGIA', ML, 20, { size: 5, color: SLATE });
+  t(doc, 'SOLUÇÕES EM TECNOLOGIA', ML, 20, { size: 5, color: SLATE });
   // Numero da proposta
   t(doc, 'Proposta Comercial', ML + CW, 12, { size: 7, color: MUTED, align: 'right' });
   t(doc, `No ${propNum}`, ML + CW, 16, { size: 10, style: 'bold', color: NAVY, align: 'right' });
@@ -159,7 +159,7 @@ function drawCover(doc: jsPDF, r: CommercialProposalPdfData) {
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(255, 255, 255);
   doc.text('Delta7', ML, 26);
-  t(doc, 'SOLUCOES EM TECNOLOGIA', ML, 31, { size: 6, color: [148, 163, 184] });
+  t(doc, 'SOLUÇÕES EM TECNOLOGIA', ML, 31, { size: 6, color: [148, 163, 184] });
 
   //  Altatek badge (canto superior direito)
   if (r.showAltatekLogo) {
@@ -190,7 +190,7 @@ function drawCover(doc: jsPDF, r: CommercialProposalPdfData) {
   doc.text('Online.', ML, 140);
 
   //  Slogan 
-  t(doc, 'Continuidade do seu negocio', ML, 154, { size: 14, color: [203, 213, 225], style: 'normal' });
+  t(doc, 'Continuidade do seu negócio', ML, 154, { size: 14, color: [203, 213, 225], style: 'normal' });
   t(doc, 'protegida com tecnologia de verdade.', ML, 161, { size: 14, color: [203, 213, 225], style: 'normal' });
 
   //  Rodape da capa 
@@ -278,7 +278,7 @@ function drawClientesIdentificacao(
   // Clientes em destaque
   if (S.showClients && r.featuredClients && r.featuredClients.length > 0) {
     console.log('[M03] clients:', r.featuredClients.length);
-    y = sectionTitle(doc, 'Confianca', 'Clientes que confiam na Delta7', y);
+    y = sectionTitle(doc, 'Confiança', 'Clientes que confiam na Delta7', y);
     t(doc, 'Algumas das empresas que confiam na Delta7 para gestao e suporte de TI:', ML, y, { size: 8.5, color: MUTED });
     y += 5;
 
@@ -316,12 +316,12 @@ function drawClientesIdentificacao(
 
   // Identificacao do cliente
   console.log('[M03] drawInfoTable cliente...');
-  y = sectionTitle(doc, 'Cliente', 'Identificacao do Cliente', y);
+  y = sectionTitle(doc, 'Cliente', 'Identificação do Cliente', y);
   console.log('[M03] sectionTitle done');
   const tableRows = [
-    ['Razao Social', r.clientName, '', ''],
+    ['Razão Social', r.clientName, '', ''],
     ['CNPJ / CPF', r.clientDocument || '-', 'Contato', r.clientContact || '-'],
-    ['E-mail', r.clientEmail || '-', 'Endereco', r.clientAddress || '-'],
+    ['E-mail', r.clientEmail || '-', 'Endereço', r.clientAddress || '-'],
   ];
   y = drawInfoTable(doc, tableRows, y);
   console.log('[M03] drawInfoTable done');
@@ -329,7 +329,7 @@ function drawClientesIdentificacao(
 
   // Executivo Responsavel
   console.log('[M03] executivo...');
-  y = sectionTitle(doc, 'Delta7', 'Executivo Responsavel', y);
+  y = sectionTitle(doc, 'Delta7', 'Executivo Responsável', y);
   drawInfoTable(doc, [
     ['Executivo de Vendas', r.salesRepName, 'E-mail', r.salesRepEmail || '-'],
   ], y);
@@ -384,14 +384,14 @@ function drawInvestimento(doc: jsPDF, r: CommercialProposalPdfData): void {
   let y = 28;
 
   // Tabela Ativacao
-  y = sectionTitle(doc, 'Investimento', 'Configuracao inicial', y);
+  y = sectionTitle(doc, 'Investimento', 'Configuração inicial', y);
   y = drawItemsTable(doc, [
-    { desc: 'Ativacao do Servico (taxa unica)', qty: 1, unit: r.activationFee },
+    { desc: 'Ativação do Serviço (taxa única)', qty: 1, unit: r.activationFee },
   ], y);
   y += 6;
 
   // Tabela Mensalidade
-  y = sectionTitle(doc, 'Mensalidade', 'Cenario com Backup Online', y);
+  y = sectionTitle(doc, 'Mensalidade', 'Cenário com Backup Online', y);
   const items = r.items.filter(i => i.qty > 0);
   y = drawItemsTable(doc, items.map(i => ({ desc: i.description, qty: i.qty, unit: i.unit_price })), y);
   y += 6;
@@ -415,7 +415,7 @@ function drawInvestimento(doc: jsPDF, r: CommercialProposalPdfData): void {
   fillRect(doc, ML, y, CW, 1, SLATE);
   fillRect(doc, ML, y, 2.5, 10, SLATE);
   fillRect(doc, ML, y, CW, 10, PAPER);
-  t(doc, 'Nao inclusos:', ML + 5, y + 6.5, { size: 8.5, style: 'bold', color: NAVY });
+  t(doc, 'Não incluíos:', ML + 5, y + 6.5, { size: 8.5, style: 'bold', color: NAVY });
   const niText = truncate(doc, NOT_INCLUDED.replace('Nesta proposta nao estao inclusos: ', ''), CW - 40);
   t(doc, niText, ML + 34, y + 6.5, { size: 8.5, color: INK });
   y += 14;
@@ -491,8 +491,8 @@ function drawSummaryBox(
     rows.push({ label: '() Desconto mensal', value: ` ${formatBRL(data.discount)}` });
   }
   rows.push({ label: '= Mensalidade recorrente', value: formatBRL(data.monthly), bold: true });
-  rows.push({ label: '(+) Taxa de Ativacao (cobrada uma unica vez)', value: formatBRL(data.activation) });
-  rows.push({ label: 'INVESTIMENTO NO 1o MES', value: formatBRL(data.firstMonth), highlight: true });
+  rows.push({ label: '(+) Taxa de Ativação (cobrada uma única vez)', value: formatBRL(data.activation) });
+  rows.push({ label: 'INVESTIMENTO NO 1º MÊS', value: formatBRL(data.firstMonth), highlight: true });
 
   // Header do resumo
   fillRect(doc, ML, y, CW, rowH, CREAM);
@@ -517,7 +517,7 @@ function drawSummaryBox(
 
   // Nota
   fillRect(doc, ML, y, CW, 7, PAPER);
-  t(doc, `A partir do 2o mes, o valor recorrente e de ${formatBRL(data.monthly)}/mes.`, ML + 3, y + 4.5, {
+  t(doc, `A partir do 2o mes, o valor recorrente é de ${formatBRL(data.monthly)}/mes.`, ML + 3, y + 4.5, {
     size: 7.5, style: 'italic', color: MUTED,
   });
   y += 7;
@@ -537,7 +537,7 @@ function drawSuporte(doc: jsPDF, r: CommercialProposalPdfData, S: ProposalSectio
   drawPageHeader(doc, r.proposalNumber, DELTA7_LOGO_DARK_DATA_URL);
   let y = 28;
 
-  y = sectionTitle(doc, 'Atendimento', 'Suporte Tecnico', y);
+  y = sectionTitle(doc, 'Atendimento', 'Suporte Técnico', y);
 
   // Paragrafos do SUPPORT_TEXT
   const paras = SUPPORT_TEXT.split('\n\n');
@@ -551,7 +551,7 @@ function drawSuporte(doc: jsPDF, r: CommercialProposalPdfData, S: ProposalSectio
   }
 
   if (S.showSupportReqs) {
-    t(doc, 'Requisitos para a prestacao dos servicos', ML, y, { size: 9.5, style: 'bold', color: NAVY });
+    t(doc, 'Requisitos para a prestação dos serviços', ML, y, { size: 9.5, style: 'bold', color: NAVY });
     y += 6;
     for (const req of SUPPORT_REQUIREMENTS) {
       t(doc, '', ML, y, { size: 7, color: SLATE });
@@ -587,9 +587,9 @@ async function drawAceite(doc: jsPDF, r: CommercialProposalPdfData): Promise<voi
   drawPageHeader(doc, r.proposalNumber, DELTA7_LOGO_DARK_DATA_URL);
   let y = 28;
 
-  y = sectionTitle(doc, 'Formalizacao', 'Aceite da Proposta', y);
+  y = sectionTitle(doc, 'Formalização', 'Aceite da Proposta', y);
 
-  t(doc, `Declaro estar de acordo com os termos, valores e condicoes apresentados nesta proposta`, ML, y, { size: 8.5, color: MUTED });
+  t(doc, `Declaro estar de acordo com os termos, valores e condições apresentados nesta proposta`, ML, y, { size: 8.5, color: MUTED });
   y += 4.5;
   t(doc, `comercial, emitida em ${fmtDate(r.generatedAt)} com validade de ${r.validityDays} dias.`, ML, y, { size: 8.5, color: MUTED });
   y += 18;
@@ -631,7 +631,7 @@ async function drawAceite(doc: jsPDF, r: CommercialProposalPdfData): Promise<voi
   doc.text(r.integrityHash, ML + 36, y + 13.5);
 
   t(doc, `Link: ${validationUrl.substring(0, 70)}${validationUrl.length > 70 ? '...' : ''}`, ML + 35, y + 20, { size: 6.5, color: MUTED });
-  t(doc, 'Documento emitido eletronicamente pela plataforma Delta7. Autenticidade verificavel pelo QR Code ou link acima.', ML + 35, y + 25, { size: 6.5, style: 'italic', color: MUTED });
+  t(doc, 'Documento emitido eletronicamente pela plataforma Delta7. Autenticidade verificável pelo QR Code ou link acima.', ML + 35, y + 25, { size: 6.5, style: 'italic', color: MUTED });
   t(doc, 'VALIDAR PROPOSTA  |  Escaneie para verificar autenticidade', ML + 17, y + 31.5, { size: 6, color: SLATE, align: 'center' });
 }
 
