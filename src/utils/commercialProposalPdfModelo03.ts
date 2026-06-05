@@ -416,7 +416,7 @@ function drawInvestimento(doc: jsPDF, r: CommercialProposalPdfData): void {
   fillRect(doc, ML, y, 2.5, 10, SLATE);
   fillRect(doc, ML, y, CW, 10, PAPER);
   t(doc, 'Não inclusos:', ML + 5, y + 6.5, { size: 8.5, style: 'bold', color: NAVY });
-  const niText = truncate(doc, NOT_INCLUDED.replace('Nesta proposta nao estao inclusos: ', ''), CW - 40);
+  const niText = truncate(doc, NOT_INCLUDED.replace('Nesta proposta não estão inclusos: ', ''), CW - 40);
   t(doc, niText, ML + 34, y + 6.5, { size: 8.5, color: INK });
   y += 14;
 
@@ -517,7 +517,7 @@ function drawSummaryBox(
 
   // Nota
   fillRect(doc, ML, y, CW, 7, PAPER);
-  t(doc, `A partir do 2º mês, o valor recorrente é de ${formatBRL(data.monthly)}/mes.`, ML + 3, y + 4.5, {
+  t(doc, `A partir do 2º mês, o valor recorrente é de ${formatBRL(data.monthly)}/mês.`, ML + 3, y + 4.5, {
     size: 7.5, style: 'italic', color: MUTED,
   });
   y += 7;
