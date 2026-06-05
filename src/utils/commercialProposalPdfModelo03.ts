@@ -632,6 +632,7 @@ const yieldToUI = () => new Promise<void>(resolve => setTimeout(resolve, 0));
 
 //  MONTAGEM FINAL 
 export async function buildModelo03(r: CommercialProposalPdfData): Promise<jsPDF> {
+  console.log('[M03] start');
   const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
   const S: ProposalSections = { ...DEFAULT_SECTIONS, ...(r.sections || {}) };
 
@@ -639,32 +640,45 @@ export async function buildModelo03(r: CommercialProposalPdfData): Promise<jsPDF
   // As logos PNG de 20KB bloqueiam a thread principal no browser
 
   // Pagina 1: Capa
+  console.log('[M03] drawCover...');
   drawCover(doc, r);
   await yieldToUI();
+  console.log('[M03] drawCover done');
 
   // Pagina 2: Sobre + Beneficios (se habilitados)
   if (S.showAbout || S.showBenefits) {
+    console.log('[M03] drawSobreBeneficios...');
     drawSobreBeneficios(doc, r, S);
     await yieldToUI();
+    console.log('[M03] drawSobreBeneficios done');
   }
 
   // Pagina 3: Clientes + Identificacao
+  console.log('[M03] drawClientesIdentificacao...');
   drawClientesIdentificacao(doc, r, S);
   await yieldToUI();
+  console.log('[M03] drawClientesIdentificacao done');
 
   // Pagina 4: Investimento
+  console.log('[M03] drawInvestimento...');
   drawInvestimento(doc, r);
   await yieldToUI();
+  console.log('[M03] drawInvestimento done');
 
   // Pagina 5: Suporte (se habilitado)
   if (S.showSupportReqs || S.showQuote) {
+    console.log('[M03] drawSuporte...');
     drawSuporte(doc, r, S);
     await yieldToUI();
+    console.log('[M03] drawSuporte done');
   }
 
   // Ultima pagina: Aceite
+  console.log('[M03] drawAceite...');
   await drawAceite(doc, r);
+  console.log('[M03] drawAceite done');
 
+  console.log('[M03] output...');
   return doc;
 }
 
