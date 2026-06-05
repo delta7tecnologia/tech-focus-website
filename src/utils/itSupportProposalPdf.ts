@@ -60,6 +60,7 @@ export interface ItSupportProposalPdfData {
   sections?: SupProposalSections;
   template?: 'modelo01' | 'modelo02';
   showAltatekLogo?: boolean;
+  featuredClients?: FeaturedClientPdf[];
 }
 
 export type ProposalTemplate = 'modelo01' | 'modelo02';
