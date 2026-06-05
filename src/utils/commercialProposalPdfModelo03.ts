@@ -606,18 +606,9 @@ async function drawAceite(doc: jsPDF, r: CommercialProposalPdfData): Promise<voi
   doc.setLineWidth(0.3);
   doc.rect(ML, y, CW, 34);
 
-  // QR Code (pequeno, gerado dinamicamente)
-  try {
-    const qrDataUrl = await QRCode.toDataURL(validationUrl, {
-      margin: 1, width: 120, errorCorrectionLevel: 'L',
-      color: { dark: '#0a1f44', light: '#ffffff' },
-    });
-    doc.addImage(qrDataUrl, 'PNG', ML + 3, y + 3, 28, 28);
-  } catch {
-    // Se falhar, mostra um placeholder
-    fillRect(doc, ML + 3, y + 3, 28, 28, CREAM);
-    t(doc, 'QR', ML + 17, y + 19, { size: 10, style: 'bold', color: NAVY, align: 'center' });
-  }
+  // QR Code desabilitado temporariamente - placeholder
+  fillRect(doc, ML + 3, y + 3, 28, 28, CREAM);
+  t(doc, 'QR', ML + 17, y + 19, { size: 10, style: 'bold', color: NAVY, align: 'center' });
 
   // Hash info
   t(doc, 'HASH DE LEGITIMIDADE SHA-256', ML + 35, y + 7, { size: 7, style: 'bold', color: MUTED });
