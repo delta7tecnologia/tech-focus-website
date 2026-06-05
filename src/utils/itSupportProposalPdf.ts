@@ -21,6 +21,11 @@ import {
   SUP_DEFAULT_SECTIONS,
   type SupProposalSections,
 } from '@/lib/itSupportContent';
+import {
+  renderFeaturedClientsModelo01,
+  renderFeaturedClientsModelo02,
+  type FeaturedClientPdf,
+} from './proposalClientsBlock';
 
 export interface SupProposalItem {
   description: string;
