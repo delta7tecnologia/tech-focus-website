@@ -3,6 +3,7 @@ import QRCode from 'qrcode';
 import html2canvas from 'html2canvas';
 import { escapeHtml } from './reportNarrative';
 import { DELTA7_LOGO_DATA_URL } from '@/assets/delta7LogoBase64';
+import { PROP_COLORS as PC } from '@/lib/proposalContent';
 import {
   narrateHardware,
   narrateSO,
