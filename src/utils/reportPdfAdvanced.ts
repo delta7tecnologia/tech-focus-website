@@ -183,7 +183,7 @@ function buildHtml(r: AdvancedReportData): string {
       }
       return `
         <div class="pdf-avoid-break" style="break-inside: avoid; page-break-inside: avoid; width: 48%; margin-bottom: 14px;">
-          <img src="${p.dataUrl}" style="width: 100%; height: 170px; object-fit: cover; border: 1px solid #cbd5e1; border-radius: 4px;" />
+          <img src="${p.dataUrl}" style="width: 100%; height: 220px; object-fit: contain; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 4px; image-rendering: -webkit-optimize-contrast;" />
           <div style="font-size: 10px; color: #475569; margin-top: 4px; text-align: center; font-style: italic;">
             ${escapeHtml(p.caption || 'Sem legenda')}
           </div>
@@ -524,7 +524,7 @@ export async function generateAdvancedReportPdf(report: AdvancedReportData): Pro
     const footer = target.querySelector('#report-footer-block') as HTMLElement | null;
     if (footer) pushElement(footer, 24);
 
-    const canvas = await html2canvas(target, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+    const canvas = await html2canvas(target, { scale: 3, useCORS: true, backgroundColor: '#ffffff', imageTimeout: 0 });
     const pdf = new jsPDF('p', 'mm', 'a4');
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
@@ -532,13 +532,13 @@ export async function generateAdvancedReportPdf(report: AdvancedReportData): Pro
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
     let heightLeft = imgHeight;
     let position = 0;
-    const imgData = canvas.toDataURL('image/jpeg', 0.92);
-    pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+    const imgData = canvas.toDataURL('image/png');
+    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
     heightLeft -= pageHeight;
     while (heightLeft > 0) {
       position = heightLeft - imgHeight;
       pdf.addPage();
-      pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
       heightLeft -= pageHeight;
     }
     return pdf;
