@@ -232,10 +232,6 @@ function buildHtml(r: AdvancedReportData): string {
   </div>
 
   <div style="padding: 22px 44px 0;">
-</div>`.replace('</div>`;', '') /* keep wrapper open */ + `
-</div>`.replace(/^\s*<\/div>`;\s*$/, '') /* noop */ + `
-</div>`.slice(0, 0) +
-`<div style="padding: 22px 44px 0;">`;
 
   ${sectionTitle('1', 'IDENTIFICAÇÃO DO EQUIPAMENTO')}
   <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
