@@ -125,7 +125,9 @@ const ReportList: React.FC<Props> = ({ onEditDraft }) => {
       if (r.report_type === 'equipamento') {
         const ident = r.triagem?.identificacao || {};
         const conc = r.conclusao || {};
-        const ass = conc.assinaturas || {};
+        const fd = (r.form_data || {}) as any;
+        // Merge: legado conclusao.assinaturas <- form_data root <- form_data.signatures (link remoto, prioridade máxima)
+        const ass = { ...(conc.assinaturas || {}), ...(fd.signatures || {}) };
         await downloadAdvancedReportPdf({
           reportNumber: r.report_number,
           generatedAt: r.generated_at,
