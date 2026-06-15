@@ -16,32 +16,54 @@ const SignaturePad: React.FC<Props> = ({ label, value, onChange, readOnly = fals
   const lastEmittedRef = useRef<string>('');
   const drawingRef = useRef(false);
 
-  useEffect(() => {
-    const c = canvasRef.current;
-    if (!c) return;
-    const ratio = window.devicePixelRatio || 1;
-    const rect = c.getBoundingClientRect();
-    c.width = rect.width * ratio;
-    c.height = rect.height * ratio;
-    const ctx = c.getContext('2d');
-    if (!ctx) return;
+  const setupCtx = (ctx: CanvasRenderingContext2D, ratio: number) => {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, c.width, c.height);
     ctx.scale(ratio, ratio);
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.lineWidth = 2;
     ctx.strokeStyle = '#0f172a';
-    if (value) {
-      const img = new Image();
-      img.onload = () => {
-        ctx.clearRect(0, 0, rect.width, rect.height);
-        ctx.drawImage(img, 0, 0, rect.width, rect.height);
-        setHasDrawn(true);
-        lastEmittedRef.current = value;
-      };
-      img.src = value;
-    }
+  };
+
+  const drawFromDataUrl = (dataUrl: string) => {
+    const c = canvasRef.current;
+    if (!c || !dataUrl) return;
+    const rect = c.getBoundingClientRect();
+    const ctx = c.getContext('2d');
+    if (!ctx) return;
+    const img = new Image();
+    img.onload = () => {
+      ctx.clearRect(0, 0, rect.width, rect.height);
+      ctx.drawImage(img, 0, 0, rect.width, rect.height);
+      setHasDrawn(true);
+    };
+    img.src = dataUrl;
+  };
+
+  // Resize-aware init: re-sizes the canvas whenever its layout box changes,
+  // and re-applies the saved signature (avoids 0-width init during transitions).
+  useEffect(() => {
+    const c = canvasRef.current;
+    if (!c) return;
+
+    const resize = () => {
+      const ratio = window.devicePixelRatio || 1;
+      const rect = c.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+      const prev = hasDrawn ? c.toDataURL('image/png') : '';
+      c.width = Math.max(1, Math.floor(rect.width * ratio));
+      c.height = Math.max(1, Math.floor(rect.height * ratio));
+      const ctx = c.getContext('2d');
+      if (!ctx) return;
+      setupCtx(ctx, ratio);
+      const toRestore = prev || value || '';
+      if (toRestore) drawFromDataUrl(toRestore);
+    };
+
+    resize();
+    const ro = new ResizeObserver(resize);
+    ro.observe(c);
+    return () => ro.disconnect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -54,12 +76,7 @@ const SignaturePad: React.FC<Props> = ({ label, value, onChange, readOnly = fals
     const rect = c.getBoundingClientRect();
     ctx.clearRect(0, 0, rect.width, rect.height);
     if (value) {
-      const img = new Image();
-      img.onload = () => {
-        ctx.drawImage(img, 0, 0, rect.width, rect.height);
-        setHasDrawn(true);
-      };
-      img.src = value;
+      drawFromDataUrl(value);
     } else {
       setHasDrawn(false);
     }
