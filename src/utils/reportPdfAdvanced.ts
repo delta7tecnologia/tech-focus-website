@@ -209,27 +209,33 @@ function buildHtml(r: AdvancedReportData): string {
     r.parecer === 'CONDENADO' ? 'CONDENADO' : '—';
 
   return `
-<div style="width: 794px; padding: 36px 44px; font-family: 'Helvetica', Arial, sans-serif; color: #1e293b; background: white; box-sizing: border-box; font-size: 11px;">
-  <!-- Cabeçalho timbrado Delta7 -->
-  <div style="border-bottom: 4px solid #1e3a8a; padding-bottom: 14px; margin-bottom: 18px;">
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 14px;">
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <img src="${DELTA7_LOGO_DATA_URL}" alt="Delta7" style="height: 54px; width: auto; display: block;" />
+<div style="width: 794px; padding: 0 0 36px; font-family: 'Helvetica', Arial, sans-serif; color: ${PC.ink}; background: white; box-sizing: border-box; font-size: 11px;">
+  <!-- Cabeçalho navy estilo proposta de backup -->
+  <div style="background: linear-gradient(135deg, ${PC.navy} 0%, ${PC.navyDeep} 100%); color: white; padding: 28px 44px 22px; position: relative;">
+    <div style="position: absolute; inset: 0; opacity: 0.06; background-image: radial-gradient(${PC.goldLight} 1.2px, transparent 1.2px); background-size: 18px 18px;"></div>
+    <div style="position: relative; display: flex; justify-content: space-between; align-items: center; gap: 14px;">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <img src="${DELTA7_LOGO_DATA_URL}" alt="Delta7" crossorigin="anonymous" style="height: 60px; width: auto; display: block;" />
         <div>
-          <div style="font-size: 17px; font-weight: 800; color: #1e3a8a; letter-spacing: 0.5px;">
-            DELTA7 SOLUÇÕES EM TECNOLOGIA
-          </div>
-          <div style="font-size: 11px; color: #64748b; margin-top: 2px;">
-            LAUDO TÉCNICO DE EQUIPAMENTO — Computador / Estação de Trabalho
-          </div>
+          <div style="font-size: 9px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: ${PC.goldLight};">Delta7 Tecnologia</div>
+          <div style="font-size: 18px; font-weight: 800; letter-spacing: 0.3px; margin-top: 2px;">LAUDO TÉCNICO DE EQUIPAMENTO</div>
+          <div style="font-size: 10.5px; color: #cbd5e1; margin-top: 2px;">Computador / Estação de Trabalho</div>
         </div>
       </div>
       <div style="text-align: right; font-size: 11px;">
-        <div style="font-weight: 700; color: #1e3a8a; font-size: 13px;">Nº ${escapeHtml(r.reportNumber)}</div>
-        <div style="color: #64748b; margin-top: 2px;">${fmtDateTime(r.generatedAt)}</div>
+        <div style="font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: ${PC.goldLight};">Nº do Laudo</div>
+        <div style="font-weight: 800; font-size: 15px; margin-top: 2px;">${escapeHtml(r.reportNumber)}</div>
+        <div style="color: #cbd5e1; margin-top: 4px; font-size: 10.5px;">${fmtDateTime(r.generatedAt)}</div>
       </div>
     </div>
+    <div style="position: relative; margin-top: 14px; height: 2px; background: linear-gradient(to right, ${PC.goldLight}, transparent);"></div>
   </div>
+
+  <div style="padding: 22px 44px 0;">
+</div>`.replace('</div>`;', '') /* keep wrapper open */ + `
+</div>`.replace(/^\s*<\/div>`;\s*$/, '') /* noop */ + `
+</div>`.slice(0, 0) +
+`<div style="padding: 22px 44px 0;">`;
 
   ${sectionTitle('1', 'IDENTIFICAÇÃO DO EQUIPAMENTO')}
   <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
