@@ -234,31 +234,22 @@ export async function generateReportPdf(report: ReportData): Promise<jsPDF> {
     const pageHeightMM = 297;
     const pxPerMM = target.offsetWidth / pageWidthMM;
     const pageHeightPx = pageHeightMM * pxPerMM;
-    const footer = target.querySelector('#report-footer-block') as HTMLElement | null;
-    const avoidBlocks = Array.from(target.querySelectorAll<HTMLElement>('.pdf-avoid-break'));
-    for (const el of avoidBlocks) {
+    // Mesma estratégia da proposta de backup em nuvem
+    const pushElement = (el: HTMLElement, baseMargin: number) => {
       const top = el.offsetTop;
       const bottom = top + el.offsetHeight;
       const startPage = Math.floor(top / pageHeightPx);
       const endPage = Math.floor((bottom - 1) / pageHeightPx);
-      if (endPage > startPage) {
+      if (endPage > startPage && el.offsetHeight < pageHeightPx - 40) {
         const nextPageStart = (startPage + 1) * pageHeightPx;
         const extraPx = nextPageStart - top + 8;
-        const currentMT = parseFloat(getComputedStyle(el).marginTop) || 0;
-        el.style.marginTop = `${currentMT + extraPx}px`;
+        const current = parseFloat(el.style.marginTop || '0') || 0;
+        el.style.marginTop = `${current + extraPx + baseMargin}px`;
       }
-    }
-    if (footer) {
-      const footerTop = footer.offsetTop;
-      const footerBottom = footerTop + footer.offsetHeight;
-      const startPage = Math.floor(footerTop / pageHeightPx);
-      const endPage = Math.floor((footerBottom - 1) / pageHeightPx);
-      if (endPage > startPage) {
-        const nextPageStart = (startPage + 1) * pageHeightPx;
-        const extraPx = nextPageStart - footerTop + 8;
-        footer.style.marginTop = `${extraPx + 32}px`;
-      }
-    }
+    };
+    target.querySelectorAll<HTMLElement>('.pdf-avoid-break, [data-keep="1"]').forEach((el) => pushElement(el, 8));
+    const footer = target.querySelector('#report-footer-block') as HTMLElement | null;
+    if (footer) pushElement(footer, 24);
 
     const canvas = await html2canvas(target, {
       scale: 2,
