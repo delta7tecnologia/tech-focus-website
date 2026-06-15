@@ -450,6 +450,7 @@ function buildHtml(r: AdvancedReportData): string {
       </div>
     </div>
   </div>
+  </div>
 </div>`;
 }
 
