@@ -486,34 +486,25 @@ export async function generateAdvancedReportPdf(report: AdvancedReportData): Pro
     const pxPerMM = targetWidthPx / pageWidthMM;
     const pageHeightPx = pageHeightMM * pxPerMM;
 
-    // Anti-quebra de blocos (fotos e demais): empurra para a próxima página se cortado
-    const avoidBlocks = Array.from(target.querySelectorAll<HTMLElement>('.pdf-avoid-break'));
-    for (const el of avoidBlocks) {
+    // Mesma estratégia da proposta de backup em nuvem: empurra blocos marcados
+    // para a próxima página apenas se cruzarem a quebra E couberem em uma única página.
+    const pushElement = (el: HTMLElement, baseMargin: number) => {
       const top = el.offsetTop;
       const bottom = top + el.offsetHeight;
       const startPage = Math.floor(top / pageHeightPx);
       const endPage = Math.floor((bottom - 1) / pageHeightPx);
-      if (endPage > startPage) {
+      if (endPage > startPage && el.offsetHeight < pageHeightPx - 40) {
         const nextPageStart = (startPage + 1) * pageHeightPx;
         const extraPx = nextPageStart - top + 8;
-        const currentMT = parseFloat(getComputedStyle(el).marginTop) || 0;
-        el.style.marginTop = `${currentMT + extraPx}px`;
+        const current = parseFloat(el.style.marginTop || '0') || 0;
+        el.style.marginTop = `${current + extraPx + baseMargin}px`;
       }
-    }
+    };
+
+    target.querySelectorAll<HTMLElement>('.pdf-avoid-break, [data-keep="1"]').forEach((el) => pushElement(el, 8));
 
     const footer = target.querySelector('#report-footer-block') as HTMLElement | null;
-    if (footer) {
-      const footerTop = footer.offsetTop;
-      const footerHeight = footer.offsetHeight;
-      const footerBottom = footerTop + footerHeight;
-      const startPage = Math.floor(footerTop / pageHeightPx);
-      const endPage = Math.floor((footerBottom - 1) / pageHeightPx);
-      if (endPage > startPage) {
-        const nextPageStart = (startPage + 1) * pageHeightPx;
-        const extraPx = nextPageStart - footerTop + 8;
-        footer.style.marginTop = `${extraPx + 24}px`;
-      }
-    }
+    if (footer) pushElement(footer, 24);
 
     const canvas = await html2canvas(target, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
     const pdf = new jsPDF('p', 'mm', 'a4');
