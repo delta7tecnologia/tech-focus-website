@@ -483,6 +483,20 @@ export async function generateAdvancedReportPdf(report: AdvancedReportData): Pro
   try {
     const target = container.firstElementChild as HTMLElement;
 
+    // Pré-carrega imagens (logo, fotos base64) para garantir render no html2canvas
+    const imgs = Array.from(target.querySelectorAll('img'));
+    await Promise.all(
+      imgs.map((img) =>
+        img.complete && img.naturalWidth > 0
+          ? Promise.resolve()
+          : new Promise<void>((res) => {
+              img.onload = () => res();
+              img.onerror = () => res();
+            }),
+      ),
+    );
+
+
     // Anti-quebra do rodapé: medir e empurrar para a próxima página caso seja cortado
     const pageWidthMM = 210;
     const pageHeightMM = 297;
