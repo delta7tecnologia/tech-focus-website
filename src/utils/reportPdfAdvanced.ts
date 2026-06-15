@@ -169,7 +169,7 @@ function buildHtml(r: AdvancedReportData): string {
     .map((p) => {
       if (p.external) {
         return `
-        <div style="break-inside: avoid; page-break-inside: avoid; width: 48%; margin-bottom: 14px;">
+        <div class="pdf-avoid-break" style="break-inside: avoid; page-break-inside: avoid; width: 48%; margin-bottom: 14px;">
           <div style="width: 100%; height: 170px; border: 1px dashed #94a3b8; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px; background: #f1f5f9; box-sizing: border-box;">
             <div style="font-size: 10px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">📎 Anexo externo</div>
             <div style="font-size: 11px; color: #1e3a8a; margin-top: 6px; font-weight: 600;">${escapeHtml(p.externalProvider || 'Link externo')}</div>
@@ -181,7 +181,7 @@ function buildHtml(r: AdvancedReportData): string {
         </div>`;
       }
       return `
-        <div style="break-inside: avoid; page-break-inside: avoid; width: 48%; margin-bottom: 14px;">
+        <div class="pdf-avoid-break" style="break-inside: avoid; page-break-inside: avoid; width: 48%; margin-bottom: 14px;">
           <img src="${p.dataUrl}" style="width: 100%; height: 170px; object-fit: cover; border: 1px solid #cbd5e1; border-radius: 4px;" />
           <div style="font-size: 10px; color: #475569; margin-top: 4px; text-align: center; font-style: italic;">
             ${escapeHtml(p.caption || 'Sem legenda')}
@@ -486,6 +486,21 @@ export async function generateAdvancedReportPdf(report: AdvancedReportData): Pro
     const pxPerMM = targetWidthPx / pageWidthMM;
     const pageHeightPx = pageHeightMM * pxPerMM;
 
+    // Anti-quebra de blocos (fotos e demais): empurra para a próxima página se cortado
+    const avoidBlocks = Array.from(target.querySelectorAll<HTMLElement>('.pdf-avoid-break'));
+    for (const el of avoidBlocks) {
+      const top = el.offsetTop;
+      const bottom = top + el.offsetHeight;
+      const startPage = Math.floor(top / pageHeightPx);
+      const endPage = Math.floor((bottom - 1) / pageHeightPx);
+      if (endPage > startPage) {
+        const nextPageStart = (startPage + 1) * pageHeightPx;
+        const extraPx = nextPageStart - top + 8;
+        const currentMT = parseFloat(getComputedStyle(el).marginTop) || 0;
+        el.style.marginTop = `${currentMT + extraPx}px`;
+      }
+    }
+
     const footer = target.querySelector('#report-footer-block') as HTMLElement | null;
     if (footer) {
       const footerTop = footer.offsetTop;
@@ -494,13 +509,8 @@ export async function generateAdvancedReportPdf(report: AdvancedReportData): Pro
       const startPage = Math.floor(footerTop / pageHeightPx);
       const endPage = Math.floor((footerBottom - 1) / pageHeightPx);
       if (endPage > startPage) {
-        // Empurra o rodapé para iniciar na próxima página
         const nextPageStart = (startPage + 1) * pageHeightPx;
-        const extraPx = nextPageStart - footerTop + 8; // pequena folga
-        const extraMM = extraPx / pxPerMM;
-        footer.style.marginTop = `${24 + extraMM * (pageWidthMM / pageWidthMM)}px`;
-        // recalcular usando px direto:
-        footer.style.marginTop = `${parseFloat(footer.style.marginTop) || 0}px`;
+        const extraPx = nextPageStart - footerTop + 8;
         footer.style.marginTop = `${extraPx + 24}px`;
       }
     }
