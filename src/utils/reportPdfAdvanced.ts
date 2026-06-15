@@ -524,7 +524,7 @@ export async function generateAdvancedReportPdf(report: AdvancedReportData): Pro
     const footer = target.querySelector('#report-footer-block') as HTMLElement | null;
     if (footer) pushElement(footer, 24);
 
-    const canvas = await html2canvas(target, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+    const canvas = await html2canvas(target, { scale: 3, useCORS: true, backgroundColor: '#ffffff', imageTimeout: 0 });
     const pdf = new jsPDF('p', 'mm', 'a4');
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
