@@ -122,12 +122,31 @@ const ReportList: React.FC<Props> = ({ onEditDraft }) => {
         }
       }
 
+      // Busca assinaturas remotas (links já assinados) para garantir prioridade no PDF
+      const { data: links } = await supabase
+        .from('report_signature_links')
+        .select('signer_role, signer_name, signature_data, signed_at')
+        .eq('report_id', r.id)
+        .not('signed_at', 'is', null)
+        .order('signed_at', { ascending: true });
+      const remoteSigs: any = {};
+      for (const lk of (links || [])) {
+        if (!lk.signature_data) continue;
+        if (lk.signer_role === 'gestor') {
+          remoteSigs.assinaturaGestor = lk.signature_data;
+          if (lk.signer_name) remoteSigs.gestorNome = lk.signer_name;
+        } else if (lk.signer_role === 'cliente') {
+          remoteSigs.assinaturaUsuario = lk.signature_data;
+          if (lk.signer_name) remoteSigs.usuarioNome = lk.signer_name;
+        }
+      }
+
       if (r.report_type === 'equipamento') {
         const ident = r.triagem?.identificacao || {};
         const conc = r.conclusao || {};
         const fd = (r.form_data || {}) as any;
-        // Merge: legado conclusao.assinaturas <- form_data root <- form_data.signatures (link remoto, prioridade máxima)
-        const ass = { ...(conc.assinaturas || {}), ...(fd.signatures || {}) };
+        // Prioridade: links remotos > form_data.signatures > form_data root > conclusao.assinaturas (legado)
+        const ass = { ...(conc.assinaturas || {}), ...(fd.signatures || {}), ...remoteSigs };
         await downloadAdvancedReportPdf({
           reportNumber: r.report_number,
           generatedAt: r.generated_at,
