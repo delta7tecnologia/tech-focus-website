@@ -235,6 +235,19 @@ export async function generateReportPdf(report: ReportData): Promise<jsPDF> {
     const pxPerMM = target.offsetWidth / pageWidthMM;
     const pageHeightPx = pageHeightMM * pxPerMM;
     const footer = target.querySelector('#report-footer-block') as HTMLElement | null;
+    const avoidBlocks = Array.from(target.querySelectorAll<HTMLElement>('.pdf-avoid-break'));
+    for (const el of avoidBlocks) {
+      const top = el.offsetTop;
+      const bottom = top + el.offsetHeight;
+      const startPage = Math.floor(top / pageHeightPx);
+      const endPage = Math.floor((bottom - 1) / pageHeightPx);
+      if (endPage > startPage) {
+        const nextPageStart = (startPage + 1) * pageHeightPx;
+        const extraPx = nextPageStart - top + 8;
+        const currentMT = parseFloat(getComputedStyle(el).marginTop) || 0;
+        el.style.marginTop = `${currentMT + extraPx}px`;
+      }
+    }
     if (footer) {
       const footerTop = footer.offsetTop;
       const footerBottom = footerTop + footer.offsetHeight;
