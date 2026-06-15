@@ -183,7 +183,7 @@ function buildHtml(r: AdvancedReportData): string {
       }
       return `
         <div class="pdf-avoid-break" style="break-inside: avoid; page-break-inside: avoid; width: 48%; margin-bottom: 14px;">
-          <img src="${p.dataUrl}" style="width: 100%; height: 170px; object-fit: cover; border: 1px solid #cbd5e1; border-radius: 4px;" />
+          <img src="${p.dataUrl}" style="width: 100%; height: 220px; object-fit: contain; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 4px; image-rendering: -webkit-optimize-contrast;" />
           <div style="font-size: 10px; color: #475569; margin-top: 4px; text-align: center; font-style: italic;">
             ${escapeHtml(p.caption || 'Sem legenda')}
           </div>
