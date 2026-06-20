@@ -1,37 +1,51 @@
-User-agent: Googlebot
+# robots.txt — Delta7 Tecnologia
+# Site institucional: https://delta7tecnologia.com.br
+
+User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /area-tecnica
 Disallow: /reset-password
 Disallow: /assinar/
 Disallow: /assinar-os/
 Disallow: /assinar-proposta/
 Disallow: /assinar-suporte/
-Disallow: /loja
-Disallow: /termos-uso
+Disallow: /validar-laudo/
+Disallow: /validar-os/
+Disallow: /validar-proposta/
+Disallow: /validar-suporte/
+
+User-agent: Googlebot
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /area-tecnica
+Disallow: /reset-password
+Disallow: /assinar/
+Disallow: /assinar-os/
+Disallow: /assinar-proposta/
+Disallow: /assinar-suporte/
+Disallow: /validar-laudo/
+Disallow: /validar-os/
+Disallow: /validar-proposta/
+Disallow: /validar-suporte/
 
 User-agent: Bingbot
 Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /area-tecnica
 Disallow: /reset-password
 Disallow: /assinar/
 Disallow: /assinar-os/
 Disallow: /assinar-proposta/
 Disallow: /assinar-suporte/
-Disallow: /loja
-Disallow: /termos-uso
 
 User-agent: Twitterbot
 Allow: /
 
 User-agent: facebookexternalhit
 Allow: /
-
-User-agent: *
-Allow: /
-Disallow: /reset-password
-Disallow: /assinar/
-Disallow: /assinar-os/
-Disallow: /assinar-proposta/
-Disallow: /assinar-suporte/
-Disallow: /loja
-Disallow: /termos-uso
 
 Sitemap: https://delta7tecnologia.com.br/sitemap.xml
