@@ -22,12 +22,11 @@ const Navigation = () => {
 
   const navLinks = [
     { name: 'Início', href: '/' },
-    { name: 'Serviços', href: '/#services' },
     { name: 'Soluções', href: '/solucoes' },
-    
+    { name: 'Ponto Eletrônico', href: '/ponto-eletronico' },
+    { name: 'Backup em Nuvem', href: '/backup-nuvem' },
     { name: 'Links Úteis', href: '/links-uteis' },
     { name: 'Área Técnica', href: '/area-tecnica' },
-    { name: 'Quem Somos', href: '/#about' },
     { name: 'Contato', href: '/#contact' }
   ];
 
