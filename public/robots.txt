@@ -1,4 +1,4 @@
-ND# robots.txt — Delta7 Tecnologia
+# robots.txt — Delta7 Tecnologia
 # Site institucional: https://delta7tecnologia.com.br
 
 User-agent: *
