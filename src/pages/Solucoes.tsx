@@ -7,7 +7,7 @@ import PageTransition from '@/components/PageTransition';
 import { 
   ArrowLeft, ArrowRight, Shield, Monitor, Cloud, BarChart3, Server, Database,
   Code2, Mail, Globe, Smartphone, Zap, Users, HardDrive, Wrench, CheckCircle,
-  Scale, Lock, HeadphonesIcon
+  Scale, Lock, HeadphonesIcon, Clock
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
