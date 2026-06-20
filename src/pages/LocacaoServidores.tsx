@@ -13,7 +13,7 @@ import Footer from '@/components/Footer';
 import SEOHead from '@/components/SEOHead';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import PageTransition from '@/components/PageTransition';
-import { DELL_EXPERT_LOGO_DATA_URL } from '@/assets/dellExpertLogoBase64';
+import dellLogo from '@/assets/dell-expert-network.png';
 
 const WHATSAPP = 'https://wa.me/5591982370332?text=Ol%C3%A1!%20Tenho%20interesse%20em%20Loca%C3%A7%C3%A3o%20de%20Servidores%20Dell%20Delta7.';
 
