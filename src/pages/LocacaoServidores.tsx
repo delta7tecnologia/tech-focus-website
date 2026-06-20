@@ -71,11 +71,11 @@ const LocacaoServidores = () => {
               </p>
 
               {/* Dell Partner Logo */}
-              <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl px-5 py-3 mb-8">
-                <img src={DELL_EXPERT_LOGO_DATA_URL} alt="Dell Technologies Partner" className="h-10 w-auto" />
-                <div className="text-left">
-                  <p className="text-xs text-blue-200 uppercase tracking-wide">Parceiro Oficial</p>
-                  <p className="text-sm font-semibold">Dell Technologies</p>
+              <div className="inline-flex items-center gap-4 bg-white rounded-2xl px-6 py-4 mb-8 shadow-lg">
+                <img src={dellLogo} alt="Dell Expert Network — Parceiro Oficial Dell Technologies" className="h-10 w-auto" />
+                <div className="text-left border-l border-gray-200 pl-4">
+                  <p className="text-[10px] text-gray-500 uppercase tracking-wider">Parceiro Oficial</p>
+                  <p className="text-sm font-bold text-gray-900">Dell Technologies</p>
                 </div>
               </div>
 
@@ -178,7 +178,9 @@ const LocacaoServidores = () => {
         {/* CTA */}
         <section className="py-20 bg-gradient-to-br from-blue-700 to-blue-900 text-white">
           <div className="max-w-4xl mx-auto px-4 text-center">
-            <img src={DELL_EXPERT_LOGO_DATA_URL} alt="Dell Technologies" className="h-12 w-auto mx-auto mb-6 opacity-90" />
+            <div className="inline-block bg-white rounded-xl px-6 py-3 mb-6 shadow-lg">
+              <img src={dellLogo} alt="Dell Technologies" className="h-10 w-auto" />
+            </div>
             <h2 className="text-3xl lg:text-4xl font-bold mb-4">Monte agora a configuração ideal</h2>
             <p className="text-xl text-blue-100 mb-8">
               Conte com a expertise Delta7 + a robustez Dell para dimensionar seu servidor.
