@@ -68,7 +68,7 @@ const BackupNuvem = () => {
                     Solicitar Proposta <ArrowRight className="ml-2 h-5 w-5" />
                   </a>
                 </Button>
-                <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
+                <Button size="lg" variant="outline" className="border-2 border-white bg-white/10 text-white hover:bg-white hover:text-cyan-700 backdrop-blur-sm" asChild>
                   <a href={SYSTEM_URL} target="_blank" rel="noopener noreferrer">
                     <ExternalLink className="mr-2 h-5 w-5" /> Acessar Sistema
                   </a>
@@ -150,7 +150,7 @@ const BackupNuvem = () => {
                   <Phone className="mr-2 h-5 w-5" /> Falar com Especialista
                 </a>
               </Button>
-              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild>
+              <Button size="lg" variant="outline" className="border-2 border-white bg-white/10 text-white hover:bg-white hover:text-cyan-700 backdrop-blur-sm" asChild>
                 <a href={SYSTEM_URL} target="_blank" rel="noopener noreferrer">
                   <ExternalLink className="mr-2 h-5 w-5" /> Acessar Sistema
                 </a>
