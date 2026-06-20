@@ -21,9 +21,9 @@ const Footer = () => {
     { name: "Suporte de TI", href: "/#services" },
     { name: "Servidores e Virtualização", href: "/#services" },
     { name: "Firewall e Segurança", href: "/#services" },
-    { name: "Backup em Nuvem", href: "/#services" },
+    { name: "Backup em Nuvem", href: "/backup-nuvem" },
+    { name: "Ponto Eletrônico", href: "/ponto-eletronico" },
     { name: "Monitoramento 24/7", href: "/#services" },
-    { name: "Consultoria de TI", href: "/#services" },
   ];
 
   const quickLinks = [
@@ -32,6 +32,12 @@ const Footer = () => {
     { name: "Links Úteis", href: "/links-uteis" },
     { name: "FAQ", href: "/faq" },
     { name: "Contato", href: "/#contact" },
+  ];
+
+  const systemLinks = [
+    { name: "Portal de Chamados", href: "https://www.app.delta7tecnologia.com.br/front/login.php" },
+    { name: "Ponto Eletrônico", href: "https://ponto.delta7tecnologia.com.br/v2/login" },
+    { name: "Backup em Nuvem", href: "https://backup.delta7tecnologia.com.br/" },
   ];
 
   return (
@@ -149,15 +155,23 @@ const Footer = () => {
               </li>
             </ul>
 
-            {/* Portal Link */}
+            {/* Sistemas Delta7 */}
             <div className="mt-8 p-4 bg-white/5 rounded-xl border border-white/10">
-              <p className="text-sm text-gray-300 mb-2">Já é cliente?</p>
-              <a 
-                href="https://www.app.delta7tecnologia.com.br/front/login.php"
-                className="text-blue-400 hover:text-blue-300 font-medium transition-colors"
-              >
-                Acessar Portal de Chamados →
-              </a>
+              <p className="text-sm text-gray-300 mb-3 font-semibold">Sistemas Delta7</p>
+              <ul className="space-y-2">
+                {systemLinks.map((s) => (
+                  <li key={s.name}>
+                    <a
+                      href={s.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-400 hover:text-blue-300 font-medium transition-colors text-sm"
+                    >
+                      {s.name} →
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>
