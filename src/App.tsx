@@ -15,6 +15,7 @@ import VideoInstitucional from "./pages/VideoInstitucional";
 import LinksUteis from "./pages/LinksUteis";
 import PontoEletronico from "./pages/PontoEletronico";
 import BackupNuvem from "./pages/BackupNuvem";
+import LocacaoServidores from "./pages/LocacaoServidores";
 import AreaTecnica from "./pages/AreaTecnica";
 import FAQ from "./pages/FAQ";
 import NotFound from "./pages/NotFound";
@@ -67,6 +68,7 @@ const App = () => (
             <Route path="/links-uteis" element={<LinksUteis />} />
             <Route path="/ponto-eletronico" element={<PontoEletronico />} />
             <Route path="/backup-nuvem" element={<BackupNuvem />} />
+            <Route path="/locacao-servidores" element={<LocacaoServidores />} />
             <Route path="/area-tecnica" element={<AreaTecnica />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/reset-password" element={<ResetPassword />} />

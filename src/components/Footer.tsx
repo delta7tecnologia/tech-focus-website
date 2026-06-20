@@ -19,10 +19,10 @@ const Footer = () => {
 
   const services = [
     { name: "Suporte de TI", href: "/#services" },
-    { name: "Servidores e Virtualização", href: "/#services" },
-    { name: "Firewall e Segurança", href: "/#services" },
+    { name: "Locação de Servidores Dell", href: "/locacao-servidores" },
     { name: "Backup em Nuvem", href: "/backup-nuvem" },
     { name: "Ponto Eletrônico", href: "/ponto-eletronico" },
+    { name: "Firewall e Segurança", href: "/#services" },
     { name: "Monitoramento 24/7", href: "/#services" },
   ];
 
