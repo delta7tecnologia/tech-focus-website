@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import StructuredData from "@/components/StructuredData";
 
@@ -10,7 +10,8 @@ import Index from "./pages/Index";
 import Solucoes from "./pages/Solucoes";
 import Portfolio from "./pages/Portfolio";
 import Depoimentos from "./pages/Depoimentos";
-import Ferramentas from "./pages/Ferramentas";
+import PoliticaPrivacidade from "./pages/PoliticaPrivacidade";
+import TermosUso from "./pages/TermosUso";
 import VideoInstitucional from "./pages/VideoInstitucional";
 import LinksUteis from "./pages/LinksUteis";
 import PontoEletronico from "./pages/PontoEletronico";
@@ -63,7 +64,9 @@ const App = () => (
             <Route path="/solucoes" element={<Solucoes />} />
             <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/depoimentos" element={<Depoimentos />} />
-            <Route path="/ferramentas" element={<Ferramentas />} />
+            <Route path="/ferramentas" element={<Navigate to="/links-uteis" replace />} />
+            <Route path="/politica-privacidade" element={<PoliticaPrivacidade />} />
+            <Route path="/termos-uso" element={<TermosUso />} />
             <Route path="/video-institucional" element={<VideoInstitucional />} />
             <Route path="/links-uteis" element={<LinksUteis />} />
             <Route path="/ponto-eletronico" element={<PontoEletronico />} />

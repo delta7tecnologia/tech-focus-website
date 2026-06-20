@@ -36,18 +36,16 @@ const menu: MenuNode[] = [
       { name: 'Backup em Nuvem', href: '/backup-nuvem', icon: <Cloud className="w-4 h-4" />, desc: 'Backup gerenciado e disaster recovery' },
       { name: 'Ponto Eletrônico', href: '/ponto-eletronico', icon: <Clock className="w-4 h-4" />, desc: 'Controle de jornada digital' },
       { name: 'Locação de Servidores', href: '/locacao-servidores', icon: <Server className="w-4 h-4" />, desc: 'Servidores Dell sob locação' },
-      { name: 'Suporte de TI', href: '/#services', icon: <Wrench className="w-4 h-4" />, desc: 'Suporte gerenciado para empresas' },
-      { name: 'Segurança e Firewall', href: '/#services', icon: <ShieldCheck className="w-4 h-4" />, desc: 'Proteção avançada e compliance' },
+      { name: 'Suporte Gerenciado', href: '/#services', icon: <Wrench className="w-4 h-4" />, desc: 'Suporte, segurança e monitoramento' },
     ],
   },
   {
     name: 'Recursos',
     children: [
-      { name: 'Links Úteis', href: '/links-uteis', icon: <Link2 className="w-4 h-4" />, desc: 'Ferramentas remotas e utilitários' },
+      { name: 'Links Úteis', href: '/links-uteis', icon: <Link2 className="w-4 h-4" />, desc: 'Ferramentas e acessos rápidos' },
       { name: 'FAQ', href: '/faq', icon: <HelpCircle className="w-4 h-4" />, desc: 'Perguntas frequentes' },
       { name: 'Portfólio', href: '/portfolio', icon: <ImageIcon className="w-4 h-4" />, desc: 'Cases e projetos realizados' },
       { name: 'Depoimentos', href: '/depoimentos', icon: <MessageSquare className="w-4 h-4" />, desc: 'O que dizem nossos clientes' },
-      { name: 'Ferramentas', href: '/ferramentas', icon: <BookOpen className="w-4 h-4" />, desc: 'Plataformas e tecnologias' },
     ],
   },
   {
