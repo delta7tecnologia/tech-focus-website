@@ -204,6 +204,56 @@ const Solucoes = () => {
 
       <Breadcrumbs items={[{ label: 'Soluções' }]} />
 
+      {/* Sistemas Delta7 — Destaque */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <Badge className="bg-blue-100 text-blue-700 mb-3">Sistemas Delta7</Badge>
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900">Sistemas prontos para sua empresa</h2>
+            <p className="text-gray-600 mt-3 max-w-2xl mx-auto">Soluções gerenciadas hospedadas e suportadas pela Delta7.</p>
+          </div>
+          <div className="grid md:grid-cols-2 gap-6">
+            <Link to="/ponto-eletronico" className="group">
+              <Card className="h-full hover:shadow-xl transition-all border-0 shadow-lg overflow-hidden">
+                <div className="h-1 bg-gradient-to-r from-blue-500 to-blue-600" />
+                <CardHeader>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+                      <Clock className="h-7 w-7" />
+                    </div>
+                    <Badge variant="secondary">Novo</Badge>
+                  </div>
+                  <CardTitle className="text-xl group-hover:text-blue-600 transition-colors">Ponto Eletrônico Online</CardTitle>
+                  <CardDescription>Controle de jornada com biometria facial, geolocalização e conformidade com a Portaria 671.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <span className="text-blue-600 font-medium inline-flex items-center gap-1">Saiba mais <ArrowRight className="h-4 w-4" /></span>
+                </CardContent>
+              </Card>
+            </Link>
+            <Link to="/backup-nuvem" className="group">
+              <Card className="h-full hover:shadow-xl transition-all border-0 shadow-lg overflow-hidden">
+                <div className="h-1 bg-gradient-to-r from-cyan-500 to-teal-600" />
+                <CardHeader>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="p-3 rounded-xl bg-gradient-to-br from-cyan-500 to-teal-600 text-white">
+                      <Cloud className="h-7 w-7" />
+                    </div>
+                    <Badge variant="secondary">Gerenciado</Badge>
+                  </div>
+                  <CardTitle className="text-xl group-hover:text-cyan-600 transition-colors">Backup em Nuvem</CardTitle>
+                  <CardDescription>Backup automatizado, criptografado e monitorado 24x7 com plano de disaster recovery.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <span className="text-cyan-600 font-medium inline-flex items-center gap-1">Saiba mais <ArrowRight className="h-4 w-4" /></span>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+
       {/* Infraestrutura de TI */}
       <section id="infra" className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
