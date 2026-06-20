@@ -212,7 +212,25 @@ const Solucoes = () => {
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900">Sistemas prontos para sua empresa</h2>
             <p className="text-gray-600 mt-3 max-w-2xl mx-auto">Soluções gerenciadas hospedadas e suportadas pela Delta7.</p>
           </div>
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-3 gap-6">
+            <Link to="/locacao-servidores" className="group">
+              <Card className="h-full hover:shadow-xl transition-all border-0 shadow-lg overflow-hidden">
+                <div className="h-1 bg-gradient-to-r from-slate-700 to-blue-800" />
+                <CardHeader>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="p-3 rounded-xl bg-gradient-to-br from-slate-700 to-blue-800 text-white">
+                      <Server className="h-7 w-7" />
+                    </div>
+                    <Badge variant="secondary">Dell Partner</Badge>
+                  </div>
+                  <CardTitle className="text-xl group-hover:text-blue-700 transition-colors">Locação de Servidores</CardTitle>
+                  <CardDescription>Servidores Dell PowerEdge novos, com garantia, suporte e gestão completa Delta7.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <span className="text-blue-700 font-medium inline-flex items-center gap-1">Saiba mais <ArrowRight className="h-4 w-4" /></span>
+                </CardContent>
+              </Card>
+            </Link>
             <Link to="/ponto-eletronico" className="group">
               <Card className="h-full hover:shadow-xl transition-all border-0 shadow-lg overflow-hidden">
                 <div className="h-1 bg-gradient-to-r from-blue-500 to-blue-600" />
