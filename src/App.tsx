@@ -45,6 +45,7 @@ import AdminReports from "./pages/admin/AdminReports";
 import AdminServiceOrders from "./pages/admin/AdminServiceOrders";
 import AdminProposals from "./pages/admin/AdminProposals";
 import AdminItSupportProposals from "./pages/admin/AdminItSupportProposals";
+import AdminVmProposals from "./pages/admin/AdminVmProposals";
 import AdminSeo from "./pages/admin/AdminSeo";
 import ValidateProposal from "./pages/ValidateProposal";
 import SignItSupportProposal from "./pages/SignItSupportProposal";
@@ -103,6 +104,7 @@ const App = () => (
               <Route path="ordens-servico" element={<AdminServiceOrders />} />
               <Route path="propostas" element={<AdminProposals />} />
               <Route path="propostas-suporte" element={<AdminItSupportProposals />} />
+              <Route path="propostas-vm" element={<AdminVmProposals />} />
               <Route path="seo" element={<AdminSeo />} />
               <Route path="configuracoes" element={<AdminSettings />} />
             </Route>
