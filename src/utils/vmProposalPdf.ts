@@ -1,23 +1,23 @@
 // src/utils/vmProposalPdf.ts
 // Engine jsPDF para Proposta de Locacao de VMs — Delta7 Tecnologia
-// Segue o mesmo padrao do commercialProposalPdfModelo03.ts
+// v2 — correcoes: checkmark via "-", header condicoes comerciais, filtro VM vazia
 
 import jsPDF from 'jspdf';
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
 
 export interface VmItem {
-  nome: string;       // ex: "VM 1 — Active Directory"
-  funcao: string;     // ex: "Controlador de Dominio"
+  nome: string;
+  funcao: string;
   vcpus: number;
-  ram: string;        // ex: "4 GB"
-  storage: string;    // ex: "80 GB SSD"
-  so: string;         // ex: "Windows Server 2022"
+  ram: string;
+  storage: string;
+  so: string;
 }
 
 export interface VmPlano {
-  prazo: string;      // ex: "12 MESES"
-  mensal: number;     // valor numerico
+  prazo: string;
+  mensal: number;
 }
 
 export interface VmProposalData {
@@ -45,9 +45,12 @@ const formatBRL = (v: number) =>
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleDateString('pt-BR');
 
-// Quebra texto em linhas respeitando largura maxima (em mm convertido p/ chars aprox)
 const splitLines = (doc: jsPDF, text: string, maxWidth: number): string[] =>
   doc.splitTextToSize(text, maxWidth);
+
+// Filtra VMs que nao tem nome nem funcao preenchidos (linhas vazias do editor)
+const filterVms = (vms: VmItem[]): VmItem[] =>
+  vms.filter((v) => (v.nome?.trim() ?? '') !== '' || (v.funcao?.trim() ?? '') !== '');
 
 // ── Cores Delta7 ──────────────────────────────────────────────────────────────
 const COR = {
@@ -60,73 +63,69 @@ const COR = {
   verde:      [ 30, 126,  52] as [number, number, number],
   texto:      [ 44,  44, 44]  as [number, number, number],
   cinzaMed:   [120, 120, 120] as [number, number, number],
+  laranjaCard:[201,  90,  0]  as [number, number, number],
 };
 
 // ── Builder principal ─────────────────────────────────────────────────────────
 
 function buildVmProposalPdf(data: VmProposalData): jsPDF {
   const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
-  const W = 210;
-  const ML = 14; // margin left
-  const MR = 14; // margin right
-  const CW = W - ML - MR; // content width
-  let y = 0;
+  const W  = 210;
+  const ML = 14;
+  const MR = 14;
+  const CW = W - ML - MR;
+  let y    = 0;
 
-  const setFill  = (c: [number,number,number]) => doc.setFillColor(...c);
-  const setDraw  = (c: [number,number,number]) => doc.setDrawColor(...c);
-  const setTxt   = (c: [number,number,number]) => doc.setTextColor(...c);
-  const setFont  = (style: 'normal'|'bold', size: number) => {
+  const setFill = (c: [number, number, number]) => doc.setFillColor(...c);
+  const setDraw = (c: [number, number, number]) => doc.setDrawColor(...c);
+  const setTxt  = (c: [number, number, number]) => doc.setTextColor(...c);
+  const setFont = (style: 'normal' | 'bold', size: number) => {
     doc.setFont('helvetica', style);
     doc.setFontSize(size);
   };
 
   // ── CABEÇALHO ───────────────────────────────────────────────────────────────
-  // Faixa laranja no topo
   setFill(COR.laranja);
   doc.rect(0, 0, W, 28, 'F');
 
-  // Logo texto "Delta7" (substituir por image se tiver base64)
   setFont('bold', 18);
   setTxt(COR.branco);
   doc.text('Delta7 Tecnologia', ML, 12);
   setFont('normal', 8);
   doc.text('Solucoes em Tecnologia', ML, 17);
 
-  // Titulo proposta (lado direito)
   setFont('bold', 11);
   doc.text('PROPOSTA COMERCIAL', W - MR, 10, { align: 'right' });
   setFont('normal', 8);
   doc.text('Locacao de Maquinas Virtuais Gerenciadas', W - MR, 15, { align: 'right' });
-  doc.text(`N° ${data.proposalNumber}  |  ${formatDate(data.generatedAt)}`, W - MR, 20, { align: 'right' });
+  doc.text(`N${String.fromCharCode(176)} ${data.proposalNumber}  |  ${formatDate(data.generatedAt)}`, W - MR, 20, { align: 'right' });
 
-  // Linha divisoria laranja escura
   setFill(COR.laranjaEsc);
   doc.rect(0, 28, W, 1.5, 'F');
 
   y = 35;
 
-  // ── IDENTIFICACAO ──────────────────────────────────────────────────────────
+  // ── IDENTIFICAÇÃO ──────────────────────────────────────────────────────────
   const drawInfoRow = (label: string, value: string, x: number, yy: number, colW: number) => {
     setFont('bold', 7);
     setTxt(COR.laranja);
     doc.text(label, x, yy);
     setFont('normal', 9);
     setTxt(COR.texto);
-    doc.text(splitLines(doc, value, colW - 2), x, yy + 4);
+    doc.text(splitLines(doc, value || '---', colW - 2), x, yy + 4);
   };
 
   const colW2 = CW / 2;
-  drawInfoRow('CLIENTE',    data.clientName,                   ML,           y,      colW2);
-  drawInfoRow('DOCUMENTO',  data.clientDocument || '—',        ML + colW2,   y,      colW2);
+  drawInfoRow('CLIENTE',   data.clientName,                  ML,         y,    colW2);
+  drawInfoRow('DOCUMENTO', data.clientDocument || '---',     ML + colW2, y,    colW2);
   y += 12;
-  drawInfoRow('CONTATO',    data.clientContact  || '—',        ML,           y,      colW2);
-  drawInfoRow('E-MAIL',     data.clientEmail    || '—',        ML + colW2,   y,      colW2);
+  drawInfoRow('CONTATO',   data.clientContact  || '---',     ML,         y,    colW2);
+  drawInfoRow('E-MAIL',    data.clientEmail    || '---',     ML + colW2, y,    colW2);
   y += 12;
-  drawInfoRow('EXECUTIVO',  data.salesRepName,                 ML,           y,      colW2);
-  drawInfoRow('VALIDADE',   `${data.validityDays} dias`,       ML + colW2,   y,      colW2);
+  drawInfoRow('EXECUTIVO', data.salesRepName,                ML,         y,    colW2);
+  drawInfoRow('VALIDADE',  `${data.validityDays} dias`,      ML + colW2, y,    colW2);
   y += 10;
 
-  // Linha separadora
   setDraw(COR.cinzaBd);
   doc.setLineWidth(0.3);
   doc.line(ML, y, W - MR, y);
@@ -141,18 +140,17 @@ function buildVmProposalPdf(data: VmProposalData): jsPDF {
   doc.rect(ML, y, CW, 1.2, 'F');
   y += 5;
 
-  // Cabecalho da tabela de VMs
   const vmCols = [
-    { label: 'VM',        w: 22 },
-    { label: 'FUNCAO',    w: 42 },
-    { label: 'vCPUs',     w: 16 },
-    { label: 'RAM',       w: 18 },
-    { label: 'STORAGE',   w: 38 },
-    { label: 'SISTEMA',   w: 46 },
+    { label: 'VM',      w: 24 },
+    { label: 'FUNCAO',  w: 44 },
+    { label: 'vCPUs',   w: 14 },
+    { label: 'RAM',     w: 16 },
+    { label: 'STORAGE', w: 40 },
+    { label: 'SISTEMA', w: 44 },
   ];
   const vmRowH = 8;
 
-  // Header row
+  // Cabeçalho da tabela
   setFill(COR.cinzaEsc);
   doc.rect(ML, y, CW, vmRowH, 'F');
   setFont('bold', 7.5);
@@ -164,15 +162,24 @@ function buildVmProposalPdf(data: VmProposalData): jsPDF {
   });
   y += vmRowH;
 
-  // Linhas de VMs
-  data.vms.forEach((vm, idx) => {
+  // Filtra VMs vazias antes de renderizar
+  const vmsValidas = filterVms(data.vms);
+
+  vmsValidas.forEach((vm, idx) => {
     const bg = idx % 2 === 0 ? COR.cinzaClaro : COR.branco;
     setFill(bg);
     doc.rect(ML, y, CW, vmRowH, 'F');
     setFont('normal', 8);
     setTxt(COR.texto);
     cx = ML + 2;
-    const vals = [vm.nome, vm.funcao, String(vm.vcpus), vm.ram, vm.storage, vm.so];
+    const vals = [
+      vm.nome    || '---',
+      vm.funcao  || '---',
+      String(vm.vcpus || 0),
+      vm.ram     || '---',
+      vm.storage || '---',
+      vm.so      || '---',
+    ];
     vmCols.forEach((col, ci) => {
       const txt = splitLines(doc, vals[ci], col.w - 2)[0] || vals[ci];
       doc.text(txt, cx, y + 5.5);
@@ -181,25 +188,27 @@ function buildVmProposalPdf(data: VmProposalData): jsPDF {
     y += vmRowH;
   });
 
-  // Linha total
-  setFill([255, 243, 232]);
+  // Linha de total
+  const totalVcpus = vmsValidas.reduce((s, v) => s + (Number(v.vcpus) || 0), 0);
+  setFill([255, 243, 232] as any);
   doc.rect(ML, y, CW, vmRowH, 'F');
   setFont('bold', 8);
   setTxt(COR.laranjaEsc);
-  const totalVcpus = data.vms.reduce((s, v) => s + v.vcpus, 0);
   doc.text('TOTAL', ML + 2, y + 5.5);
   cx = ML + 2 + vmCols[0].w + vmCols[1].w;
-  doc.text(String(totalVcpus) + ' vCPUs', cx, y + 5.5);
+  doc.text(`${totalVcpus} vCPUs`, cx, y + 5.5);
   y += vmRowH + 3;
 
-  // Nota discos cliente
+  // Nota
   setFont('normal', 7);
   setTxt(COR.cinzaMed);
-  const nota = '* Infraestrutura hospedada em servidor dedicado Dell PowerEdge R630 com Proxmox VE, operado e gerenciado pela Delta7 Tecnologia. Licencas Windows Server 2022 Standard incluidas nos planos.';
+  const nota =
+    '* Infraestrutura hospedada em servidor dedicado com Proxmox VE, ' +
+    'operado e gerenciado pela Delta7 Tecnologia. Licencas Windows Server 2022 Standard incluidas nos planos.';
   doc.text(splitLines(doc, nota, CW), ML, y);
   y += 10;
 
-  // ── PLANOS DE CONTRATACAO ─────────────────────────────────────────────────
+  // ── PLANOS ────────────────────────────────────────────────────────────────
   setFont('bold', 11);
   setTxt(COR.cinzaEsc);
   doc.text('Planos de Contratacao', ML, y);
@@ -208,36 +217,36 @@ function buildVmProposalPdf(data: VmProposalData): jsPDF {
   doc.rect(ML, y, CW, 1.2, 'F');
   y += 6;
 
-  const planoW  = CW / data.planos.length;
-  const planoH  = 28;
+  const planoW = CW / data.planos.length;
+  const planoH = 28;
 
   data.planos.forEach((plano, idx) => {
-    const px    = ML + idx * planoW;
-    const isAlt = idx % 2 === 1;
-    const bgHdr = isAlt ? COR.laranja : COR.cinzaEsc;
-    const bgBdy = isAlt ? ([201, 90, 0] as [number,number,number]) : COR.cinzaClaro;
-    const txtPrx = isAlt ? COR.branco : COR.laranja;
+    const px     = ML + idx * planoW;
+    const isAlt  = idx % 2 === 1;
+    const bgHdr  = isAlt ? COR.laranja    : COR.cinzaEsc;
+    const bgBdy  = isAlt ? COR.laranjaCard: COR.cinzaClaro;
+    const txtPrx = isAlt ? COR.branco     : COR.laranja;
+    const lblClr = isAlt
+      ? ([255, 220, 180] as [number, number, number])
+      : COR.cinzaMed;
 
-    // Header do card
     setFill(bgHdr);
     doc.rect(px, y, planoW - 1, 9, 'F');
     setFont('bold', 10);
     setTxt(COR.branco);
-    doc.text(plano.prazo, px + planoW / 2 - 0.5, y + 6, { align: 'center' });
+    doc.text(plano.prazo, px + (planoW - 1) / 2, y + 6, { align: 'center' });
 
-    // Body do card
     setFill(bgBdy);
     doc.rect(px, y + 9, planoW - 1, planoH - 9, 'F');
     setFont('bold', 16);
     setTxt(txtPrx);
-    doc.text(formatBRL(plano.mensal), px + planoW / 2 - 0.5, y + 21, { align: 'center' });
+    doc.text(formatBRL(plano.mensal), px + (planoW - 1) / 2, y + 21, { align: 'center' });
     setFont('normal', 7);
-    setTxt(isAlt ? ([255, 220, 180] as [number,number,number]) : COR.cinzaMed);
-    doc.text('/mes', px + planoW / 2 - 0.5, y + 26, { align: 'center' });
+    setTxt(lblClr);
+    doc.text('/mes', px + (planoW - 1) / 2, y + 26, { align: 'center' });
     setFont('normal', 7);
-    doc.text('3 VMs gerenciadas', px + planoW / 2 - 0.5, y + 30, { align: 'center' });
+    doc.text(`${vmsValidas.length} VM(s) gerenciadas`, px + (planoW - 1) / 2, y + 30, { align: 'center' });
 
-    // Borda
     setDraw(COR.cinzaBd);
     doc.setLineWidth(0.3);
     doc.rect(px, y, planoW - 1, planoH, 'S');
@@ -245,15 +254,17 @@ function buildVmProposalPdf(data: VmProposalData): jsPDF {
 
   y += planoH + 6;
 
-  // Taxa de ativacao
   if (data.activationFee > 0) {
     setFont('normal', 8);
     setTxt(COR.cinzaMed);
-    doc.text(`* Taxa de ativacao / implantacao: ${formatBRL(data.activationFee)} (cobrada uma unica vez)`, ML, y);
+    doc.text(
+      `* Taxa de ativacao / implantacao: ${formatBRL(data.activationFee)} (cobrada uma unica vez)`,
+      ML, y
+    );
     y += 7;
   }
 
-  // ── O QUE ESTA INCLUIDO ───────────────────────────────────────────────────
+  // ── O QUE ESTÁ INCLUÍDO ───────────────────────────────────────────────────
   setFont('bold', 11);
   setTxt(COR.cinzaEsc);
   doc.text('O que esta incluido', ML, y);
@@ -263,35 +274,43 @@ function buildVmProposalPdf(data: VmProposalData): jsPDF {
   y += 5;
 
   const incluidos = [
-    ['VMs provisionadas e configuradas pela Delta7',     'Suporte tecnico incluso — equipe Delta7'],
+    ['VMs provisionadas e configuradas pela Delta7',     'Suporte tecnico incluso - equipe Delta7'],
     ['Licencas Windows Server 2022 (VMs Windows)',       'Monitoramento proativo de disponibilidade'],
     ['Snapshots e backup periodico do ambiente virtual', 'Atualizacoes e manutencao do hypervisor Proxmox'],
-    ['Isolamento de rede entre VMs (seguranca)',         'Escalabilidade — recursos ampliados sob demanda'],
+    ['Isolamento de rede entre VMs (seguranca)',         'Escalabilidade - recursos ampliados sob demanda'],
   ];
 
   incluidos.forEach((row, idx) => {
     const bg = idx % 2 === 0 ? COR.cinzaClaro : COR.branco;
     setFill(bg);
     doc.rect(ML, y, CW, 7, 'F');
+
+    // Checkmark como "[OK]" — compativel com helvetica padrao do jsPDF
+    setFont('bold', 8);
+    setTxt(COR.verde);
+    doc.text('[OK]', ML + 2, y + 5);
     setFont('normal', 8);
-    setTxt(COR.verde);
-    doc.text('✓', ML + 2, y + 5);
     setTxt(COR.texto);
-    doc.text(row[0], ML + 7, y + 5);
+    doc.text(row[0], ML + 12, y + 5);
+
+    setFont('bold', 8);
     setTxt(COR.verde);
-    doc.text('✓', ML + CW / 2 + 2, y + 5);
+    doc.text('[OK]', ML + CW / 2 + 2, y + 5);
+    setFont('normal', 8);
     setTxt(COR.texto);
-    doc.text(row[1], ML + CW / 2 + 7, y + 5);
+    doc.text(row[1], ML + CW / 2 + 12, y + 5);
+
     y += 7;
   });
   y += 4;
 
-  // ── CONDICOES COMERCIAIS ──────────────────────────────────────────────────
+  // ── CONDIÇÕES COMERCIAIS ──────────────────────────────────────────────────
+  // Header com fundo cinza escuro — rect ANTES do texto
   setFill(COR.cinzaEsc);
   doc.rect(ML, y, CW, 8, 'F');
   setFont('bold', 8.5);
   setTxt(COR.branco);
-  doc.text('  Condicoes Comerciais', ML + 2, y + 5.5);
+  doc.text('Condicoes Comerciais', ML + 4, y + 5.5);
   y += 8;
 
   const conds = [
@@ -301,7 +320,7 @@ function buildVmProposalPdf(data: VmProposalData): jsPDF {
     'A infraestrutura fisica permanece sob propriedade e gestao da Delta7 Tecnologia.',
     'Recursos adicionais de CPU, RAM ou storage podem ser contratados separadamente.',
     'Em caso de dano causado por uso indevido das VMs, o cliente arcara com os custos de restauracao.',
-    'Proposta valida por ' + data.validityDays + ' dias a partir da data de emissao.',
+    `Proposta valida por ${data.validityDays} dias a partir da data de emissao.`,
   ];
 
   conds.forEach((c, idx) => {
@@ -310,12 +329,12 @@ function buildVmProposalPdf(data: VmProposalData): jsPDF {
     doc.rect(ML, y, CW, 6, 'F');
     setFont('normal', 7.5);
     setTxt(COR.texto);
-    doc.text('• ' + c, ML + 3, y + 4.2);
+    doc.text('- ' + c, ML + 3, y + 4.2);
     y += 6;
   });
   y += 5;
 
-  // ── OBSERVACOES ───────────────────────────────────────────────────────────
+  // ── OBSERVAÇÕES ───────────────────────────────────────────────────────────
   if (data.notes) {
     setFont('bold', 9);
     setTxt(COR.cinzaEsc);
@@ -331,7 +350,6 @@ function buildVmProposalPdf(data: VmProposalData): jsPDF {
   const assW = CW / 2 - 5;
   const assY = y;
 
-  // Delta7
   setDraw(COR.cinzaBd);
   doc.setLineWidth(0.4);
   doc.line(ML, assY + 10, ML + assW, assY + 10);
@@ -343,7 +361,6 @@ function buildVmProposalPdf(data: VmProposalData): jsPDF {
   doc.text('Representante Legal', ML + assW / 2, assY + 18, { align: 'center' });
   doc.text(formatDate(data.generatedAt), ML + assW / 2, assY + 22, { align: 'center' });
 
-  // Cliente
   const cx2 = ML + CW / 2 + 5;
   doc.line(cx2, assY + 10, cx2 + assW, assY + 10);
   setFont('bold', 8);
@@ -356,14 +373,14 @@ function buildVmProposalPdf(data: VmProposalData): jsPDF {
 
   y = assY + 28;
 
-  // ── RODAPE ────────────────────────────────────────────────────────────────
+  // ── RODAPÉ ────────────────────────────────────────────────────────────────
   setFill(COR.laranja);
   doc.rect(0, y, W, 1.5, 'F');
   y += 4;
   setFont('normal', 7);
   setTxt(COR.cinzaMed);
   doc.text(
-    'Delta7 Tecnologia — Solucoes em Tecnologia  |  contato@delta7.com.br  |  www.delta7.com.br',
+    'Delta7 Tecnologia - Solucoes em Tecnologia  |  contato@delta7.com.br  |  www.delta7.com.br',
     W / 2, y, { align: 'center' }
   );
   y += 4;
@@ -387,7 +404,7 @@ export async function downloadVmProposalPdf(data: VmProposalData): Promise<void>
 }
 
 export async function previewVmProposalPdf(data: VmProposalData): Promise<string[]> {
-  const doc = buildVmProposalPdf(data);
+  const doc  = buildVmProposalPdf(data);
   const blob = doc.output('bloburl');
   return [blob as unknown as string];
 }
