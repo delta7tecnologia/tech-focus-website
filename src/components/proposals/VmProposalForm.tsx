@@ -392,8 +392,21 @@ const VmProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
           <div className="flex-1 overflow-auto bg-gray-200 p-4">
             <div className="mx-auto max-w-3xl space-y-4">
               {previewPages?.map((src, i) =>
-                src.startsWith('data:application/pdf') ? (
-                  <iframe key={i} src={src} className="w-full bg-white shadow-lg rounded" style={{ height: '80vh' }} title="Previa PDF" />
+                src.startsWith('data:application/pdf') || src.startsWith('blob:') ? (
+                  <object
+                    key={i}
+                    data={src}
+                    type="application/pdf"
+                    className="w-full bg-white shadow-lg rounded"
+                    style={{ height: '80vh' }}
+                  >
+                    <div className="flex flex-col items-center justify-center h-64 bg-white rounded shadow text-gray-500 gap-3">
+                      <p className="text-sm">Seu navegador bloqueou a previa do PDF.</p>
+                      <a href={src} download="previa-proposta.pdf" className="text-blue-700 underline text-sm">
+                        Clique aqui para baixar a previa
+                      </a>
+                    </div>
+                  </object>
                 ) : (
                   <img key={i} src={src} alt={`Pagina ${i + 1}`} className="w-full block bg-white shadow-lg rounded" />
                 )
