@@ -26,6 +26,7 @@ import ValidateReport from "./pages/ValidateReport";
 import ValidateServiceOrder from "./pages/ValidateServiceOrder";
 import SignServiceOrder from "./pages/SignServiceOrder";
 import SignProposal from "./pages/SignProposal";
+import PropostaVm from "./pages/PropostaVm";
 
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminSetup from "./pages/admin/AdminSetup";
@@ -83,6 +84,7 @@ const App = () => (
             <Route path="/validar-laudo/:hash" element={<ValidateReport />} />
             <Route path="/validar-os/:hash" element={<ValidateServiceOrder />} />
             <Route path="/validar-proposta/:hash" element={<ValidateProposal />} />
+            <Route path="/propostas/vm" element={<PropostaVm />} />
             
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />

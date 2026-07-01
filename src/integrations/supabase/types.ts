@@ -1163,6 +1163,84 @@ export type Database = {
         }
         Relationships: []
       }
+      vm_proposals: {
+        Row: {
+          activation_fee: number
+          audit_log: Json
+          client_contact: string | null
+          client_document: string | null
+          client_email: string | null
+          client_name: string
+          created_at: string
+          created_by: string
+          generated_at: string | null
+          id: string
+          integrity_hash: string | null
+          is_draft: boolean
+          locked: boolean
+          notes: string | null
+          planos: Json
+          proposal_number: string | null
+          proposal_seq: number | null
+          sales_rep_email: string | null
+          sales_rep_name: string
+          status: string
+          updated_at: string
+          validity_days: number
+          vms: Json
+        }
+        Insert: {
+          activation_fee?: number
+          audit_log?: Json
+          client_contact?: string | null
+          client_document?: string | null
+          client_email?: string | null
+          client_name: string
+          created_at?: string
+          created_by: string
+          generated_at?: string | null
+          id?: string
+          integrity_hash?: string | null
+          is_draft?: boolean
+          locked?: boolean
+          notes?: string | null
+          planos?: Json
+          proposal_number?: string | null
+          proposal_seq?: number | null
+          sales_rep_email?: string | null
+          sales_rep_name: string
+          status?: string
+          updated_at?: string
+          validity_days?: number
+          vms?: Json
+        }
+        Update: {
+          activation_fee?: number
+          audit_log?: Json
+          client_contact?: string | null
+          client_document?: string | null
+          client_email?: string | null
+          client_name?: string
+          created_at?: string
+          created_by?: string
+          generated_at?: string | null
+          id?: string
+          integrity_hash?: string | null
+          is_draft?: boolean
+          locked?: boolean
+          notes?: string | null
+          planos?: Json
+          proposal_number?: string | null
+          proposal_seq?: number | null
+          sales_rep_email?: string | null
+          sales_rep_name?: string
+          status?: string
+          updated_at?: string
+          validity_days?: number
+          vms?: Json
+        }
+        Relationships: []
+      }
     }
     Views: {
       clients_public: {
