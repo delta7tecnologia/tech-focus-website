@@ -404,7 +404,7 @@ export async function downloadVmProposalPdf(data: VmProposalData): Promise<void>
 }
 
 export async function previewVmProposalPdf(data: VmProposalData): Promise<string[]> {
-  const doc  = buildVmProposalPdf(data);
-  const blob = doc.output('bloburl');
-  return [blob as unknown as string];
+  const doc     = buildVmProposalPdf(data);
+  const dataUrl = doc.output('datauristring');
+  return [dataUrl];
 }
