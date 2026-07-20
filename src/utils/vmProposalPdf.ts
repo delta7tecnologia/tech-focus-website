@@ -15,6 +15,7 @@ export interface VmItem {
   ram: string;
   storage: string;
   so: string;
+  preco: number; // preco mensal desta VM (R$)
 }
 
 export interface VmPlano {
@@ -50,7 +51,6 @@ const BORDER  = [226, 232, 240] as [number, number, number];
 const WHITE   = [255, 255, 255] as [number, number, number];
 const ORANGE  = [232, 119,  34] as [number, number, number];
 const ORANGE2 = [192,  90,   0] as [number, number, number];
-const GREEN   = [ 30, 126,  52] as [number, number, number];
 
 // ── Dimensoes A4 ──────────────────────────────────────────────────────────────
 const PW = 210;
@@ -62,9 +62,6 @@ const CW = PW - ML - MR; // 174mm
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const fmtDate = (iso: string) =>
   new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
-
-const fmtDateShort = (iso: string) =>
-  new Date(iso).toLocaleDateString('pt-BR');
 
 const formatBRL = (v: number) =>
   v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -138,10 +135,8 @@ function sectionTitle(doc: jsPDF, eyebrow: string, title: string, y: number): nu
 
 // ── CAPA ──────────────────────────────────────────────────────────────────────
 function drawCover(doc: jsPDF, r: VmProposalData) {
-  // Fundo navy
   fillRect(doc, 0, 0, PW, PH, NAVY);
 
-  // Logo branca
   try {
     doc.addImage(DELTA7_LOGO_WHITE_SMALL, 'JPEG', ML, 12, 36, 11);
   } catch {
@@ -149,14 +144,9 @@ function drawCover(doc: jsPDF, r: VmProposalData) {
   }
 
   t(doc, 'DELTA7 TECNOLOGIA', ML + CW, 20, { size: 7, color: [148, 163, 184] as any, align: 'right' });
-
-  // Linha decorativa laranja
   fillRect(doc, ML, 80, 20, 1.5, ORANGE);
-
-  // Tag
   t(doc, 'P R O P O S T A   C O M E R C I A L', ML, 90, { size: 8, color: [148, 163, 184] as any });
 
-  // Titulo
   doc.setFontSize(52);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(255, 255, 255);
@@ -170,7 +160,6 @@ function drawCover(doc: jsPDF, r: VmProposalData) {
   t(doc, 'Maquinas virtuais gerenciadas,', ML, 155, { size: 14, color: [203, 213, 225] as any });
   t(doc, 'infraestrutura dedicada Delta7.', ML, 162, { size: 14, color: [203, 213, 225] as any });
 
-  // Rodape da capa
   hline(doc, ML, PH - 38, CW, [30, 58, 110] as any, 0.5);
 
   t(doc, 'PREPARADO PARA', ML, PH - 31, { size: 7, color: [148, 163, 184] as any });
@@ -188,7 +177,6 @@ function drawIdentificacaoVms(doc: jsPDF, r: VmProposalData) {
   drawPageHeader(doc, r.proposalNumber);
   let y = 28;
 
-  // Identificacao do cliente
   y = sectionTitle(doc, 'Cliente', 'Identificacao do Cliente', y);
 
   const infoRows = [
@@ -199,78 +187,90 @@ function drawIdentificacaoVms(doc: jsPDF, r: VmProposalData) {
   y = drawInfoTable(doc, infoRows, y);
   y += 8;
 
-  // Ambiente Virtual
   y = sectionTitle(doc, 'Infraestrutura', 'Ambiente Virtual Provisionado', y);
 
   const vmsValidas = filterVms(r.vms);
+  const totalMensal = vmsValidas.reduce((s, v) => s + (Number(v.preco) || 0), 0);
 
-  // Cabecalho da tabela
+  // Cabecalho da tabela de VMs — com coluna de preco
   const vmCols = [
-    { label: 'VM',       w: CW * 0.18 },
-    { label: 'FUNCAO',   w: CW * 0.26 },
-    { label: 'vCPUs',    w: CW * 0.09 },
-    { label: 'RAM',      w: CW * 0.10 },
-    { label: 'STORAGE',  w: CW * 0.20 },
-    { label: 'SISTEMA',  w: CW * 0.17 },
+    { label: 'VM',        w: CW * 0.16 },
+    { label: 'FUNCAO',    w: CW * 0.22 },
+    { label: 'vCPUs',     w: CW * 0.08 },
+    { label: 'RAM',       w: CW * 0.09 },
+    { label: 'STORAGE',   w: CW * 0.20 },
+    { label: 'SISTEMA',   w: CW * 0.14 },
+    { label: 'R$/MES',    w: CW * 0.11 },
   ];
   const vmRowH = 8;
 
   fillRect(doc, ML, y, CW, vmRowH, NAVY);
-  let cx = ML + 3;
+  let cx = ML;
   vmCols.forEach((col) => {
-    t(doc, col.label, cx, y + 5.5, { size: 7.5, style: 'bold', color: WHITE });
+    const align = col.label === 'vCPUs' || col.label === 'RAM' || col.label === 'R$/MES' ? 'center' : 'left';
+    t(doc, col.label, align === 'center' ? cx + col.w / 2 : cx + 2, y + 5.5, { size: 7.5, style: 'bold', color: WHITE, align });
     cx += col.w;
   });
   y += vmRowH;
 
   vmsValidas.forEach((vm, idx) => {
-    const bg = idx % 2 === 0 ? WHITE : PAPER;
+    const bg = idx % 2 === 0 ? PAPER : WHITE;
     fillRect(doc, ML, y, CW, vmRowH, bg);
-    cx = ML + 3;
-    const vals = [
-      truncate(doc, vm.nome || '-',    vmCols[0].w - 4),
-      truncate(doc, vm.funcao || '-',  vmCols[1].w - 4),
-      String(vm.vcpus || 0),
-      vm.ram     || '-',
-      truncate(doc, vm.storage || '-', vmCols[4].w - 4),
-      truncate(doc, vm.so || '-',      vmCols[5].w - 4),
+
+    let cx2 = ML;
+    const cells = [
+      { val: truncate(doc, vm.nome,    vmCols[0].w - 4), align: 'left'   as const },
+      { val: truncate(doc, vm.funcao,  vmCols[1].w - 4), align: 'left'   as const },
+      { val: String(vm.vcpus),                           align: 'center' as const },
+      { val: vm.ram,                                     align: 'center' as const },
+      { val: truncate(doc, vm.storage, vmCols[4].w - 4), align: 'left'   as const },
+      { val: truncate(doc, vm.so,      vmCols[5].w - 4), align: 'left'   as const },
+      { val: vm.preco > 0 ? formatBRL(vm.preco) : '—',  align: 'center' as const },
     ];
-    vals.forEach((val, ci) => {
-      t(doc, val, cx, y + 5.5, { size: 8, color: INK });
-      cx += vmCols[ci].w;
+
+    cells.forEach((cell, ci) => {
+      const col = vmCols[ci];
+      // Destaque laranja na coluna de preco
+      const isPreco = ci === 6;
+      const textColor = isPreco ? ORANGE : INK;
+      const textStyle = isPreco ? 'bold' : 'normal';
+      t(
+        doc,
+        cell.val,
+        cell.align === 'center' ? cx2 + col.w / 2 : cx2 + 2,
+        y + 5.5,
+        { size: 8, color: textColor, align: cell.align, style: textStyle }
+      );
+      cx2 += col.w;
     });
+
     hline(doc, ML, y + vmRowH, CW, BORDER, 0.2);
     y += vmRowH;
   });
 
   // Linha de total
-  const totalVcpus = vmsValidas.reduce((s, v) => s + (Number(v.vcpus) || 0), 0);
   fillRect(doc, ML, y, CW, vmRowH, CREAM);
-  fillRect(doc, ML, y, 3, vmRowH, ORANGE);
-  t(doc, 'TOTAL', ML + 6, y + 5.5, { size: 8, style: 'bold', color: NAVY });
-  t(doc, `${totalVcpus} vCPUs`, ML + vmCols[0].w + vmCols[1].w + 3, y + 5.5, { size: 8, style: 'bold', color: ORANGE2 });
-  hline(doc, ML, y + vmRowH, CW, BORDER, 0.3);
-  y += vmRowH + 4;
-
-  // Nota
-  t(doc, '* Infraestrutura hospedada em servidor dedicado com Proxmox VE, operado e gerenciado pela Delta7 Tecnologia.', ML, y, { size: 7, style: 'italic', color: MUTED, maxWidth: CW });
-  t(doc, '  Licencas Windows Server 2022 Standard incluidas nos planos.', ML, y + 4, { size: 7, style: 'italic', color: MUTED });
-  y += 12;
+  hline(doc, ML, y, CW, ORANGE, 0.5);
+  t(doc, 'TOTAL MENSAL', ML + 2, y + 5.5, { size: 8, style: 'bold', color: NAVY });
+  t(doc, `${vmsValidas.length} VM(s)`, ML + CW * 0.5, y + 5.5, { size: 8, color: SLATE, align: 'center' });
+  if (totalMensal > 0) {
+    t(doc, formatBRL(totalMensal), ML + CW - 2, y + 5.5, { size: 9, style: 'bold', color: ORANGE, align: 'right' });
+  }
+  y += vmRowH + 8;
 
   // O que esta incluido
   y = sectionTitle(doc, 'Servicos', 'O que esta incluido', y);
 
   const incluidos = [
-    ['VMs provisionadas e configuradas pela Delta7',     'Suporte tecnico incluso - equipe Delta7'],
-    ['Licencas Windows Server 2022 (VMs Windows)',       'Monitoramento proativo de disponibilidade'],
-    ['Snapshots e backup periodico do ambiente virtual', 'Atualizacoes e manutencao do hypervisor Proxmox'],
-    ['Isolamento de rede entre VMs (seguranca)',         'Escalabilidade - recursos ampliados sob demanda'],
+    ['VMs gerenciadas conforme especificado',            'Monitoramento proativo de disponibilidade'],
+    ['Suporte tecnico Delta7 (TI dedicado ao cliente)',  'Snapshots e backup periodico das VMs'],
+    ['Atualizacoes e manutencao do ambiente Proxmox',   'Escalabilidade - recursos ampliados sob demanda'],
+    ['Isolamento de rede entre VMs (seguranca)',         'Licencas de SO incluidas conforme especificado'],
   ];
 
   incluidos.forEach((row, idx) => {
     const bg = idx % 2 === 0 ? PAPER : WHITE;
     fillRect(doc, ML, y, CW, 7, bg);
-    // Marcador laranja
     fillRect(doc, ML, y, 2.5, 7, ORANGE);
     t(doc, row[0], ML + 6, y + 5, { size: 8, color: INK });
     fillRect(doc, ML + CW / 2, y, 2.5, 7, ORANGE);
@@ -287,20 +287,20 @@ function drawInvestimentoCondicoes(doc: jsPDF, r: VmProposalData) {
   let y = 28;
 
   const vmsValidas = filterVms(r.vms);
+  const totalMensal = vmsValidas.reduce((s, v) => s + (Number(v.preco) || 0), 0);
 
-  // Planos
   y = sectionTitle(doc, 'Investimento', 'Planos de Contratacao', y);
 
   const planoW = CW / r.planos.length;
-  const planoH = 32;
+  const planoH = 38;
 
   r.planos.forEach((plano, idx) => {
-    const px    = ML + idx * planoW;
-    const isAlt = idx % 2 === 1;
-    const bgHdr = isAlt ? ORANGE  : NAVY;
-    const bgBdy = isAlt ? ORANGE2 : CREAM;
-    const priceColor = isAlt ? (WHITE as [number,number,number]) : (ORANGE as [number,number,number]);
-    const labelColor = isAlt ? ([255,220,180] as [number,number,number]) : (MUTED as [number,number,number]);
+    const px      = ML + idx * planoW;
+    const isAlt   = idx % 2 === 1;
+    const bgHdr   = isAlt ? ORANGE  : NAVY;
+    const bgBdy   = isAlt ? ORANGE2 : CREAM;
+    const priceColor: [number,number,number] = isAlt ? WHITE  : ORANGE;
+    const labelColor: [number,number,number] = isAlt ? [255,220,180] : MUTED;
 
     // Header
     fillRect(doc, px, y, planoW - 1, 10, bgHdr);
@@ -308,11 +308,17 @@ function drawInvestimentoCondicoes(doc: jsPDF, r: VmProposalData) {
 
     // Body
     fillRect(doc, px, y + 10, planoW - 1, planoH - 10, bgBdy);
-    t(doc, formatBRL(plano.mensal), px + (planoW - 1) / 2, y + 23, { size: 17, style: 'bold', color: priceColor, align: 'center' });
-    t(doc, '/mes', px + (planoW - 1) / 2, y + 28, { size: 7, color: labelColor, align: 'center' });
-    t(doc, `${vmsValidas.length} VM(s) gerenciadas`, px + (planoW - 1) / 2, y + 32, { size: 7, color: labelColor, align: 'center' });
+    t(doc, formatBRL(plano.mensal), px + (planoW - 1) / 2, y + 23, { size: 15, style: 'bold', color: priceColor, align: 'center' });
+    t(doc, '/mes — pacote completo', px + (planoW - 1) / 2, y + 29, { size: 6.5, color: labelColor, align: 'center' });
 
-    // Borda
+    // Linha de desconto se houver
+    if (totalMensal > 0 && plano.mensal < totalMensal) {
+      const pct = Math.round((1 - plano.mensal / totalMensal) * 100);
+      t(doc, `${pct}% de desconto`, px + (planoW - 1) / 2, y + 34, { size: 7, style: 'bold', color: isAlt ? [255,240,200] : ORANGE, align: 'center' });
+    }
+
+    t(doc, `${vmsValidas.length} VM(s) gerenciadas`, px + (planoW - 1) / 2, y + 37, { size: 6.5, color: labelColor, align: 'center' });
+
     doc.setDrawColor(...BORDER);
     doc.setLineWidth(0.3);
     doc.rect(px, y, planoW - 1, planoH);
@@ -357,7 +363,6 @@ function drawInvestimentoCondicoes(doc: jsPDF, r: VmProposalData) {
     const bg = idx % 2 === 0 ? WHITE : PAPER;
     fillRect(doc, ML, y, CW, 7, bg);
     hline(doc, ML, y, CW, BORDER, 0.2);
-    // Bullet laranja
     fillRect(doc, ML + 3, y + 2.8, 1.5, 1.5, ORANGE);
     t(doc, c, ML + 8, y + 5, { size: 8, color: INK, maxWidth: CW - 10 });
     y += 7;
@@ -406,7 +411,7 @@ function drawInvestimentoCondicoes(doc: jsPDF, r: VmProposalData) {
 
 // ── tabela info ───────────────────────────────────────────────────────────────
 function drawInfoTable(doc: jsPDF, rows: string[][], y: number): number {
-  const rowH = 8;
+  const rowH  = 8;
   const col1W = CW * 0.22;
   const col2W = CW * 0.28;
   const col3W = CW * 0.20;
@@ -442,15 +447,12 @@ const yieldToUI = () => new Promise<void>(resolve => setTimeout(resolve, 0));
 async function buildVmProposalPdf(data: VmProposalData): Promise<jsPDF> {
   const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
 
-  // Pagina 1 — Capa
   drawCover(doc, data);
   await yieldToUI();
 
-  // Pagina 2 — Identificacao + VMs + Incluidos
   drawIdentificacaoVms(doc, data);
   await yieldToUI();
 
-  // Pagina 3 — Planos + Condicoes + Aceite
   drawInvestimentoCondicoes(doc, data);
 
   return doc;
@@ -458,7 +460,7 @@ async function buildVmProposalPdf(data: VmProposalData): Promise<jsPDF> {
 
 // ── Exports publicos ──────────────────────────────────────────────────────────
 export async function downloadVmProposalPdf(data: VmProposalData): Promise<void> {
-  const doc = await buildVmProposalPdf(data);
+  const doc      = await buildVmProposalPdf(data);
   const filename = `Proposta_VM_${data.clientName.replace(/\s+/g, '_')}_${data.proposalNumber}.pdf`;
   try {
     const blob = doc.output('blob') as Blob;
@@ -477,7 +479,7 @@ export async function downloadVmProposalPdf(data: VmProposalData): Promise<void>
 }
 
 export async function previewVmProposalPdf(data: VmProposalData): Promise<string[]> {
-  const doc = await buildVmProposalPdf(data);
+  const doc     = await buildVmProposalPdf(data);
   const dataUri = doc.output('datauristring');
   return [dataUri];
 }
