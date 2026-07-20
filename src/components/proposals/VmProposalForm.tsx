@@ -1,5 +1,5 @@
 // src/components/proposals/VmProposalForm.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -17,13 +17,14 @@ import { downloadVmProposalPdf, previewVmProposalPdf, type VmPlano } from '@/uti
 import { validateDocument, formatDocument } from '@/lib/validators/document';
 
 // ── Constantes ────────────────────────────────────────────────────────────────
-const VALIDITY_DAYS_DEFAULT = 30;
+const VALIDITY_DAYS_DEFAULT  = 30;
 const ACTIVATION_FEE_DEFAULT = 0;
 
-const PLANOS_DEFAULT: VmPlano[] = [
-  { prazo: '12 MESES', mensal: 990 },
-  { prazo: '24 MESES', mensal: 790 },
-  { prazo: '36 MESES', mensal: 590 },
+// Fatores de desconto por prazo (quanto menor o fator, maior o desconto para contratos longos)
+const PLANOS_FATORES = [
+  { prazo: '12 MESES', fator: 1.00 },
+  { prazo: '24 MESES', fator: 0.92 },
+  { prazo: '36 MESES', fator: 0.85 },
 ];
 
 interface Props {
@@ -35,29 +36,71 @@ const formatBRL = (v: number) =>
   v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
 const VmProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const isEdit = !!proposal;
+  const { user }        = useAuth();
+  const { toast }       = useToast();
+  const queryClient     = useQueryClient();
+  const isEdit          = !!proposal;
 
-  // ── Estado do formulário ──────────────────────────────────────────────────
-  const [clientName,    setClientName]    = useState(proposal?.client_name    || '');
-  const [clientDocument,setClientDocument]= useState(proposal?.client_document|| '');
-  const [clientContact, setClientContact] = useState(proposal?.client_contact || '');
-  const [clientEmail,   setClientEmail]   = useState(proposal?.client_email   || '');
-  const [salesRepName,  setSalesRepName]  = useState(proposal?.sales_rep_name || '');
-  const [salesRepEmail, setSalesRepEmail] = useState(proposal?.sales_rep_email|| '');
-  const [validityDays,  setValidityDays]  = useState<number>(proposal?.validity_days ?? VALIDITY_DAYS_DEFAULT);
-  const [notes,         setNotes]         = useState(proposal?.notes          || '');
-  const [activationFee, setActivationFee] = useState<number>(proposal?.activation_fee ?? ACTIVATION_FEE_DEFAULT);
+  // ── Estado do formulario ──────────────────────────────────────────────────
+  const [clientName,     setClientName]     = useState(proposal?.client_name     || '');
+  const [clientDocument, setClientDocument] = useState(proposal?.client_document || '');
+  const [clientContact,  setClientContact]  = useState(proposal?.client_contact  || '');
+  const [clientEmail,    setClientEmail]    = useState(proposal?.client_email    || '');
+  const [salesRepName,   setSalesRepName]   = useState(proposal?.sales_rep_name  || '');
+  const [salesRepEmail,  setSalesRepEmail]  = useState(proposal?.sales_rep_email || '');
+  const [validityDays,   setValidityDays]   = useState<number>(proposal?.validity_days ?? VALIDITY_DAYS_DEFAULT);
+  const [notes,          setNotes]          = useState(proposal?.notes           || '');
+  const [activationFee,  setActivationFee]  = useState<number>(proposal?.activation_fee ?? ACTIVATION_FEE_DEFAULT);
 
   const [vms,    setVms]    = useState<VmItem[]>(proposal?.vms    || []);
-  const [planos, setPlanos] = useState<VmPlano[]>(proposal?.planos || PLANOS_DEFAULT);
 
-  const [previewPages,  setPreviewPages]  = useState<string[] | null>(null);
-  const [previewLoading,setPreviewLoading]= useState(false);
+  // Planos: se vier do banco usa os salvos, senao calcula automaticamente
+  const [planosOverride, setPlanosOverride] = useState<VmPlano[] | null>(
+    proposal?.planos?.length ? proposal.planos : null
+  );
+
+  const [previewPages,   setPreviewPages]   = useState<string[] | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
 
   const docValidation = validateDocument(clientDocument);
+
+  // ── Calculo automatico dos planos baseado no total das VMs ────────────────
+  const totalMensalVms = useMemo(
+    () => vms.reduce((s, v) => s + (Number(v.preco) || 0), 0),
+    [vms]
+  );
+
+  // Planos calculados automaticamente
+  const planosCalculados: VmPlano[] = useMemo(
+    () => PLANOS_FATORES.map(({ prazo, fator }) => ({
+      prazo,
+      mensal: Math.ceil(totalMensalVms * fator), // arredonda para cima
+    })),
+    [totalMensalVms]
+  );
+
+  // Planos efetivos: override manual ou calculados
+  const planos: VmPlano[] = planosOverride ?? planosCalculados;
+
+  // Quando as VMs mudam e nao ha override, os planos se recalculam automaticamente.
+  // Se houver override, mantem o que o usuario editou.
+  const updatePlano = (idx: number, patch: Partial<VmPlano>) => {
+    const base = planosOverride ?? planosCalculados;
+    setPlanosOverride(base.map((p, i) => (i === idx ? { ...p, ...patch } : p)));
+  };
+
+  const addPlano = () => {
+    const base = planosOverride ?? planosCalculados;
+    setPlanosOverride([...base, { prazo: '', mensal: totalMensalVms }]);
+  };
+
+  const removePlano = (idx: number) => {
+    const base = planosOverride ?? planosCalculados;
+    setPlanosOverride(base.filter((_, i) => i !== idx));
+  };
+
+  // Botao para redefinir planos ao calculo automatico
+  const resetPlanos = () => setPlanosOverride(null);
 
   // Pre-preenche executivo
   useEffect(() => {
@@ -69,8 +112,8 @@ const VmProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
         .eq('user_id', user.id)
         .maybeSingle();
       if (data) {
-        if (!salesRepName) setSalesRepName(data.full_name || '');
-        if (!salesRepEmail) setSalesRepEmail(data.email   || '');
+        if (!salesRepName)  setSalesRepName(data.full_name || '');
+        if (!salesRepEmail) setSalesRepEmail(data.email    || '');
       }
     })();
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -128,7 +171,11 @@ const VmProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
     setPreviewLoading(true);
     try {
       const payload = buildPayload();
-      const pages = await previewVmProposalPdf(buildPdfData({ ...payload, proposal_number: 'PREVIA', generated_at: new Date().toISOString() }));
+      const pages = await previewVmProposalPdf(buildPdfData({
+        ...payload,
+        proposal_number: 'PREVIA',
+        generated_at:    new Date().toISOString(),
+      }));
       setPreviewPages(pages);
     } catch (e: any) {
       toast({ title: 'Erro na previa', description: e.message, variant: 'destructive' });
@@ -181,62 +228,37 @@ const VmProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
       }
     },
     onSuccess: async (data: any, vars) => {
-      queryClient.invalidateQueries({ queryKey: ['vm-proposals'] });
-      toast({ title: vars.finalize ? 'Proposta gerada' : 'Rascunho salvo' });
+      queryClient.invalidateQueries({ queryKey: ['vm_proposals'] });
       if (vars.finalize) {
-        try {
-          await downloadVmProposalPdf(buildPdfData(data));
-        } catch (pdfErr: any) {
-          toast({
-            title: 'Proposta salva, mas falhou ao gerar PDF',
-            description: pdfErr?.message || 'Erro desconhecido.',
-            variant: 'destructive',
-          });
-        }
+        toast({ title: 'Proposta finalizada!', description: `N\u00ba ${data.proposal_number}` });
+        await downloadVmProposalPdf(buildPdfData(data));
+      } else {
+        toast({ title: 'Rascunho salvo.' });
       }
       onClose();
     },
     onError: (e: any) => {
-      const msg  = e?.message || String(e) || 'Erro desconhecido';
-      const hint = /load failed|failed to fetch|network/i.test(msg) ? ' Verifique sua conexao.' : '';
-      toast({ title: 'Erro ao salvar proposta', description: msg + hint, variant: 'destructive' });
+      toast({ title: 'Erro ao salvar', description: e.message, variant: 'destructive' });
     },
   });
 
-  // ── Editor de Planos inline ───────────────────────────────────────────────
-  const updatePlano = (idx: number, patch: Partial<VmPlano>) =>
-    setPlanos(planos.map((p, i) => (i === idx ? { ...p, ...patch } : p)));
-  const removePlano = (idx: number) => setPlanos(planos.filter((_, i) => i !== idx));
-  const addPlano    = () => setPlanos([...planos, { prazo: '', mensal: 0 }]);
-
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-4">
 
-      {/* Identificacao do Cliente */}
+      {/* Cliente */}
       <Card>
         <CardContent className="p-6 space-y-4">
-          <h3 className="text-lg font-bold text-blue-900">Identificacao do Cliente</h3>
+          <h3 className="text-lg font-bold text-blue-900">Dados do Cliente</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div className="md:col-span-2">
-              <Label>Nome / Razao Social *</Label>
+            <div>
+              <Label>Razao Social / Nome *</Label>
               <Input value={clientName} onChange={(e) => setClientName(e.target.value)} required />
             </div>
             <div>
               <Label>CNPJ / CPF</Label>
-              <Input
-                value={clientDocument}
-                onChange={(e) => setClientDocument(e.target.value)}
-                placeholder="00.000.000/0001-00"
-                onBlur={() => {
-                  if (clientDocument && docValidation.valid && !docValidation.empty)
-                    setClientDocument(formatDocument(clientDocument));
-                }}
-              />
-              {clientDocument && !docValidation.valid && (
-                <p className="text-xs text-red-600 mt-1">{docValidation.message}</p>
-              )}
-              {clientDocument && docValidation.valid && !docValidation.empty && (
+              <Input value={clientDocument} onChange={(e) => setClientDocument(e.target.value)} placeholder="00.000.000/0000-00" />
+              {clientDocument && docValidation.valid && (
                 <p className="text-xs text-green-700 mt-1">{docValidation.type.toUpperCase()} valido</p>
               )}
             </div>
@@ -285,15 +307,32 @@ const VmProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
         </CardContent>
       </Card>
 
-      {/* Planos */}
+      {/* Planos — calculados automaticamente */}
       <Card>
         <CardContent className="p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold text-blue-900">Planos de Contratacao</h3>
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <h3 className="text-lg font-bold text-blue-900">Planos de Contratacao</h3>
+              {totalMensalVms > 0 && (
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Base: {formatBRL(totalMensalVms)}/mes
+                  {planosOverride && (
+                    <button
+                      type="button"
+                      onClick={resetPlanos}
+                      className="ml-2 text-orange-600 underline hover:no-underline"
+                    >
+                      Redefinir para automatico
+                    </button>
+                  )}
+                </p>
+              )}
+            </div>
             <Button type="button" size="sm" variant="outline" onClick={addPlano}>
               <Plus className="w-3 h-3 mr-1" /> Adicionar plano
             </Button>
           </div>
+
           <div className="border rounded-lg overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-blue-900 text-white">

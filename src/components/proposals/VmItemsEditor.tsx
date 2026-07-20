@@ -12,6 +12,7 @@ export interface VmItem {
   ram: string;
   storage: string;
   so: string;
+  preco: number; // preco base mensal desta VM (R$)
 }
 
 interface Props {
@@ -19,29 +20,51 @@ interface Props {
   onChange: (vms: VmItem[]) => void;
 }
 
-// ── Templates predefinidos ────────────────────────────────────────────────────
+const formatBRL = (v: number) =>
+  v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+// ── Precos base por template ──────────────────────────────────────────────────
+// Logica de precificacao:
+//   - Linux simples (DNS, Web, Notion, Node.js, Monitoramento): R$ 150–250
+//   - Linux pesado (Backup): R$ 200
+//   - Windows simples (AD, File): R$ 350
+//   - Windows pesado (SQL, ERP): R$ 550
+
 const VM_TEMPLATES: VmItem[] = [
-  { nome: 'VM — Active Directory', funcao: 'Controlador de Dominio (AD/DC)',        vcpus: 2, ram: '4 GB',  storage: '80 GB SSD',             so: 'Windows Server 2022' },
-  { nome: 'VM — Fileserver',       funcao: 'Servidor de Arquivos',                  vcpus: 2, ram: '4 GB',  storage: '100 GB SSD + 1 TB HDD', so: 'Windows Server 2022' },
-  { nome: 'VM — Notion',           funcao: 'Notion Self-hosted (Aplicacao Web)',     vcpus: 2, ram: '4 GB',  storage: '100 GB SSD',            so: 'Ubuntu Server LTS'   },
-  { nome: 'VM — Node.js',          funcao: 'Aplicacao Node.js / API',               vcpus: 2, ram: '4 GB',  storage: '80 GB SSD',             so: 'Ubuntu Server LTS'   },
-  { nome: 'VM — SQL Server',       funcao: 'Banco de Dados SQL Server',             vcpus: 4, ram: '8 GB',  storage: '200 GB SSD',            so: 'Windows Server 2022' },
-  { nome: 'VM — DNS',              funcao: 'Servidor DNS secundario',               vcpus: 1, ram: '2 GB',  storage: '40 GB SSD',             so: 'Ubuntu Server LTS'   },
-  { nome: 'VM — Backup',           funcao: 'Servidor de Backup local (PBS/Veeam)',  vcpus: 2, ram: '4 GB',  storage: '500 GB HDD',            so: 'Ubuntu Server LTS'   },
-  { nome: 'VM — ERP',              funcao: 'Servidor de ERP / Sistema interno',     vcpus: 4, ram: '8 GB',  storage: '200 GB SSD',            so: 'Windows Server 2022' },
-  { nome: 'VM — Web',              funcao: 'Servidor Web / Nginx / Apache',         vcpus: 2, ram: '4 GB',  storage: '80 GB SSD',             so: 'Ubuntu Server LTS'   },
-  { nome: 'VM — Monitoramento',    funcao: 'Zabbix / Grafana / PRTG',              vcpus: 2, ram: '4 GB',  storage: '100 GB SSD',            so: 'Ubuntu Server LTS'   },
+  { nome: 'VM — Active Directory', funcao: 'Controlador de Dominio (AD/DC)',       vcpus: 2, ram: '4 GB',  storage: '80 GB SSD',             so: 'Windows Server 2022', preco: 350 },
+  { nome: 'VM — Fileserver',       funcao: 'Servidor de Arquivos',                 vcpus: 2, ram: '4 GB',  storage: '100 GB SSD + 1 TB HDD', so: 'Windows Server 2022', preco: 350 },
+  { nome: 'VM — Notion',           funcao: 'Notion Self-hosted (Aplicacao Web)',    vcpus: 2, ram: '4 GB',  storage: '100 GB SSD',            so: 'Ubuntu Server LTS',   preco: 200 },
+  { nome: 'VM — Node.js',          funcao: 'Aplicacao Node.js / API',              vcpus: 2, ram: '4 GB',  storage: '80 GB SSD',             so: 'Ubuntu Server LTS',   preco: 200 },
+  { nome: 'VM — SQL Server',       funcao: 'Banco de Dados SQL Server',            vcpus: 4, ram: '8 GB',  storage: '200 GB SSD',            so: 'Windows Server 2022', preco: 550 },
+  { nome: 'VM — DNS',              funcao: 'Servidor DNS secundario',              vcpus: 1, ram: '2 GB',  storage: '40 GB SSD',             so: 'Ubuntu Server LTS',   preco: 150 },
+  { nome: 'VM — Backup',           funcao: 'Servidor de Backup local (PBS/Veeam)', vcpus: 2, ram: '4 GB',  storage: '500 GB HDD',            so: 'Ubuntu Server LTS',   preco: 200 },
+  { nome: 'VM — ERP',              funcao: 'Servidor de ERP / Sistema interno',    vcpus: 4, ram: '8 GB',  storage: '200 GB SSD',            so: 'Windows Server 2022', preco: 550 },
+  { nome: 'VM — Web',              funcao: 'Servidor Web / Nginx / Apache',        vcpus: 2, ram: '4 GB',  storage: '80 GB SSD',             so: 'Ubuntu Server LTS',   preco: 180 },
+  { nome: 'VM — Monitoramento',    funcao: 'Zabbix / Grafana / PRTG',             vcpus: 2, ram: '4 GB',  storage: '100 GB SSD',            so: 'Ubuntu Server LTS',   preco: 200 },
 ];
 
-const VM_EMPTY: VmItem = { nome: '', funcao: '', vcpus: 2, ram: '4 GB', storage: '', so: '' };
+const VM_EMPTY: VmItem = { nome: '', funcao: '', vcpus: 2, ram: '4 GB', storage: '', so: '', preco: 0 };
 
+// ── Ajuste de preco por recursos ──────────────────────────────────────────────
+// Quando o usuario aumenta vcpus alem do padrao do template, o preco sobe.
+// Regra simples: +R$50 por vCPU acima de 2; +R$30 por cada 4GB de RAM acima de 4GB.
+function parseGb(str: string): number {
+  const m = String(str).match(/(\d+)/);
+  return m ? parseInt(m[1]) : 0;
+}
+
+// Calcula o preco dinamico de uma VM dado o preco base do template original
+// e os recursos atuais. Como nao temos o template base original em runtime,
+// guardamos o preco ja ajustado — o usuario pode editar livremente o campo preco.
+// Esta funcao e usada apenas quando um template e adicionado pela primeira vez.
+export function calcPrecoVm(vm: VmItem): number {
+  return vm.preco; // O usuario controla o campo diretamente
+}
+
+// ── Componente ────────────────────────────────────────────────────────────────
 const VmItemsEditor: React.FC<Props> = ({ vms, onChange }) => {
-  const addTemplate = (tpl: VmItem) => {
-    // Permite adicionar duplicatas — pode querer duas VMs do mesmo tipo
-    onChange([...vms, { ...tpl }]);
-  };
-
-  const addCustom = () => onChange([...vms, { ...VM_EMPTY }]);
+  const addTemplate = (tpl: VmItem) => onChange([...vms, { ...tpl }]);
+  const addCustom   = () => onChange([...vms, { ...VM_EMPTY }]);
 
   const update = (idx: number, patch: Partial<VmItem>) =>
     onChange(vms.map((v, i) => (i === idx ? { ...v, ...patch } : v)));
@@ -49,6 +72,7 @@ const VmItemsEditor: React.FC<Props> = ({ vms, onChange }) => {
   const remove = (idx: number) => onChange(vms.filter((_, i) => i !== idx));
 
   const totalVcpus = vms.reduce((s, v) => s + (Number(v.vcpus) || 0), 0);
+  const totalPreco = vms.reduce((s, v) => s + (Number(v.preco) || 0), 0);
 
   return (
     <div className="space-y-5">
@@ -82,11 +106,12 @@ const VmItemsEditor: React.FC<Props> = ({ vms, onChange }) => {
             <thead className="bg-gray-800 text-white">
               <tr>
                 <th className="text-left px-3 py-2">Nome / Identificacao</th>
-                <th className="text-left px-3 py-2">Funcao</th>
+                <th className="text-left px-2 py-2">Funcao</th>
                 <th className="text-center px-2 py-2 w-20">vCPUs</th>
                 <th className="text-center px-2 py-2 w-24">RAM</th>
                 <th className="text-left px-2 py-2">Storage</th>
-                <th className="text-left px-2 py-2">Sistema</th>
+                <th className="text-left px-2 py-2 w-32">Sistema</th>
+                <th className="text-right px-2 py-2 w-32">Preco/mes (R$)</th>
                 <th className="w-10"></th>
               </tr>
             </thead>
@@ -143,6 +168,16 @@ const VmItemsEditor: React.FC<Props> = ({ vms, onChange }) => {
                       className="h-8 text-xs"
                     />
                   </td>
+                  <td className="px-2 py-1">
+                    <Input
+                      type="number"
+                      min={0}
+                      step="0.01"
+                      value={vm.preco}
+                      onChange={(e) => update(idx, { preco: Number(e.target.value) })}
+                      className="h-8 text-xs text-right font-medium text-orange-700"
+                    />
+                  </td>
                   <td className="px-2 py-1 text-center">
                     <Button
                       type="button"
@@ -158,9 +193,13 @@ const VmItemsEditor: React.FC<Props> = ({ vms, onChange }) => {
               ))}
               {/* Linha de total */}
               <tr className="bg-orange-50 border-t-2 border-orange-200">
-                <td className="px-3 py-2 font-bold text-xs text-orange-700" colSpan={2}>TOTAL</td>
+                <td className="px-3 py-2 font-bold text-xs text-orange-700" colSpan={2}>TOTAL MENSAL</td>
                 <td className="px-2 py-2 text-center font-bold text-xs text-orange-700">{totalVcpus} vCPUs</td>
-                <td colSpan={4}></td>
+                <td colSpan={3}></td>
+                <td className="px-2 py-2 text-right font-bold text-sm text-orange-700">
+                  {formatBRL(totalPreco)}
+                </td>
+                <td></td>
               </tr>
             </tbody>
           </table>
@@ -170,6 +209,13 @@ const VmItemsEditor: React.FC<Props> = ({ vms, onChange }) => {
       {vms.length === 0 && (
         <p className="text-sm text-gray-400 italic text-center py-6 border rounded-lg border-dashed">
           Nenhuma VM adicionada. Use os templates acima ou adicione uma VM personalizada.
+        </p>
+      )}
+
+      {/* Legenda de precos */}
+      {vms.length > 0 && (
+        <p className="text-xs text-gray-400 italic">
+          * O preco de cada VM pode ser editado diretamente. Os planos de contratacao sao calculados automaticamente com base no total acima.
         </p>
       )}
     </div>
