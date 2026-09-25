@@ -165,5 +165,37 @@ export const SUP_SECTION_LABELS: { key: keyof SupProposalSections; label: string
   { key: 'showSupportReqs', label: 'Requisitos do contrato', hint: '~½ página' },
 ];
 
+export interface ItSupportCustomContent {
+  about: string;
+  kpis: typeof SUP_KPIS;
+  benefits: typeof SUP_BENEFITS;
+  infrastructure: typeof SUP_INFRA;
+  idealFor: typeof SUP_IDEAL_FOR;
+  notIncluded: string;
+  contractText: string;
+  requirements: string[];
+  sla: typeof SUP_SLA;
+  quote: typeof SUP_QUOTE;
+}
+
+export const getDefaultItSupportContent = (): ItSupportCustomContent => ({
+  about: ABOUT_DELTA7_SUP,
+  kpis: SUP_KPIS.map((item) => ({ ...item })),
+  benefits: SUP_BENEFITS.map((item) => ({ ...item })),
+  infrastructure: SUP_INFRA.map((item) => ({ ...item })),
+  idealFor: SUP_IDEAL_FOR.map((item) => ({ ...item })),
+  notIncluded: SUP_NOT_INCLUDED,
+  contractText: SUP_CONTRACT_TEXT,
+  requirements: [...SUP_CONTRACT_REQUIREMENTS],
+  sla: SUP_SLA.map((item) => ({ ...item })),
+  quote: { ...SUP_QUOTE },
+});
+
+export const normalizeItSupportContent = (value?: Partial<ItSupportCustomContent> | null): ItSupportCustomContent => ({
+  ...getDefaultItSupportContent(),
+  ...(value || {}),
+  quote: { ...SUP_QUOTE, ...(value?.quote || {}) },
+});
+
 export const formatBRL = (n: number) =>
   n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });

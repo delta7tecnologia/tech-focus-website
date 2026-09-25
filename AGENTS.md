@@ -1,0 +1,1 @@
+Proposal document copy is stored as a complete JSON snapshot per proposal, preserving historical output when defaults change.
