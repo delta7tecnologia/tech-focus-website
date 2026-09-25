@@ -14,4 +14,4 @@
 - [x] Implementar planos, cláusulas e textos por proposta
 - [x] Criar PDF comercial sem dados internos
 - [x] Adicionar telas administrativas e menu
-- [ ] Validar compilação, fluxo real e PDF
+- [x] Validar compilação, fluxo real e PDF
