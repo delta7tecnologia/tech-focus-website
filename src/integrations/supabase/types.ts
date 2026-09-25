@@ -744,12 +744,19 @@ export type Database = {
           fabricante: string
           fonte_redundante: boolean
           formato: string
+          geracao: string | null
           id: string
+          interface_disco: string[]
           mensalidade_base: number
           nome: string
           observacoes: string | null
+          padrao_memoria: string | null
           ram_base_gb: number
+          ram_max_gb: number
+          slots_memoria: number
           storage_base: string
+          tamanho_baia: string | null
+          tipo_modulo: string | null
           updated_at: string
           vida_util_meses: number
         }
@@ -762,12 +769,19 @@ export type Database = {
           fabricante: string
           fonte_redundante?: boolean
           formato: string
+          geracao?: string | null
           id?: string
+          interface_disco?: string[]
           mensalidade_base?: number
           nome: string
           observacoes?: string | null
+          padrao_memoria?: string | null
           ram_base_gb?: number
+          ram_max_gb?: number
+          slots_memoria?: number
           storage_base: string
+          tamanho_baia?: string | null
+          tipo_modulo?: string | null
           updated_at?: string
           vida_util_meses?: number
         }
@@ -780,12 +794,19 @@ export type Database = {
           fabricante?: string
           fonte_redundante?: boolean
           formato?: string
+          geracao?: string | null
           id?: string
+          interface_disco?: string[]
           mensalidade_base?: number
           nome?: string
           observacoes?: string | null
+          padrao_memoria?: string | null
           ram_base_gb?: number
+          ram_max_gb?: number
+          slots_memoria?: number
           storage_base?: string
+          tamanho_baia?: string | null
+          tipo_modulo?: string | null
           updated_at?: string
           vida_util_meses?: number
         }
@@ -897,36 +918,57 @@ export type Database = {
         Row: {
           aplica_modalidade: string
           ativo: boolean
+          capacidade_gb: number | null
           categoria: string
+          compat_baia: string[]
+          compat_interface: string[]
+          compat_memoria: string[]
+          compat_modelos: string[]
+          compat_tipo_modulo: string[]
           created_at: string
           custo_aquisicao: number
           id: string
           mensalidade: number
           nome: string
+          permite_quantidade: boolean
           tipo_cobranca: string
           updated_at: string
         }
         Insert: {
           aplica_modalidade?: string
           ativo?: boolean
+          capacidade_gb?: number | null
           categoria: string
+          compat_baia?: string[]
+          compat_interface?: string[]
+          compat_memoria?: string[]
+          compat_modelos?: string[]
+          compat_tipo_modulo?: string[]
           created_at?: string
           custo_aquisicao?: number
           id?: string
           mensalidade?: number
           nome: string
+          permite_quantidade?: boolean
           tipo_cobranca?: string
           updated_at?: string
         }
         Update: {
           aplica_modalidade?: string
           ativo?: boolean
+          capacidade_gb?: number | null
           categoria?: string
+          compat_baia?: string[]
+          compat_interface?: string[]
+          compat_memoria?: string[]
+          compat_modelos?: string[]
+          compat_tipo_modulo?: string[]
           created_at?: string
           custo_aquisicao?: number
           id?: string
           mensalidade?: number
           nome?: string
+          permite_quantidade?: boolean
           tipo_cobranca?: string
           updated_at?: string
         }
