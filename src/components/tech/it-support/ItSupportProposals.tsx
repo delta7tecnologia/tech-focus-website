@@ -11,6 +11,7 @@ import { FilePlus, Edit, Trash2, FileDown, Loader2, Lock, FileText } from 'lucid
 import ItSupportProposalForm from './ItSupportProposalForm';
 import { downloadItSupportProposalPdf } from '@/utils/itSupportProposalPdf';
 import { formatBRL } from '@/lib/itSupportContent';
+import { normalizeItSupportContent } from '@/lib/itSupportContent';
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   rascunho: { label: 'Rascunho', color: 'bg-gray-100 text-gray-700' },
@@ -74,6 +75,8 @@ const ItSupportProposals: React.FC = () => {
         sections: p.sections || undefined,
         showAltatekLogo: p.show_altatek_logo ?? false,
         template,
+        featuredClients: Array.isArray(p.featured_clients) ? p.featured_clients : [],
+        customContent: normalizeItSupportContent(p.custom_content),
       });
     } catch (e: any) {
       toast({ title: 'Erro ao gerar PDF', description: e.message, variant: 'destructive' });

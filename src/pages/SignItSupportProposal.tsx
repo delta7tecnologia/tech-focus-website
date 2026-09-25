@@ -9,7 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Loader2, FileSignature, CheckCircle2, XCircle, ShieldCheck, FileDown } from 'lucide-react';
 import SignaturePad from '@/components/tech/reports/SignaturePad';
 import { downloadItSupportProposalPdf } from '@/utils/itSupportProposalPdf';
-import { formatBRL } from '@/lib/itSupportContent';
+import { formatBRL, normalizeItSupportContent } from '@/lib/itSupportContent';
 import delta7Logo from '@/assets/delta7-logo.png';
 import { useSEO } from '@/hooks/useSEO';
 
@@ -83,6 +83,7 @@ const SignItSupportProposal = () => {
         sections: p.sections || undefined,
         showAltatekLogo: p.show_altatek_logo ?? false,
         featuredClients: Array.isArray(p.featured_clients) ? p.featured_clients : [],
+        customContent: normalizeItSupportContent(p.custom_content),
         template,
       });
     } catch (e: any) {

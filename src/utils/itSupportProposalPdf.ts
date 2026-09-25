@@ -6,18 +6,8 @@ import { DELTA7_LOGO_DATA_URL, DELTA7_LOGO_DARK_DATA_URL } from '@/assets/delta7
 import { DELL_EXPERT_LOGO_DATA_URL } from '@/assets/dellExpertLogoBase64';
 import { DELL_EXPERT_LOGO_SQUARE_DATA_URL } from '@/assets/dellExpertLogoSquareBase64';
 import {
-  ABOUT_DELTA7_SUP,
-  SUP_NOT_INCLUDED,
-  SUP_CONTRACT_TEXT,
-  SUP_CONTRACT_REQUIREMENTS,
-  SUP_SLA,
   formatBRL,
   SUP_COLORS as C,
-  SUP_KPIS,
-  SUP_INFRA,
-  SUP_BENEFITS,
-  SUP_IDEAL_FOR,
-  SUP_QUOTE,
   SUP_DEFAULT_SECTIONS,
   type SupProposalSections,
   normalizeItSupportContent,

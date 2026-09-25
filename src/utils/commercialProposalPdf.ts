@@ -6,17 +6,8 @@ import { DELTA7_LOGO_DATA_URL, DELTA7_LOGO_DARK_DATA_URL } from '@/assets/delta7
 import { ALTATEK_LOGO_DATA_URL } from '@/assets/altatekLogoBase64';
 import { ALTATEK_LOGO_MODELO01_DATA_URL } from '@/assets/altatekLogoModelo01Base64';
 import {
-  ABOUT_DELTA7,
-  NOT_INCLUDED,
-  SUPPORT_TEXT,
-  SUPPORT_REQUIREMENTS,
   formatBRL,
   PROP_COLORS as C,
-  DELTA7_KPIS,
-  INFRA_HIGHLIGHTS,
-  BENEFIT_CARDS,
-  IDEAL_FOR,
-  INSTITUTIONAL_QUOTE,
   DEFAULT_SECTIONS,
   type ProposalSections,
   normalizeProposalContent,
