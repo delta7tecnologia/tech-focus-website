@@ -1,0 +1,66 @@
+import { useEffect, useMemo, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Building2, ChevronDown, Eye, FileDown, RotateCcw, Save, Server } from 'lucide-react';
+import { sha256Hex } from '@/utils/reportHash';
+import ServerItemsEditor from './ServerItemsEditor';
+import ServerClausesEditor from './ServerClausesEditor';
+import ServerContentEditor from './ServerContentEditor';
+import { calculateServerTotals, DEFAULT_CALCULATION_PARAMS, formatBRL, getDefaultServerClauses, getDefaultServerContent, normalizeServerContent, suggestedMonthly, type CalculationParams, type ServerClause, type ServerModality, type ServerPlan, type ServerProposalItem } from '@/lib/serverRental';
+import { downloadServerProposalPdf, previewServerProposalPdf } from '@/utils/serverProposalPdf';
+import { formatDocument, validateDocument } from '@/lib/validators/document';
+
+export default function ServerProposalForm({ proposal, onClose }:{proposal?:any;onClose:()=>void}) {
+  const { user }=useAuth(), { toast }=useToast(), qc=useQueryClient();
+  const [form,setForm]=useState({clientName:proposal?.client_name||'',clientDocument:proposal?.client_document||'',clientContact:proposal?.client_contact||'',clientEmail:proposal?.client_email||'',clientPhone:proposal?.client_phone||'',clientAddress:proposal?.client_address||'',salesRepName:proposal?.sales_rep_name||'',salesRepEmail:proposal?.sales_rep_email||'',validityDays:proposal?.validity_days??15,notes:proposal?.notes||''});
+  const [modality,setModality]=useState<ServerModality>(proposal?.modalidade||'on_premise');
+  const [items,setItems]=useState<ServerProposalItem[]>(proposal?.items||[]);
+  const [params,setParams]=useState<CalculationParams>(proposal?.calculation_params||DEFAULT_CALCULATION_PARAMS);
+  const [plansOverride,setPlansOverride]=useState<ServerPlan[]|null>(proposal?.plans?.length?proposal.plans:null);
+  const [clauses,setClauses]=useState<ServerClause[]>(proposal?.clauses?.length?proposal.clauses:getDefaultServerClauses(modality));
+  const [content,setContent]=useState(normalizeServerContent(proposal?.custom_content));
+  const [preview,setPreview]=useState<string|null>(null);
+  const models=useQuery({queryKey:['server-models'],queryFn:async()=>{const{data,error}=await(supabase as any).from('server_models').select('*').order('nome');if(error)throw error;return data||[]}});
+  const upgrades=useQuery({queryKey:['server-upgrades'],queryFn:async()=>{const{data,error}=await(supabase as any).from('server_upgrades').select('*').order('nome');if(error)throw error;return data||[]}});
+  const totals=useMemo(()=>calculateServerTotals(items),[items]);
+  const catalogPlans=useMemo(()=>[12,24,36].map(p=>({prazo:p,mensal:Math.ceil(totals.monthly*(p===12?1.18:p===24?1.08:1)),manual:false})),[totals.monthly]);
+  const suggested=useMemo(()=>[12,24,36].map(p=>({prazo:p,mensal:suggestedMonthly(totals.cost,totals.monthlyServices,p,params),manual:false})),[totals,params]);
+  const plans=plansOverride||catalogPlans;
+  useEffect(()=>{if(proposal||!user)return;(async()=>{const{data}=await supabase.from('profiles').select('full_name,email').eq('user_id',user.id).maybeSingle();if(data)setForm(f=>({...f,salesRepName:data.full_name||'',salesRepEmail:data.email||''}))})()},[proposal,user]);
+  const changeModality=(next:ServerModality)=>{setModality(next);setItems(old=>old.map(i=>({...i,upgrades:i.upgrades.filter(u=>u.aplica_modalidade==='ambas'||u.aplica_modalidade===next)})));setClauses(getDefaultServerClauses(next,params.residualPercentual))};
+  const residual=Math.ceil((totals.cost*params.residualPercentual/100)/50)*50;
+  useEffect(()=>setClauses(old=>old.map(c=>c.key==='compra'?{...c,params:{...c.params,residual_percentual:params.residualPercentual,valor_residual:formatBRL(residual)}}:c)),[params.residualPercentual,residual]);
+  const payload=()=>({client_name:form.clientName.trim(),client_document:form.clientDocument?formatDocument(form.clientDocument):null,client_contact:form.clientContact||null,client_email:form.clientEmail||null,client_phone:form.clientPhone||null,client_address:form.clientAddress||null,sales_rep_name:form.salesRepName.trim(),sales_rep_email:form.salesRepEmail||null,modalidade:modality,items,calculation_params:params,plans,clauses,custom_content:content,contract_months:36,monthly_total:plans.find(p=>p.prazo===36)?.mensal||0,setup_total:totals.setup,validity_days:form.validityDays,notes:form.notes||null});
+  const validate=()=>!form.clientName.trim()?'Informe o cliente.':form.clientDocument&&!validateDocument(form.clientDocument).valid?'Documento inválido.':!form.salesRepName.trim()?'Informe o executivo.':!items.length?'Adicione um servidor.':null;
+  const pdfData=(data:any)=>({proposalNumber:data.proposal_number||'PRÉVIA',generatedAt:data.generated_at||new Date().toISOString(),validityDays:data.validity_days,clientName:data.client_name,clientDocument:data.client_document,clientContact:data.client_contact,clientEmail:data.client_email,clientPhone:data.client_phone,clientAddress:data.client_address,salesRepName:data.sales_rep_name,salesRepEmail:data.sales_rep_email,modalidade:data.modalidade,items:data.items,plans:data.plans,clauses:data.clauses,customContent:normalizeServerContent(data.custom_content),notes:data.notes,integrityHash:data.integrity_hash||'prévia sem hash'});
+  const save=useMutation({mutationFn:async(finalize:boolean)=>{const err=validate();if(err)throw new Error(err);const body:any=payload(),now=new Date().toISOString();if(finalize){body.is_draft=false;body.status='enviada';body.generated_at=now;body.integrity_hash=await sha256Hex(JSON.stringify(body)+'|'+(proposal?.proposal_number||user?.id)+'|'+now)}const q=proposal?(supabase as any).from('server_proposals').update(body).eq('id',proposal.id):(supabase as any).from('server_proposals').insert({...body,created_by:user?.id,is_draft:!finalize,status:finalize?'enviada':'rascunho'});const{data,error}=await q.select().single();if(error)throw error;return{data,finalize}},onSuccess:async({data,finalize})=>{qc.invalidateQueries({queryKey:['server-proposals']});toast({title:finalize?'Proposta finalizada':'Rascunho salvo'});if(finalize)await downloadServerProposalPdf(pdfData(data));onClose()},onError:(e:any)=>toast({title:'Erro ao salvar',description:e.message,variant:'destructive'})});
+  const handlePreview = async () => {
+    const error = validate();
+    if (error) {
+      toast({ title: error, variant: 'destructive' });
+      return;
+    }
+    const data = pdfData({ ...payload(), proposal_number: 'PRÉVIA' });
+    setPreview(await previewServerProposalPdf(data));
+  };
+  const field=(key:keyof typeof form,label:string,type='text')=><div><Label>{label}</Label><Input type={type} value={form[key]} onChange={e=>setForm({...form,[key]:type==='number'?Number(e.target.value):e.target.value})}/></div>;
+  return <div className="space-y-5 pb-4"><Card><CardContent className="p-5 space-y-3"><h3 className="font-bold text-primary">Dados do cliente</h3><div className="grid gap-3 sm:grid-cols-2">{field('clientName','Razão social / Nome *')}{field('clientDocument','CNPJ / CPF')}{field('clientContact','Contato')}{field('clientEmail','E-mail','email')}{field('clientPhone','Telefone')}{field('clientAddress','Endereço')}</div></CardContent></Card>
+  <Card><CardContent className="p-5 space-y-3"><h3 className="font-bold text-primary">Modalidade</h3><div className="grid gap-3 sm:grid-cols-2"><Button type="button" variant={modality==='on_premise'?'default':'outline'} className="h-auto justify-start p-4" onClick={()=>changeModality('on_premise')}><Building2 className="mr-3 h-5 w-5"/><span className="text-left">Servidor no cliente<small className="block font-normal">Instalado no local do cliente</small></span></Button><Button type="button" variant={modality==='dedicado'?'default':'outline'} className="h-auto justify-start p-4" onClick={()=>changeModality('dedicado')}><Server className="mr-3 h-5 w-5"/><span className="text-left">Servidor dedicado Delta7<small className="block font-normal">Hospedado na infraestrutura Delta7</small></span></Button></div></CardContent></Card>
+  <Card><CardContent className="p-5"><ServerItemsEditor items={items} models={models.data||[]} upgrades={upgrades.data||[]} modality={modality} onChange={setItems}/></CardContent></Card>
+  <Card><CardContent className="p-5"><Collapsible><CollapsibleTrigger asChild><Button type="button" variant="ghost" className="w-full justify-between"><span>Cálculo sugerido — uso interno</span><ChevronDown className="h-4 w-4"/></Button></CollapsibleTrigger><CollapsibleContent className="pt-4 space-y-4"><div className="grid gap-3 sm:grid-cols-4">{Object.entries(params).map(([k,v])=><div key={k}><Label className="text-xs">{k.replace(/([A-Z])/g,' $1')}</Label><Input type="number" step="0.1" value={v} onChange={e=>setParams({...params,[k]:Number(e.target.value)})}/></div>)}</div><div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr className="border-b"><th>Prazo</th><th>Catálogo</th><th>Sugerido</th><th>Diferença</th></tr></thead><tbody>{catalogPlans.map((p,i)=>{const diff=p.mensal?((p.mensal-suggested[i].mensal)/suggested[i].mensal)*100:0;return <tr key={p.prazo} className="text-center border-b"><td>{p.prazo} meses</td><td>{formatBRL(p.mensal)}</td><td>{formatBRL(suggested[i].mensal)}</td><td className={diff>=0?'text-green-700':diff>=-10?'text-amber-700':'text-red-700'}>{diff.toFixed(1)}%</td></tr>})}</tbody></table></div><Button type="button" size="sm" variant="outline" onClick={()=>setPlansOverride(suggested)}>Usar valores sugeridos</Button></CollapsibleContent></Collapsible></CardContent></Card>
+  <Card><CardContent className="p-5 space-y-3"><div className="flex justify-between"><h3 className="font-bold text-primary">Planos</h3><Button type="button" size="sm" variant="outline" onClick={()=>setPlansOverride(null)}><RotateCcw className="mr-2 h-4 w-4"/>Automático</Button></div><div className="grid gap-3 sm:grid-cols-3">{plans.map((p,i)=><div key={p.prazo}><Label>{p.prazo} meses</Label><Input type="number" value={p.mensal} onChange={e=>setPlansOverride(plans.map((x,j)=>j===i?{...x,mensal:Number(e.target.value),manual:true}:x))}/><small>Total {formatBRL(p.mensal*p.prazo)}</small></div>)}</div></CardContent></Card>
+  <Card><CardContent className="p-5 space-y-3"><h3 className="font-bold text-primary">Condições contratuais</h3><ServerClausesEditor clauses={clauses} modality={modality} onChange={setClauses}/></CardContent></Card>
+  <ServerContentEditor value={content} onChange={setContent} onReset={()=>setContent(getDefaultServerContent())}/>
+  <Card><CardContent className="p-5 space-y-3"><h3 className="font-bold text-primary">Responsável e observações</h3><div className="grid gap-3 sm:grid-cols-3">{field('salesRepName','Executivo *')}{field('salesRepEmail','E-mail','email')}{field('validityDays','Validade em dias','number')}</div><Label>Observações</Label><Textarea value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})}/></CardContent></Card>
+  <div className="sticky bottom-0 flex flex-wrap justify-end gap-2 border-t bg-background py-3"><Button variant="outline" onClick={onClose}>Cancelar</Button><Button variant="outline" onClick={handlePreview}><Eye className="mr-2 h-4 w-4"/>Prévia</Button><Button variant="outline" onClick={()=>save.mutate(false)}><Save className="mr-2 h-4 w-4"/>Salvar rascunho</Button><Button onClick={()=>save.mutate(true)}><FileDown className="mr-2 h-4 w-4"/>Finalizar e gerar PDF</Button></div>
+  <Dialog open={!!preview} onOpenChange={o=>!o&&setPreview(null)}><DialogContent className="h-[90vh] max-w-5xl"><DialogHeader><DialogTitle>Prévia da proposta</DialogTitle></DialogHeader>{preview&&<object data={preview} type="application/pdf" className="h-full w-full"><a href={preview} download="previa.pdf">Baixar prévia</a></object>}</DialogContent></Dialog></div>;
+}
