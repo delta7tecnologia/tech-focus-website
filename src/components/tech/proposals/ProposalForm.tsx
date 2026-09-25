@@ -14,6 +14,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import ProposalItemsEditor, { type EditableItem } from './ProposalItemsEditor';
 import ProposalSignatureLinksManager from './ProposalSignatureLinksManager';
 import ClientShowcasePicker, { fetchFeaturedClients, type FeaturedClient } from './ClientShowcasePicker';
+import ProposalContentEditor from './ProposalContentEditor';
 import {
   ACTIVATION_FEE_DEFAULT,
   VALIDITY_DAYS_DEFAULT,
@@ -22,6 +23,9 @@ import {
   MINIMAL_SECTIONS,
   SECTION_LABELS,
   type ProposalSections,
+  getDefaultProposalContent,
+  normalizeProposalContent,
+  type ProposalCustomContent,
 } from '@/lib/proposalContent';
 import { validateDocument, formatDocument } from '@/lib/validators/document';
 import { sha256Hex } from '@/utils/reportHash';
@@ -48,6 +52,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
   const [salesRepEmail, setSalesRepEmail] = useState(proposal?.sales_rep_email || '');
   const [validityDays, setValidityDays] = useState<number>(proposal?.validity_days ?? VALIDITY_DAYS_DEFAULT);
   const [notes, setNotes] = useState(proposal?.notes || '');
+  const [customContent, setCustomContent] = useState<ProposalCustomContent>(() => normalizeProposalContent(proposal?.custom_content));
   const [showAltatekLogo, setShowAltatekLogo] = useState<boolean>(proposal?.show_altatek_logo ?? false);
   const [items, setItems] = useState<EditableItem[]>(
     proposal?.items?.length ? proposal.items : [],
@@ -106,6 +111,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
         sections,
         showAltatekLogo,
         featuredClients,
+        customContent,
       };
       let pages: string[];
       if (template === 'modelo03') {
@@ -167,6 +173,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
       sections: sections as any,
       show_altatek_logo: showAltatekLogo,
       featured_clients: featuredClients as any,
+      custom_content: customContent as any,
     };
   };
 
@@ -236,6 +243,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
             sections: (data.sections as ProposalSections) || sections,
             showAltatekLogo: data.show_altatek_logo ?? showAltatekLogo,
             featuredClients: (Array.isArray(data.featured_clients) ? data.featured_clients : featuredClients) as any,
+            customContent: normalizeProposalContent(data.custom_content as any),
           };
           await downloadModelo03(pdfData);
         } catch (pdfErr: any) {
@@ -374,6 +382,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
               </div>
             </label>
           </div>
+          <ProposalContentEditor<ProposalCustomContent> value={customContent} onChange={setCustomContent} onReset={() => setCustomContent(getDefaultProposalContent())} mode="backup" />
         </CardContent>
       </Card>
 

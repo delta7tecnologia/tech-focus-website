@@ -14,6 +14,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import ItSupportItemsEditor, { type SupEditableItem } from './ItSupportItemsEditor';
 import ItSupportProposalSignatureLinksManager from './ItSupportProposalSignatureLinksManager';
 import ClientShowcasePicker, { fetchFeaturedClients, type FeaturedClient } from '@/components/tech/proposals/ClientShowcasePicker';
+import ProposalContentEditor from '@/components/tech/proposals/ProposalContentEditor';
 import {
   SUP_SETUP_FEE_DEFAULT,
   SUP_VALIDITY_DAYS_DEFAULT,
@@ -23,6 +24,9 @@ import {
   SUP_MINIMAL_SECTIONS,
   SUP_SECTION_LABELS,
   type SupProposalSections,
+  getDefaultItSupportContent,
+  normalizeItSupportContent,
+  type ItSupportCustomContent,
 } from '@/lib/itSupportContent';
 import { validateDocument, formatDocument } from '@/lib/validators/document';
 import { sha256Hex } from '@/utils/reportHash';
@@ -49,6 +53,7 @@ const ItSupportProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
   const [validityDays, setValidityDays] = useState<number>(proposal?.validity_days ?? SUP_VALIDITY_DAYS_DEFAULT);
   const [contractMonths, setContractMonths] = useState<number>(proposal?.contract_months ?? SUP_CONTRACT_MONTHS_DEFAULT);
   const [notes, setNotes] = useState(proposal?.notes || '');
+  const [customContent, setCustomContent] = useState<ItSupportCustomContent>(() => normalizeItSupportContent(proposal?.custom_content));
   const [showAltatekLogo, setShowAltatekLogo] = useState<boolean>(proposal?.show_altatek_logo ?? false);
   const [items, setItems] = useState<SupEditableItem[]>(proposal?.items?.length ? proposal.items : []);
   const [setupFee, setSetupFee] = useState<number>(proposal?.setup_fee ?? SUP_SETUP_FEE_DEFAULT);
@@ -116,6 +121,7 @@ const ItSupportProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
       sections: sections as any,
       show_altatek_logo: showAltatekLogo,
       featured_clients: featuredClients as any,
+      custom_content: customContent as any,
     };
   };
 
@@ -139,6 +145,7 @@ const ItSupportProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
     sections: (p.sections as SupProposalSections) || sections,
     showAltatekLogo: p.show_altatek_logo ?? showAltatekLogo,
     featuredClients: (Array.isArray(p.featured_clients) ? p.featured_clients : featuredClients) as any,
+    customContent: normalizeItSupportContent(p.custom_content as any),
     template,
   });
 
@@ -341,6 +348,7 @@ const ItSupportProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
               </div>
             </label>
           </div>
+          <ProposalContentEditor<ItSupportCustomContent> value={customContent} onChange={setCustomContent} onReset={() => setCustomContent(getDefaultItSupportContent())} mode="support" />
         </CardContent>
       </Card>
 

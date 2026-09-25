@@ -159,5 +159,35 @@ export const SECTION_LABELS: { key: keyof ProposalSections; label: string; hint:
   { key: 'showSupportReqs', label: 'Requisitos de suporte', hint: '~½ página' },
 ];
 
+export interface ProposalCustomContent {
+  about: string;
+  kpis: typeof DELTA7_KPIS;
+  benefits: typeof BENEFIT_CARDS;
+  infrastructure: typeof INFRA_HIGHLIGHTS;
+  idealFor: typeof IDEAL_FOR;
+  notIncluded: string;
+  supportText: string;
+  requirements: string[];
+  quote: typeof INSTITUTIONAL_QUOTE;
+}
+
+export const getDefaultProposalContent = (): ProposalCustomContent => ({
+  about: ABOUT_DELTA7,
+  kpis: DELTA7_KPIS.map((item) => ({ ...item })),
+  benefits: BENEFIT_CARDS.map((item) => ({ ...item })),
+  infrastructure: INFRA_HIGHLIGHTS.map((item) => ({ ...item })),
+  idealFor: IDEAL_FOR.map((item) => ({ ...item })),
+  notIncluded: NOT_INCLUDED,
+  supportText: SUPPORT_TEXT,
+  requirements: [...SUPPORT_REQUIREMENTS],
+  quote: { ...INSTITUTIONAL_QUOTE },
+});
+
+export const normalizeProposalContent = (value?: Partial<ProposalCustomContent> | null): ProposalCustomContent => ({
+  ...getDefaultProposalContent(),
+  ...(value || {}),
+  quote: { ...INSTITUTIONAL_QUOTE, ...(value?.quote || {}) },
+});
+
 export const formatBRL = (n: number) =>
   n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });

@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import logoDark from '@/assets/logo.png';
 import { downloadCommercialProposalPdf } from '@/utils/commercialProposalPdf';
-import { formatBRL } from '@/lib/proposalContent';
+import { formatBRL, normalizeProposalContent } from '@/lib/proposalContent';
 import { useSEO } from '@/hooks/useSEO';
 
 const fmt = (iso?: string | null) => (iso ? new Date(iso).toLocaleString('pt-BR') : '—');
@@ -59,6 +59,9 @@ const ValidateProposal = () => {
         notes: p.notes || undefined,
         integrityHash: p.integrity_hash || '',
         sections: (p as any).sections || undefined,
+        showAltatekLogo: (p as any).show_altatek_logo ?? false,
+        featuredClients: Array.isArray((p as any).featured_clients) ? (p as any).featured_clients : [],
+        customContent: normalizeProposalContent((p as any).custom_content),
       });
     } catch (e: any) {
       toast({ title: 'Erro ao gerar PDF', description: e.message, variant: 'destructive' });

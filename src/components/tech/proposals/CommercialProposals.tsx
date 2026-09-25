@@ -11,6 +11,7 @@ import { FilePlus, Edit, Trash2, FileDown, Loader2, Lock, FileText } from 'lucid
 import ProposalForm from './ProposalForm';
 import { downloadModelo03 } from '@/utils/commercialProposalPdfModelo03';
 import { formatBRL } from '@/lib/proposalContent';
+import { normalizeProposalContent } from '@/lib/proposalContent';
 import type { EditableItem } from './ProposalItemsEditor';
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
@@ -71,6 +72,7 @@ const CommercialProposals: React.FC = () => {
     sections: p.sections || undefined,
     showAltatekLogo: p.show_altatek_logo ?? false,
     featuredClients: Array.isArray(p.featured_clients) ? p.featured_clients : [],
+    customContent: normalizeProposalContent(p.custom_content),
   });
 
   const handleDownload = async (p: any, print = false) => {
