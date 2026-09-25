@@ -734,6 +734,204 @@ export type Database = {
         }
         Relationships: []
       }
+      server_models: {
+        Row: {
+          ativo: boolean
+          baias: number
+          cpu: string
+          created_at: string
+          custo_aquisicao: number
+          fabricante: string
+          fonte_redundante: boolean
+          formato: string
+          id: string
+          mensalidade_base: number
+          nome: string
+          observacoes: string | null
+          ram_base_gb: number
+          storage_base: string
+          updated_at: string
+          vida_util_meses: number
+        }
+        Insert: {
+          ativo?: boolean
+          baias?: number
+          cpu: string
+          created_at?: string
+          custo_aquisicao?: number
+          fabricante: string
+          fonte_redundante?: boolean
+          formato: string
+          id?: string
+          mensalidade_base?: number
+          nome: string
+          observacoes?: string | null
+          ram_base_gb?: number
+          storage_base: string
+          updated_at?: string
+          vida_util_meses?: number
+        }
+        Update: {
+          ativo?: boolean
+          baias?: number
+          cpu?: string
+          created_at?: string
+          custo_aquisicao?: number
+          fabricante?: string
+          fonte_redundante?: boolean
+          formato?: string
+          id?: string
+          mensalidade_base?: number
+          nome?: string
+          observacoes?: string | null
+          ram_base_gb?: number
+          storage_base?: string
+          updated_at?: string
+          vida_util_meses?: number
+        }
+        Relationships: []
+      }
+      server_proposals: {
+        Row: {
+          audit_log: Json
+          calculation_params: Json
+          clauses: Json
+          client_address: string | null
+          client_contact: string | null
+          client_document: string | null
+          client_email: string | null
+          client_name: string
+          client_phone: string | null
+          contract_months: number
+          created_at: string
+          created_by: string
+          custom_content: Json
+          generated_at: string | null
+          id: string
+          integrity_hash: string | null
+          is_draft: boolean
+          items: Json
+          locked: boolean
+          modalidade: string
+          monthly_total: number
+          notes: string | null
+          plans: Json
+          proposal_number: string | null
+          proposal_seq: number | null
+          sales_rep_email: string | null
+          sales_rep_name: string
+          setup_total: number
+          status: string
+          updated_at: string
+          validity_days: number
+        }
+        Insert: {
+          audit_log?: Json
+          calculation_params?: Json
+          clauses?: Json
+          client_address?: string | null
+          client_contact?: string | null
+          client_document?: string | null
+          client_email?: string | null
+          client_name: string
+          client_phone?: string | null
+          contract_months?: number
+          created_at?: string
+          created_by: string
+          custom_content?: Json
+          generated_at?: string | null
+          id?: string
+          integrity_hash?: string | null
+          is_draft?: boolean
+          items?: Json
+          locked?: boolean
+          modalidade?: string
+          monthly_total?: number
+          notes?: string | null
+          plans?: Json
+          proposal_number?: string | null
+          proposal_seq?: number | null
+          sales_rep_email?: string | null
+          sales_rep_name: string
+          setup_total?: number
+          status?: string
+          updated_at?: string
+          validity_days?: number
+        }
+        Update: {
+          audit_log?: Json
+          calculation_params?: Json
+          clauses?: Json
+          client_address?: string | null
+          client_contact?: string | null
+          client_document?: string | null
+          client_email?: string | null
+          client_name?: string
+          client_phone?: string | null
+          contract_months?: number
+          created_at?: string
+          created_by?: string
+          custom_content?: Json
+          generated_at?: string | null
+          id?: string
+          integrity_hash?: string | null
+          is_draft?: boolean
+          items?: Json
+          locked?: boolean
+          modalidade?: string
+          monthly_total?: number
+          notes?: string | null
+          plans?: Json
+          proposal_number?: string | null
+          proposal_seq?: number | null
+          sales_rep_email?: string | null
+          sales_rep_name?: string
+          setup_total?: number
+          status?: string
+          updated_at?: string
+          validity_days?: number
+        }
+        Relationships: []
+      }
+      server_upgrades: {
+        Row: {
+          aplica_modalidade: string
+          ativo: boolean
+          categoria: string
+          created_at: string
+          custo_aquisicao: number
+          id: string
+          mensalidade: number
+          nome: string
+          tipo_cobranca: string
+          updated_at: string
+        }
+        Insert: {
+          aplica_modalidade?: string
+          ativo?: boolean
+          categoria: string
+          created_at?: string
+          custo_aquisicao?: number
+          id?: string
+          mensalidade?: number
+          nome: string
+          tipo_cobranca?: string
+          updated_at?: string
+        }
+        Update: {
+          aplica_modalidade?: string
+          ativo?: boolean
+          categoria?: string
+          created_at?: string
+          custo_aquisicao?: number
+          id?: string
+          mensalidade?: number
+          nome?: string
+          tipo_cobranca?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       service_order_signature_links: {
         Row: {
           created_at: string
