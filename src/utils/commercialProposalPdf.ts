@@ -19,6 +19,8 @@ import {
   INSTITUTIONAL_QUOTE,
   DEFAULT_SECTIONS,
   type ProposalSections,
+  normalizeProposalContent,
+  type ProposalCustomContent,
 } from '@/lib/proposalContent';
 import {
   renderFeaturedClientsModelo01,
@@ -59,6 +61,7 @@ export interface CommercialProposalPdfData {
   showAltatekLogo?: boolean;
   featuredClients?: FeaturedClientPdf[];
   printMode?: boolean;
+  customContent?: ProposalCustomContent;
 }
 
 export type ProposalTemplate = 'modelo01' | 'modelo02';
@@ -161,6 +164,7 @@ const quoteBlock = (text: string, author: string) => `
 
 function buildHtml(r: CommercialProposalPdfData): string {
   const S = { ...DEFAULT_SECTIONS, ...(r.sections || {}) };
+  const content = normalizeProposalContent(r.customContent);
   const itemsSubtotal = r.items.reduce((s, i) => s + (Number(i.qty) || 0) * (Number(i.unit_price) || 0), 0);
   const discount = Number(r.discount) || 0;
   const activationFee = Number(r.activationFee) || 0;
@@ -168,23 +172,23 @@ function buildHtml(r: CommercialProposalPdfData): string {
   const firstMonthTotal = monthlyTotal + activationFee;
 
   // KPIs
-  const kpiW = `${Math.floor(100 / DELTA7_KPIS.length)}%`;
+  const kpiW = `${Math.floor(100 / content.kpis.length)}%`;
   const kpisHtml = `
     <table style="width:100%;border-collapse:separate;border-spacing:8px 0;margin-top:18px;">
-      <tr>${DELTA7_KPIS.map(k => `<td style="width:${kpiW};">${kpiCard(k.value, k.label)}</td>`).join('')}</tr>
+      <tr>${content.kpis.map(k => `<td style="width:${kpiW};">${kpiCard(k.value, k.label)}</td>`).join('')}</tr>
     </table>`;
 
   // Benefits 4x2
   const benefitsHtml = `
     <table style="width:100%;border-collapse:separate;border-spacing:0;">
-      <tr>${BENEFIT_CARDS.slice(0, 4).map(b => benefitCard(b.icon, b.title, b.text)).join('')}</tr>
-      <tr>${BENEFIT_CARDS.slice(4, 8).map(b => benefitCard(b.icon, b.title, b.text)).join('')}</tr>
+      <tr>${content.benefits.slice(0, 4).map(b => benefitCard(b.icon, b.title, b.text)).join('')}</tr>
+      <tr>${content.benefits.slice(4, 8).map(b => benefitCard(b.icon, b.title, b.text)).join('')}</tr>
     </table>`;
 
   // Infra
   const infraHtml = `
     <table style="width:100%;border-collapse:separate;border-spacing:0;">
-      <tr>${INFRA_HIGHLIGHTS.map(h => infraRow(h.icon, h.title, h.text)).join('')}</tr>
+      <tr>${content.infrastructure.map(h => infraRow(h.icon, h.title, h.text)).join('')}</tr>
     </table>`;
 
   // Tech stack removido a pedido
@@ -192,12 +196,12 @@ function buildHtml(r: CommercialProposalPdfData): string {
   // Ideal for — 2 colunas
   const idealHtml = `
     <table style="width:100%;border-collapse:separate;border-spacing:0;">
-      <tr>${IDEAL_FOR.slice(0, 2).map((i, idx) => numberedItem(String(idx + 1).padStart(2, '0'), i.title, i.text)).join('')}</tr>
-      <tr>${IDEAL_FOR.slice(2, 4).map((i, idx) => numberedItem(String(idx + 3).padStart(2, '0'), i.title, i.text)).join('')}</tr>
+      <tr>${content.idealFor.slice(0, 2).map((i, idx) => numberedItem(String(idx + 1).padStart(2, '0'), i.title, i.text)).join('')}</tr>
+      <tr>${content.idealFor.slice(2, 4).map((i, idx) => numberedItem(String(idx + 3).padStart(2, '0'), i.title, i.text)).join('')}</tr>
     </table>`;
 
   // Support requirements (bullets dourados)
-  const supportReqHtml = SUPPORT_REQUIREMENTS.map(text => `
+  const supportReqHtml = content.requirements.map(text => `
     <div style="display:flex;align-items:flex-start;margin-bottom:7px;line-height:1.55;">
       <span style="color:${C.gold};font-size:10px;margin-right:10px;flex-shrink:0;line-height:1.55;">◆</span>
       <span style="flex:1;color:${C.ink};">${escapeHtml(text)}</span>
@@ -282,7 +286,7 @@ function buildHtml(r: CommercialProposalPdfData): string {
     <div style="height:2px;background:${C.gold};width:48px;margin-bottom:8px;"></div>
 
     ${S.showAbout ? `<div data-keep="1">${sectionTitle('Quem somos', 'Sobre a Delta7 Tecnologia', 18)}
-    ${htmlParas(ABOUT_DELTA7, `color:${C.ink};`)}
+    ${htmlParas(content.about, `color:${C.ink};`)}
     ${kpisHtml}</div>` : ''}
 
     ${S.showBenefits ? `<div data-keep="1">${sectionTitle('Vantagens', 'Por que Backup Online')}
@@ -409,7 +413,7 @@ function buildHtml(r: CommercialProposalPdfData): string {
       </table>
 
       <div style="margin-top:14px;padding:13px 16px;background:${C.cream};border-left:3px solid ${C.gold};border-radius:3px;font-size:10px;color:${C.ink};line-height:1.6;">
-        <strong style="color:${C.navy};letter-spacing:0.5px;">Não inclusos:</strong> ${escapeHtml(NOT_INCLUDED)}
+        <strong style="color:${C.navy};letter-spacing:0.5px;">Não inclusos:</strong> ${escapeHtml(content.notIncluded)}
       </div>
 
       ${r.notes ? `<div style="margin-top:14px;padding:13px 16px;background:${C.paper};border-left:3px solid ${C.navy};border-radius:3px;font-size:11px;color:${C.ink};"><strong style="color:${C.navy};display:block;margin-bottom:6px;letter-spacing:0.3px;">Observações</strong>${htmlParas(r.notes, `color:${C.ink};font-size:11px;`)}</div>` : ''}
@@ -417,14 +421,14 @@ function buildHtml(r: CommercialProposalPdfData): string {
 
     <div id="prop-suporte-block" style="break-inside:avoid;page-break-inside:avoid;">
       ${sectionTitle('Atendimento', 'Suporte Técnico')}
-      ${htmlParas(SUPPORT_TEXT, `color:${C.ink};`)}
+      ${htmlParas(content.supportText, `color:${C.ink};`)}
       ${S.showSupportReqs ? `<p style="margin:14px 0 10px 0;font-weight:800;color:${C.navy};font-size:11px;letter-spacing:0.3px;">Requisitos para a prestação dos serviços</p>
       <div style="font-size:10.5px;">
         ${supportReqHtml}
       </div>` : ''}
     </div>
 
-    ${S.showQuote ? quoteBlock(INSTITUTIONAL_QUOTE.text, INSTITUTIONAL_QUOTE.author) : ''}
+    ${S.showQuote ? quoteBlock(content.quote.text, content.quote.author) : ''}
 
     <!-- Aceite + Rodapé unidos para nunca quebrarem -->
     <div id="prop-aceite-block" style="break-inside:avoid;page-break-inside:avoid;margin-top:26px;">
@@ -481,6 +485,7 @@ function buildHtml(r: CommercialProposalPdfData): string {
 // ============================================================
 function buildHtmlMinimal(r: CommercialProposalPdfData): string {
   const S = { ...DEFAULT_SECTIONS, ...(r.sections || {}) };
+  const content = normalizeProposalContent(r.customContent);
   const itemsSubtotal = r.items.reduce((s, i) => s + (Number(i.qty) || 0) * (Number(i.unit_price) || 0), 0);
   const discount = Number(r.discount) || 0;
   const activationFee = Number(r.activationFee) || 0;
@@ -570,10 +575,10 @@ function buildHtmlMinimal(r: CommercialProposalPdfData): string {
     </table>
 
     ${S.showAbout ? section('01', 'A Delta7 Tecnologia', `
-      ${htmlParas(ABOUT_DELTA7, `color:${INK};font-size:11.5px;`)}
+      ${htmlParas(content.about, `color:${INK};font-size:11.5px;`)}
       <table style="width:100%;margin-top:28px;border-collapse:collapse;">
         <tr>
-          ${DELTA7_KPIS.map(k => `
+          ${content.kpis.map(k => `
             <td style="text-align:left;padding-right:24px;border-left:2px solid ${NAVY};padding-left:14px;">
               <div style="font-size:30px;font-weight:300;color:${NAVY};line-height:1;letter-spacing:-1px;">${escapeHtml(k.value)}</div>
               <div style="font-size:9px;color:${MUTED};letter-spacing:1.5px;text-transform:uppercase;margin-top:6px;">${escapeHtml(k.label)}</div>
@@ -584,7 +589,7 @@ function buildHtmlMinimal(r: CommercialProposalPdfData): string {
 
     ${S.showBenefits ? section('02', 'Por que Backup Online', `
       <table style="width:100%;border-collapse:collapse;">
-        ${BENEFIT_CARDS.map((b, idx) => `
+        ${content.benefits.map((b, idx) => `
           <tr>
             <td style="padding:12px 0;border-bottom:1px solid ${LINE};vertical-align:top;width:36px;color:${MUTED};font-size:10px;font-weight:600;letter-spacing:1px;">${String(idx + 1).padStart(2, '0')}</td>
             <td style="padding:12px 0;border-bottom:1px solid ${LINE};vertical-align:top;width:200px;color:${NAVY};font-weight:600;font-size:11.5px;">${escapeHtml(b.title)}</td>
@@ -596,7 +601,7 @@ function buildHtmlMinimal(r: CommercialProposalPdfData): string {
     ${S.showInfra ? section('03', 'Infraestrutura', `
       <table style="width:100%;border-collapse:collapse;">
         <tr>
-          ${INFRA_HIGHLIGHTS.map(h => `
+          ${content.infrastructure.map(h => `
             <td style="width:150px;padding:0 12px 0 0;vertical-align:top;">
               <div style="border-top:2px solid ${NAVY};padding-top:14px;">
                 <div style="font-size:11.5px;font-weight:600;color:${NAVY};">${escapeHtml(h.title)}</div>
@@ -609,7 +614,7 @@ function buildHtmlMinimal(r: CommercialProposalPdfData): string {
 
     ${S.showIdealFor ? section('04', 'Para quem é', `
       <table style="width:100%;border-collapse:collapse;">
-        ${IDEAL_FOR.map((i, idx) => `
+        ${content.idealFor.map((i, idx) => `
           <tr>
             <td style="padding:14px 0;border-bottom:1px solid ${LINE};vertical-align:top;width:50px;font-size:11px;color:${MUTED};font-weight:600;letter-spacing:1px;">${String(idx + 1).padStart(2, '0')}</td>
             <td style="padding:14px 0;border-bottom:1px solid ${LINE};vertical-align:top;">
@@ -686,7 +691,7 @@ function buildHtmlMinimal(r: CommercialProposalPdfData): string {
         </table>
 
         <div style="margin-top:18px;padding:14px 0;border-top:1px solid ${LINE};font-size:10px;color:${MUTED};line-height:1.6;">
-          <strong style="color:${NAVY};font-weight:600;">Não inclusos:</strong> ${escapeHtml(NOT_INCLUDED)}
+          <strong style="color:${NAVY};font-weight:600;">Não inclusos:</strong> ${escapeHtml(content.notIncluded)}
         </div>
 
         ${r.notes ? `<div style="margin-top:14px;padding:14px 0;border-top:1px solid ${LINE};font-size:11px;color:${INK};"><strong style="color:${NAVY};font-weight:600;display:block;margin-bottom:6px;">Observações</strong>${htmlParas(r.notes, `color:${INK};font-size:11px;`)}</div>` : ''}
@@ -695,9 +700,9 @@ function buildHtmlMinimal(r: CommercialProposalPdfData): string {
 
     <div id="prop-suporte-block" style="break-inside:avoid;page-break-inside:avoid;">
       ${section(N(7), 'Suporte Técnico', `
-        ${htmlParas(SUPPORT_TEXT, `color:${INK};font-size:11px;`)}
+        ${htmlParas(content.supportText, `color:${INK};font-size:11px;`)}
         ${S.showSupportReqs ? `<table style="width:100%;border-collapse:collapse;margin-top:18px;">
-          ${SUPPORT_REQUIREMENTS.map(t => `
+          ${content.requirements.map(t => `
             <tr>
               <td style="padding:8px 0;border-bottom:1px solid ${LINE};vertical-align:top;width:18px;color:${NAVY};font-size:11px;">·</td>
               <td style="padding:8px 0;border-bottom:1px solid ${LINE};color:${INK};font-size:10.5px;line-height:1.55;">${escapeHtml(t)}</td>
@@ -707,8 +712,8 @@ function buildHtmlMinimal(r: CommercialProposalPdfData): string {
     </div>
 
     ${S.showQuote ? `<div style="margin-top:36px;padding:0;">
-      <div style="font-family:Georgia,serif;font-style:italic;font-size:18px;line-height:1.5;color:${NAVY};font-weight:300;letter-spacing:-0.3px;">"${escapeHtml(INSTITUTIONAL_QUOTE.text)}"</div>
-      <div style="margin-top:14px;font-size:9.5px;color:${MUTED};letter-spacing:2px;text-transform:uppercase;">— ${escapeHtml(INSTITUTIONAL_QUOTE.author)}</div>
+      <div style="font-family:Georgia,serif;font-style:italic;font-size:18px;line-height:1.5;color:${NAVY};font-weight:300;letter-spacing:-0.3px;">"${escapeHtml(content.quote.text)}"</div>
+      <div style="margin-top:14px;font-size:9.5px;color:${MUTED};letter-spacing:2px;text-transform:uppercase;">— ${escapeHtml(content.quote.author)}</div>
     </div>` : ''}
 
     <div id="prop-aceite-block" style="break-inside:avoid;page-break-inside:avoid;margin-top:40px;">

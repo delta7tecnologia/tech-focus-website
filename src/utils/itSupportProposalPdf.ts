@@ -20,6 +20,8 @@ import {
   SUP_QUOTE,
   SUP_DEFAULT_SECTIONS,
   type SupProposalSections,
+  normalizeItSupportContent,
+  type ItSupportCustomContent,
 } from '@/lib/itSupportContent';
 import {
   renderFeaturedClientsModelo01,
@@ -61,6 +63,7 @@ export interface ItSupportProposalPdfData {
   template?: 'modelo01' | 'modelo02';
   showAltatekLogo?: boolean;
   featuredClients?: FeaturedClientPdf[];
+  customContent?: ItSupportCustomContent;
 }
 
 export type ProposalTemplate = 'modelo01' | 'modelo02';
@@ -143,7 +146,7 @@ const quoteBlock = (text: string, author: string) => `
     <div style="margin-top:10px;font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${C.gold};">— ${escapeHtml(author)}</div>
   </div>`;
 
-const slaTable = () => `
+const slaTable = (sla: ItSupportCustomContent['sla']) => `
   <table style="width:100%;border-collapse:separate;border-spacing:0;font-size:11px;border:1px solid #e2e8f0;border-radius:6px;overflow:hidden;">
     <thead>
       <tr style="background:${C.navy};color:white;">
@@ -153,7 +156,7 @@ const slaTable = () => `
       </tr>
     </thead>
     <tbody>
-      ${SUP_SLA.map((s, idx) => `
+      ${content.sla.map((s, idx) => `
         <tr style="background:${idx % 2 === 0 ? '#ffffff' : C.paper};">
           <td style="padding:10px 14px;border-bottom:1px solid #e2e8f0;font-weight:800;color:${s.color};">● ${escapeHtml(s.priority)}</td>
           <td style="padding:10px 14px;border-bottom:1px solid #e2e8f0;color:${C.ink};">${escapeHtml(s.description)}</td>
@@ -164,6 +167,7 @@ const slaTable = () => `
 
 function buildHtml(r: ItSupportProposalPdfData): string {
   const S = { ...SUP_DEFAULT_SECTIONS, ...(r.sections || {}) };
+  const content = normalizeItSupportContent(r.customContent);
   const itemsSubtotal = r.items.reduce((s, i) => s + (Number(i.qty) || 0) * (Number(i.unit_price) || 0), 0);
   const discount = Number(r.discount) || 0;
   const setupFee = Number(r.setupFee) || 0;
@@ -171,30 +175,30 @@ function buildHtml(r: ItSupportProposalPdfData): string {
   const firstMonthTotal = monthlyTotal + setupFee;
   const contractTotal = monthlyTotal * (Number(r.contractMonths) || 12);
 
-  const kpiW = `${Math.floor(100 / SUP_KPIS.length)}%`;
+  const kpiW = `${Math.floor(100 / content.kpis.length)}%`;
   const kpisHtml = `
     <table style="width:100%;border-collapse:separate;border-spacing:8px 0;margin-top:18px;">
-      <tr>${SUP_KPIS.map(k => `<td style="width:${kpiW};">${kpiCard(k.value, k.label)}</td>`).join('')}</tr>
+      <tr>${content.kpis.map(k => `<td style="width:${kpiW};">${kpiCard(k.value, k.label)}</td>`).join('')}</tr>
     </table>`;
 
   const benefitsHtml = `
     <table style="width:100%;border-collapse:separate;border-spacing:0;">
-      <tr>${SUP_BENEFITS.slice(0, 4).map(b => benefitCard(b.icon, b.title, b.text)).join('')}</tr>
-      <tr>${SUP_BENEFITS.slice(4, 8).map(b => benefitCard(b.icon, b.title, b.text)).join('')}</tr>
+      <tr>${content.benefits.slice(0, 4).map(b => benefitCard(b.icon, b.title, b.text)).join('')}</tr>
+      <tr>${content.benefits.slice(4, 8).map(b => benefitCard(b.icon, b.title, b.text)).join('')}</tr>
     </table>`;
 
   const infraHtml = `
     <table style="width:100%;border-collapse:separate;border-spacing:0;">
-      <tr>${SUP_INFRA.map(h => infraRow(h.icon, h.title, h.text)).join('')}</tr>
+      <tr>${content.infrastructure.map(h => infraRow(h.icon, h.title, h.text)).join('')}</tr>
     </table>`;
 
   const idealHtml = `
     <table style="width:100%;border-collapse:separate;border-spacing:0;">
-      <tr>${SUP_IDEAL_FOR.slice(0, 2).map((i, idx) => numberedItem(String(idx + 1).padStart(2, '0'), i.title, i.text)).join('')}</tr>
-      <tr>${SUP_IDEAL_FOR.slice(2, 4).map((i, idx) => numberedItem(String(idx + 3).padStart(2, '0'), i.title, i.text)).join('')}</tr>
+      <tr>${content.idealFor.slice(0, 2).map((i, idx) => numberedItem(String(idx + 1).padStart(2, '0'), i.title, i.text)).join('')}</tr>
+      <tr>${content.idealFor.slice(2, 4).map((i, idx) => numberedItem(String(idx + 3).padStart(2, '0'), i.title, i.text)).join('')}</tr>
     </table>`;
 
-  const supportReqHtml = SUP_CONTRACT_REQUIREMENTS.map(text => `
+  const supportReqHtml = content.requirements.map(text => `
     <div style="display:flex;align-items:flex-start;margin-bottom:7px;line-height:1.55;">
       <span style="color:${C.gold};font-size:10px;margin-right:10px;flex-shrink:0;line-height:1.55;">◆</span>
       <span style="flex:1;color:${C.ink};">${escapeHtml(text)}</span>
@@ -270,7 +274,7 @@ function buildHtml(r: ItSupportProposalPdfData): string {
     <div style="height:2px;background:${C.gold};width:60px;margin-bottom:6px;"></div>
 
     ${S.showAbout ? `<div data-keep="1">${sectionTitle('Quem somos', 'Sobre a Delta7 Tecnologia', 18)}
-    <p style="margin:0;line-height:1.75;text-align:justify;color:${C.ink};white-space:pre-line;">${escapeHtml(ABOUT_DELTA7_SUP)}</p>
+    <p style="margin:0;line-height:1.75;text-align:justify;color:${C.ink};white-space:pre-line;">${escapeHtml(content.about)}</p>
     ${kpisHtml}</div>` : ''}
 
     ${S.showBenefits ? `<div data-keep="1">${sectionTitle('Vantagens', 'Por que terceirizar TI com a Delta7')}
@@ -280,7 +284,7 @@ function buildHtml(r: ItSupportProposalPdfData): string {
     ${infraHtml}</div>` : ''}
 
     ${S.showSla ? `<div data-keep="1">${sectionTitle('SLA', 'Tempo de resposta por prioridade')}
-    ${slaTable()}</div>` : ''}
+    ${slaTable(content.sla)}</div>` : ''}
 
     ${S.showIdealFor ? `<div data-keep="1">${sectionTitle('Perfil ideal', 'Esta solução é ideal se...')}
     ${idealHtml}</div>` : ''}
@@ -396,7 +400,7 @@ function buildHtml(r: ItSupportProposalPdfData): string {
       </table>
 
       <div style="margin-top:14px;padding:13px 16px;background:${C.cream};border-left:3px solid ${C.gold};border-radius:3px;font-size:10px;color:${C.ink};line-height:1.6;">
-        <strong style="color:${C.navy};letter-spacing:0.5px;">Não inclusos:</strong> ${escapeHtml(SUP_NOT_INCLUDED)}
+        <strong style="color:${C.navy};letter-spacing:0.5px;">Não inclusos:</strong> ${escapeHtml(content.notIncluded)}
       </div>
 
       ${r.notes ? `<div style="margin-top:14px;padding:13px 16px;background:${C.paper};border-left:3px solid ${C.navy};border-radius:3px;font-size:11px;line-height:1.6;text-align:justify;white-space:pre-line;color:${C.ink};"><strong style="color:${C.navy};display:block;margin-bottom:4px;letter-spacing:0.5px;">Observações</strong>${escapeHtml(r.notes)}</div>` : ''}
@@ -404,14 +408,14 @@ function buildHtml(r: ItSupportProposalPdfData): string {
 
     <div id="prop-suporte-block" style="break-inside:avoid;page-break-inside:avoid;">
       ${sectionTitle('Atendimento', 'Termos do Contrato')}
-      <p style="margin:0 0 12px 0;line-height:1.7;text-align:justify;color:${C.ink};white-space:pre-line;">${escapeHtml(SUP_CONTRACT_TEXT)}</p>
+      <p style="margin:0 0 12px 0;line-height:1.7;text-align:justify;color:${C.ink};white-space:pre-line;">${escapeHtml(content.contractText)}</p>
       ${S.showSupportReqs ? `<p style="margin:14px 0 10px 0;font-weight:800;color:${C.navy};font-size:11px;letter-spacing:0.3px;">Condições e horários</p>
       <div style="font-size:10.5px;">
         ${supportReqHtml}
       </div>` : ''}
     </div>
 
-    ${S.showQuote ? quoteBlock(SUP_QUOTE.text, SUP_QUOTE.author) : ''}
+    ${S.showQuote ? quoteBlock(content.quote.text, content.quote.author) : ''}
 
     <div id="prop-aceite-block" style="break-inside:avoid;page-break-inside:avoid;margin-top:26px;">
       ${sectionTitle('Formalização', 'Aceite da Proposta', 8)}
@@ -465,6 +469,7 @@ function buildHtml(r: ItSupportProposalPdfData): string {
 // ============================================================
 function buildHtmlMinimal(r: ItSupportProposalPdfData): string {
   const S = { ...SUP_DEFAULT_SECTIONS, ...(r.sections || {}) };
+  const content = normalizeItSupportContent(r.customContent);
   const itemsSubtotal = r.items.reduce((s, i) => s + (Number(i.qty) || 0) * (Number(i.unit_price) || 0), 0);
   const discount = Number(r.discount) || 0;
   const setupFee = Number(r.setupFee) || 0;
@@ -546,10 +551,10 @@ function buildHtmlMinimal(r: ItSupportProposalPdfData): string {
     </div>
 
     ${S.showAbout ? section('01', 'A Delta7 Tecnologia', `
-      <p style="margin:0;color:${INK};text-align:justify;white-space:pre-line;font-size:11.5px;line-height:1.75;">${escapeHtml(ABOUT_DELTA7_SUP)}</p>
+      <p style="margin:0;color:${INK};text-align:justify;white-space:pre-line;font-size:11.5px;line-height:1.75;">${escapeHtml(content.about)}</p>
       <table style="width:100%;margin-top:28px;border-collapse:collapse;">
         <tr>
-          ${SUP_KPIS.map(k => `
+          ${content.kpis.map(k => `
             <td style="text-align:left;padding-right:24px;border-left:2px solid ${NAVY};padding-left:14px;">
               <div style="font-size:30px;font-weight:300;color:${NAVY};line-height:1;letter-spacing:-1px;">${escapeHtml(k.value)}</div>
               <div style="font-size:9px;color:${MUTED};letter-spacing:1.5px;text-transform:uppercase;margin-top:6px;">${escapeHtml(k.label)}</div>
@@ -560,7 +565,7 @@ function buildHtmlMinimal(r: ItSupportProposalPdfData): string {
 
     ${S.showBenefits ? section('02', 'Por que terceirizar TI', `
       <table style="width:100%;border-collapse:collapse;">
-        ${SUP_BENEFITS.map((b, idx) => `
+        ${content.benefits.map((b, idx) => `
           <tr>
             <td style="padding:12px 0;border-bottom:1px solid ${LINE};vertical-align:top;width:36px;color:${MUTED};font-size:10px;font-weight:600;letter-spacing:1px;">${String(idx + 1).padStart(2, '0')}</td>
             <td style="padding:12px 0;border-bottom:1px solid ${LINE};vertical-align:top;width:200px;color:${NAVY};font-weight:600;font-size:11.5px;">${escapeHtml(b.title)}</td>
@@ -572,7 +577,7 @@ function buildHtmlMinimal(r: ItSupportProposalPdfData): string {
     ${S.showInfra ? section('03', 'Stack monitorada', `
       <table style="width:100%;border-collapse:collapse;">
         <tr>
-          ${SUP_INFRA.map(h => `
+          ${content.infrastructure.map(h => `
             <td style="width:25%;padding:0 12px 0 0;vertical-align:top;">
               <div style="border-top:2px solid ${NAVY};padding-top:14px;">
                 <div style="font-size:11.5px;font-weight:600;color:${NAVY};">${escapeHtml(h.title)}</div>
@@ -585,7 +590,7 @@ function buildHtmlMinimal(r: ItSupportProposalPdfData): string {
 
     ${S.showSla ? section('04', 'SLA por prioridade', `
       <table style="width:100%;border-collapse:collapse;">
-        ${SUP_SLA.map(s => `
+        ${content.sla.map(s => `
           <tr>
             <td style="padding:12px 0;border-bottom:1px solid ${LINE};vertical-align:top;width:130px;color:${s.color};font-weight:600;font-size:11.5px;">● ${escapeHtml(s.priority)}</td>
             <td style="padding:12px 0;border-bottom:1px solid ${LINE};vertical-align:top;color:${INK};font-size:11px;line-height:1.55;">${escapeHtml(s.description)}</td>
@@ -596,7 +601,7 @@ function buildHtmlMinimal(r: ItSupportProposalPdfData): string {
 
     ${S.showIdealFor ? section('05', 'Para quem é', `
       <table style="width:100%;border-collapse:collapse;">
-        ${SUP_IDEAL_FOR.map((i, idx) => `
+        ${content.idealFor.map((i, idx) => `
           <tr>
             <td style="padding:14px 0;border-bottom:1px solid ${LINE};vertical-align:top;width:50px;font-size:11px;color:${MUTED};font-weight:600;letter-spacing:1px;">${String(idx + 1).padStart(2, '0')}</td>
             <td style="padding:14px 0;border-bottom:1px solid ${LINE};vertical-align:top;">
@@ -677,7 +682,7 @@ function buildHtmlMinimal(r: ItSupportProposalPdfData): string {
         </table>
 
         <div style="margin-top:18px;padding:14px 0;border-top:1px solid ${LINE};font-size:10px;color:${MUTED};line-height:1.6;">
-          <strong style="color:${NAVY};font-weight:600;">Não inclusos:</strong> ${escapeHtml(SUP_NOT_INCLUDED)}
+          <strong style="color:${NAVY};font-weight:600;">Não inclusos:</strong> ${escapeHtml(content.notIncluded)}
         </div>
 
         ${r.notes ? `<div style="margin-top:14px;padding:14px 0;border-top:1px solid ${LINE};font-size:11px;color:${INK};line-height:1.65;white-space:pre-line;"><strong style="color:${NAVY};font-weight:600;display:block;margin-bottom:4px;">Observações</strong>${escapeHtml(r.notes)}</div>` : ''}
@@ -686,9 +691,9 @@ function buildHtmlMinimal(r: ItSupportProposalPdfData): string {
 
     <div id="prop-suporte-block" style="break-inside:avoid;page-break-inside:avoid;">
       ${section(N(8), 'Termos do contrato', `
-        <p style="margin:0;color:${INK};text-align:justify;white-space:pre-line;font-size:11px;line-height:1.7;">${escapeHtml(SUP_CONTRACT_TEXT)}</p>
+        <p style="margin:0;color:${INK};text-align:justify;white-space:pre-line;font-size:11px;line-height:1.7;">${escapeHtml(content.contractText)}</p>
         ${S.showSupportReqs ? `<table style="width:100%;border-collapse:collapse;margin-top:18px;">
-          ${SUP_CONTRACT_REQUIREMENTS.map(t => `
+          ${content.requirements.map(t => `
             <tr>
               <td style="padding:8px 0;border-bottom:1px solid ${LINE};vertical-align:top;width:18px;color:${NAVY};font-size:11px;">·</td>
               <td style="padding:8px 0;border-bottom:1px solid ${LINE};color:${INK};font-size:10.5px;line-height:1.55;">${escapeHtml(t)}</td>
@@ -698,8 +703,8 @@ function buildHtmlMinimal(r: ItSupportProposalPdfData): string {
     </div>
 
     ${S.showQuote ? `<div style="margin-top:36px;padding:0;">
-      <div style="font-family:Georgia,serif;font-style:italic;font-size:18px;line-height:1.5;color:${NAVY};font-weight:300;letter-spacing:-0.3px;">"${escapeHtml(SUP_QUOTE.text)}"</div>
-      <div style="margin-top:14px;font-size:9.5px;color:${MUTED};letter-spacing:2px;text-transform:uppercase;">— ${escapeHtml(SUP_QUOTE.author)}</div>
+      <div style="font-family:Georgia,serif;font-style:italic;font-size:18px;line-height:1.5;color:${NAVY};font-weight:300;letter-spacing:-0.3px;">"${escapeHtml(content.quote.text)}"</div>
+      <div style="margin-top:14px;font-size:9.5px;color:${MUTED};letter-spacing:2px;text-transform:uppercase;">— ${escapeHtml(content.quote.author)}</div>
     </div>` : ''}
 
     <div id="prop-aceite-block" style="break-inside:avoid;page-break-inside:avoid;margin-top:40px;">
