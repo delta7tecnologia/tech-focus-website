@@ -348,7 +348,7 @@ const ItSupportProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
               </div>
             </label>
           </div>
-          <ProposalContentEditor<ItSupportCustomContent> value={customContent} onChange={setCustomContent} onReset={() => setCustomContent(getDefaultItSupportContent())} mode="support" />
+          <ProposalContentEditor value={customContent} onChange={(value) => setCustomContent(value as ItSupportCustomContent)} onReset={() => setCustomContent(getDefaultItSupportContent())} mode="support" />
         </CardContent>
       </Card>
 
