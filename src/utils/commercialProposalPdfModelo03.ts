@@ -22,6 +22,7 @@ import {
   INSTITUTIONAL_QUOTE,
   DEFAULT_SECTIONS,
   type ProposalSections,
+  normalizeProposalContent,
 } from '@/lib/proposalContent';
 import type { FeaturedClientPdf } from './proposalClientsBlock';
 import type { CommercialProposalPdfData } from './commercialProposalPdf';
@@ -257,6 +258,7 @@ function drawCover(doc: jsPDF, r: CommercialProposalPdfData) {
 
 //  SOBRE + BENEFICIOS 
 function drawSobreBeneficios(doc: jsPDF, r: CommercialProposalPdfData, S: ProposalSections): void {
+  const content = normalizeProposalContent(r.customContent);
   doc.addPage();
   drawPageHeader(doc, r.proposalNumber, DELTA7_LOGO_DARK_DATA_URL);
   let y = 28;
@@ -267,16 +269,15 @@ function drawSobreBeneficios(doc: jsPDF, r: CommercialProposalPdfData, S: Propos
     doc.setFontSize(9.5);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...MUTED);
-    const paraLines = doc.splitTextToSize(ABOUT_DELTA7.replace(/\n\n/g, ' ').replace(/\n/g, ' '), CW);
-    // So as duas primeiras linhas de paragrafo para economizar espaco
-    const aboutShort = ABOUT_DELTA7.split('\n\n').slice(0, 2).join(' ');
+    // So os dois primeiros paragrafos para economizar espaco
+    const aboutShort = content.about.split('\n\n').slice(0, 2).join(' ');
     const lines = doc.splitTextToSize(aboutShort, CW);
     doc.text(lines, ML, y);
     y += lines.length * 4.5 + 4;
 
     // KPIs
     const kpiW = CW / 3;
-    DELTA7_KPIS.forEach((k, i) => {
+    content.kpis.forEach((k, i) => {
       const kx = ML + i * kpiW;
       fillRect(doc, kx + 1, y, kpiW - 2, 18, CREAM);
       // Borda top slate
@@ -292,7 +293,7 @@ function drawSobreBeneficios(doc: jsPDF, r: CommercialProposalPdfData, S: Propos
     y = sectionTitle(doc, 'Vantagens', 'Por que Backup Online', y);
     const cardW = CW / 4;
     const cardH = 28;
-    const rows = [BENEFIT_CARDS.slice(0, 4), BENEFIT_CARDS.slice(4, 8)];
+    const rows = [content.benefits.slice(0, 4), content.benefits.slice(4, 8)];
     for (const row of rows) {
       row.forEach((b, i) => {
         const cx = ML + i * cardW;
@@ -429,6 +430,7 @@ function drawInfoTable(doc: jsPDF, rows: string[][], y: number): number {
 
 //  INVESTIMENTO 
 function drawInvestimento(doc: jsPDF, r: CommercialProposalPdfData): void {
+  const content = normalizeProposalContent(r.customContent);
   doc.addPage();
   drawPageHeader(doc, r.proposalNumber, DELTA7_LOGO_DARK_DATA_URL);
   let y = 28;
@@ -466,7 +468,7 @@ function drawInvestimento(doc: jsPDF, r: CommercialProposalPdfData): void {
   fillRect(doc, ML, y, 2.5, 10, SLATE);
   fillRect(doc, ML, y, CW, 10, PAPER);
   t(doc, 'Não inclusos:', ML + 5, y + 6.5, { size: 8.5, style: 'bold', color: NAVY });
-  const niText = truncate(doc, NOT_INCLUDED.replace('Nesta proposta não estão inclusos: ', ''), CW - 40);
+  const niText = truncate(doc, content.notIncluded.replace('Nesta proposta não estão inclusos: ', ''), CW - 40);
   t(doc, niText, ML + 34, y + 6.5, { size: 8.5, color: INK });
   y += 14;
 
@@ -583,6 +585,7 @@ function drawSummaryBox(
 
 //  SUPORTE 
 function drawSuporte(doc: jsPDF, r: CommercialProposalPdfData, S: ProposalSections): void {
+  const content = normalizeProposalContent(r.customContent);
   doc.addPage();
   drawPageHeader(doc, r.proposalNumber, DELTA7_LOGO_DARK_DATA_URL);
   let y = 28;
@@ -590,7 +593,7 @@ function drawSuporte(doc: jsPDF, r: CommercialProposalPdfData, S: ProposalSectio
   y = sectionTitle(doc, 'Atendimento', 'Suporte Técnico', y);
 
   // Paragrafos do SUPPORT_TEXT
-  const paras = SUPPORT_TEXT.split('\n\n');
+  const paras = content.supportText.split('\n\n');
   for (const para of paras) {
     doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
@@ -603,7 +606,7 @@ function drawSuporte(doc: jsPDF, r: CommercialProposalPdfData, S: ProposalSectio
   if (S.showSupportReqs) {
     t(doc, 'Requisitos para a prestação dos serviços', ML, y, { size: 9.5, style: 'bold', color: NAVY });
     y += 6;
-    for (const req of SUPPORT_REQUIREMENTS) {
+    for (const req of content.requirements) {
       t(doc, '', ML, y, { size: 7, color: SLATE });
       const reqLines = doc.splitTextToSize(req, CW - 8);
       doc.setFontSize(8.5);
@@ -620,12 +623,12 @@ function drawSuporte(doc: jsPDF, r: CommercialProposalPdfData, S: ProposalSectio
     fillRect(doc, ML, y, CW, 24, PAPER);
     // Aspas decorativas
     t(doc, '"', ML + 4, y + 10, { size: 24, style: 'bold', color: SLATE });
-    const qLines = doc.splitTextToSize(INSTITUTIONAL_QUOTE.text, CW - 20);
+    const qLines = doc.splitTextToSize(content.quote.text, CW - 20);
     doc.setFontSize(9);
     doc.setFont('helvetica', 'italic');
     doc.setTextColor(...INK);
     doc.text(qLines, ML + 13, y + 8);
-    t(doc, `- ${INSTITUTIONAL_QUOTE.author}`, ML + 13, y + qLines.length * 4.5 + 10, {
+    t(doc, `- ${content.quote.author}`, ML + 13, y + qLines.length * 4.5 + 10, {
       size: 7, color: SLATE,
     });
   }

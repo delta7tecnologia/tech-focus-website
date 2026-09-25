@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 
-type NamedText = { title: string; text: string; [key: string]: unknown };
+type NamedText = { title: string; text: string };
 type Kpi = { value: string; label: string };
 type Quote = { text: string; author: string };
 type Sla = { priority: string; description: string; response: string; color: string };

@@ -156,7 +156,7 @@ const slaTable = (sla: ItSupportCustomContent['sla']) => `
       </tr>
     </thead>
     <tbody>
-      ${content.sla.map((s, idx) => `
+      ${sla.map((s, idx) => `
         <tr style="background:${idx % 2 === 0 ? '#ffffff' : C.paper};">
           <td style="padding:10px 14px;border-bottom:1px solid #e2e8f0;font-weight:800;color:${s.color};">● ${escapeHtml(s.priority)}</td>
           <td style="padding:10px 14px;border-bottom:1px solid #e2e8f0;color:${C.ink};">${escapeHtml(s.description)}</td>
