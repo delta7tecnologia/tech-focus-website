@@ -165,6 +165,7 @@ export type Database = {
           client_name: string
           created_at: string
           created_by: string
+          custom_content: Json | null
           discount: number
           featured_clients: Json
           generated_at: string
@@ -196,6 +197,7 @@ export type Database = {
           client_name: string
           created_at?: string
           created_by: string
+          custom_content?: Json | null
           discount?: number
           featured_clients?: Json
           generated_at?: string
@@ -227,6 +229,7 @@ export type Database = {
           client_name?: string
           created_at?: string
           created_by?: string
+          custom_content?: Json | null
           discount?: number
           featured_clients?: Json
           generated_at?: string
@@ -350,6 +353,7 @@ export type Database = {
           contract_months: number
           created_at: string
           created_by: string
+          custom_content: Json | null
           discount: number
           featured_clients: Json
           generated_at: string
@@ -382,6 +386,7 @@ export type Database = {
           contract_months?: number
           created_at?: string
           created_by: string
+          custom_content?: Json | null
           discount?: number
           featured_clients?: Json
           generated_at?: string
@@ -414,6 +419,7 @@ export type Database = {
           contract_months?: number
           created_at?: string
           created_by?: string
+          custom_content?: Json | null
           discount?: number
           featured_clients?: Json
           generated_at?: string
@@ -1287,6 +1293,7 @@ export type Database = {
           client_name: string
           created_at: string
           created_by: string
+          custom_content: Json | null
           discount: number
           featured_clients: Json
           generated_at: string
@@ -1327,6 +1334,7 @@ export type Database = {
           contract_months: number
           created_at: string
           created_by: string
+          custom_content: Json | null
           discount: number
           featured_clients: Json
           generated_at: string
