@@ -88,6 +88,7 @@ const App = () => (
             <Route path="/validar-os/:hash" element={<ValidateServiceOrder />} />
             <Route path="/validar-proposta/:hash" element={<ValidateProposal />} />
             <Route path="/propostas/vm" element={<PropostaVm />} />
+            <Route path="/propostas/locacao/catalogo" element={<Navigate to="/admin/catalogo-servidores" replace />} />
             
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />

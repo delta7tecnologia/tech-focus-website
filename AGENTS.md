@@ -1,2 +1,3 @@
 Proposal document copy is stored as a complete JSON snapshot per proposal, preserving historical output when defaults change.
 Server rental catalog is normalized, while each proposal stores full item, calculation, plan, clause, and document snapshots to preserve history.
+Server rental compatibility and automatic pricing rules live in `serverRental.ts` so catalog, proposal editor, totals, and PDF stay consistent.
