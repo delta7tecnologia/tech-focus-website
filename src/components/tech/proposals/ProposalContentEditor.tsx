@@ -31,7 +31,7 @@ interface Props<T extends EditableProposalContent> {
   mode: 'backup' | 'support';
 }
 
-const ProposalContentEditor = <T extends EditableProposalContent>({ value, onChange, onReset, mode }: Props<T>) => {
+function ProposalContentEditor<T extends EditableProposalContent>({ value, onChange, onReset, mode }: Props<T>) {
   const set = <K extends keyof T>(key: K, next: T[K]) => onChange({ ...value, [key]: next });
   const updateNamed = (key: 'benefits' | 'infrastructure' | 'idealFor', index: number, field: 'title' | 'text', next: string) => {
     const list = value[key].map((item, i) => i === index ? { ...item, [field]: next } : item);
@@ -61,6 +61,6 @@ const ProposalContentEditor = <T extends EditableProposalContent>({ value, onCha
       <AccordionItem value="quote"><AccordionTrigger>Citação institucional</AccordionTrigger><AccordionContent className="space-y-2"><Textarea rows={3} value={value.quote.text} onChange={(e) => onChange({ ...value, quote: { ...value.quote, text: e.target.value } })} /><Input value={value.quote.author} onChange={(e) => onChange({ ...value, quote: { ...value.quote, author: e.target.value } })} /></AccordionContent></AccordionItem>
     </Accordion>
   </div>;
-};
+}
 
 export default ProposalContentEditor;

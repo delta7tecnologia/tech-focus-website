@@ -382,7 +382,7 @@ const ProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
               </div>
             </label>
           </div>
-          <ProposalContentEditor value={customContent} onChange={setCustomContent} onReset={() => setCustomContent(getDefaultProposalContent())} mode="backup" />
+          <ProposalContentEditor<ProposalCustomContent> value={customContent} onChange={setCustomContent} onReset={() => setCustomContent(getDefaultProposalContent())} mode="backup" />
         </CardContent>
       </Card>
 
