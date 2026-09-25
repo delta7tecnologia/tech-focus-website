@@ -118,5 +118,5 @@ export function suggestedMonthly(cost: number, services: number, months: number,
 }
 
 export function renderClause(clause: ServerClause): string {
-  return Object.entries(clause.params).reduce((text, [key, value]) => text.replaceAll(`{{${key}}}`, String(value)), clause.text);
+  return Object.entries(clause.params).reduce((text, [key, value]) => text.split(`{{${key}}}`).join(String(value)), clause.text);
 }
