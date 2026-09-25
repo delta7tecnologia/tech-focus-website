@@ -20,6 +20,7 @@ import {
   HardDriveUpload,
   LifeBuoy,
   Server,
+  Database,
   TrendingUp,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -61,6 +62,7 @@ const sections: MenuSection[] = [
       { name: 'Propostas Backup', icon: HardDriveUpload, path: '/admin/propostas' },
       { name: 'Propostas Suporte TI', icon: LifeBuoy, path: '/admin/propostas-suporte' },
       { name: 'Propostas VMs', icon: Server, path: '/admin/propostas-vm' },
+      { name: 'Locação de Servidores', icon: Database, path: '/admin/propostas-servidores' },
     ],
   },
   {

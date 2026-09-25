@@ -1,1 +1,2 @@
 Proposal document copy is stored as a complete JSON snapshot per proposal, preserving historical output when defaults change.
+Server rental catalog is normalized, while each proposal stores full item, calculation, plan, clause, and document snapshots to preserve history.
