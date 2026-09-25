@@ -9,12 +9,13 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Upload, Download, Trash2, FileText, LogOut, Search, Monitor, FileSignature, ExternalLink, Link2, ClipboardList, Briefcase } from 'lucide-react';
+import { Upload, Download, Trash2, FileText, LogOut, Search, Monitor, FileSignature, ExternalLink, Link2, ClipboardList, Briefcase, Server } from 'lucide-react';
 import TechAssetViewer from './TechAssetViewer';
 import TechReports from './reports/TechReports';
 import ServiceOrders from './service-orders/ServiceOrders';
 import CommercialProposals from './proposals/CommercialProposals';
 import ItSupportProposals from './it-support/ItSupportProposals';
+import AdminServerProposals from '@/pages/admin/AdminServerProposals';
 import UploadOrLinkInput, { detectExternalProvider, type SourceMode } from './UploadOrLinkInput';
 
 const TechFileManager = () => {
@@ -170,7 +171,7 @@ const TechFileManager = () => {
       </div>
 
       <Tabs defaultValue="files" className="w-full">
-        <TabsList>
+        <TabsList className="h-auto flex-wrap justify-start">
           <TabsTrigger value="files" className="gap-2">
             <FileText className="w-4 h-4" /> Arquivos
           </TabsTrigger>
@@ -188,6 +189,9 @@ const TechFileManager = () => {
           </TabsTrigger>
           <TabsTrigger value="it-support" className="gap-2">
             <Briefcase className="w-4 h-4" /> Propostas Suporte TI
+          </TabsTrigger>
+          <TabsTrigger value="server-rental" className="gap-2">
+            <Server className="w-4 h-4" /> Locação de Servidores
           </TabsTrigger>
         </TabsList>
 
@@ -323,6 +327,10 @@ const TechFileManager = () => {
 
         <TabsContent value="it-support" className="mt-4">
           <ItSupportProposals />
+        </TabsContent>
+
+        <TabsContent value="server-rental" className="mt-4">
+          <AdminServerProposals showCatalog={false} />
         </TabsContent>
       </Tabs>
     </div>

@@ -15,3 +15,4 @@
 - [x] Criar PDF comercial sem dados internos
 - [x] Adicionar telas administrativas e menu
 - [x] Validar compilação, fluxo real e PDF
+- [x] Exibir propostas de locação de servidores na Área Técnica
