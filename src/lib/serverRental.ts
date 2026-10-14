@@ -28,6 +28,15 @@ export interface ServerClause { key: 'fidelidade' | 'reajuste' | 'guarda' | 'com
 export interface ServerProposalContent { coverSubtitle: string; onPremiseSummary: string; dedicatedSummary: string; includedTitle: string; acceptanceText: string }
 
 export const DEFAULT_CALCULATION_PARAMS: CalculationParams = { margemPercentual: 30, taxaCapitalMensal: 1.5, residualPercentual: 20, reservaManutencaoPercentual: 8 };
+
+/** Mensalidade de 36 meses por real de custo (amortização com capital 1,5% a.m., residual 20%, margem 30%, reserva 8%). */
+export const PRICE_FACTOR_36M = 0.0448;
+/** Multiplicador sobre o valor de 36 meses: prazos curtos amortizam o equipamento em menos tempo. */
+export const PLAN_MULTIPLIERS: Record<number, number> = { 12: 2.4, 24: 1.35, 36: 1 };
+export const roundUpTo5 = (value: number) => Math.ceil(Number(value || 0) / 5) * 5;
+/** Mensalidade de catálogo (36 meses) sugerida a partir do custo de aquisição. */
+export const catalogMonthlyFromCost = (cost: number) => (Number(cost) > 0 ? roundUpTo5(Number(cost) * PRICE_FACTOR_36M) : 0);
+export const planMonthly = (base36: number, months: number) => roundUpTo5(Number(base36 || 0) * (PLAN_MULTIPLIERS[months] ?? 1));
 export const getDefaultServerContent = (): ServerProposalContent => ({
   coverSubtitle: 'Infraestrutura robusta, previsível e gerenciada para sua operação.',
   onPremiseSummary: 'Servidor físico instalado no ambiente da CONTRATANTE, com configuração dedicada, implantação profissional e opções de suporte gerenciado pela Delta7 Tecnologia.',
