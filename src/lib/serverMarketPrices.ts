@@ -2,7 +2,8 @@ import { catalogMonthlyFromCost, type ServerModel, type ServerUpgrade } from './
 
 /**
  * Tabela de preços de mercado (seminovo com NF e garantia, salvo indicação), out/2026.
- * Fontes: ShockTI, Chypps, Memórias Online, iPLoja, KaBuM.
+ * Fontes: Mercado Livre (R630 128GB R$ 13.000, anúncio informado), ShockTI, Rukam, iPLoja, Memórias Online.
+ * Servidores revisados em 14/10/2026; modelos sem anúncio idêntico foram derivados do mais próximo (ajuste de RAM pelo preço de módulos).
  * Custos de servidor SEM discos — discos entram como adicionais.
  * A mensalidade de 36 meses é calculada a partir do custo (catalogMonthlyFromCost).
  */
@@ -15,13 +16,14 @@ type UpgradePreset = Pick<ServerUpgrade, 'categoria' | 'nome' | 'custo_aquisicao
 const rack = { fabricante: 'Dell', formato: 'rack' as const, storage_base: 'Sem discos', fonte_redundante: true, vida_util_meses: 60, interface_disco: ['SAS', 'SATA'] };
 
 export const MARKET_MODELS: ModelPreset[] = [
-  { ...rack, nome: 'Dell PowerEdge R720', geracao: '12G', cpu: '2x Intel Xeon E5-2650L v2 (20 núcleos / 40 threads)', ram_base_gb: 64, padrao_memoria: 'DDR3', tipo_modulo: 'RDIMM', slots_memoria: 24, ram_max_gb: 768, baias: 8, tamanho_baia: '2.5"', custo_aquisicao: 4470 },
-  { ...rack, nome: 'Dell PowerEdge R720 128GB', geracao: '12G', cpu: '2x Intel Xeon E5-2650L v2 (20 núcleos / 40 threads)', ram_base_gb: 128, padrao_memoria: 'DDR3', tipo_modulo: 'RDIMM', slots_memoria: 24, ram_max_gb: 768, baias: 8, tamanho_baia: '2.5"', custo_aquisicao: 4670 },
-  { ...rack, nome: 'Dell PowerEdge R630', geracao: '13G', cpu: '2x Intel Xeon E5-2680 v4 (28 núcleos / 56 threads)', ram_base_gb: 64, padrao_memoria: 'DDR4', tipo_modulo: 'RDIMM', slots_memoria: 24, ram_max_gb: 768, baias: 8, tamanho_baia: '2.5"', custo_aquisicao: 8545 },
-  { ...rack, nome: 'Dell PowerEdge R730', geracao: '13G', cpu: '2x Intel Xeon E5-2680 v4 (28 núcleos / 56 threads)', ram_base_gb: 64, padrao_memoria: 'DDR4', tipo_modulo: 'RDIMM', slots_memoria: 24, ram_max_gb: 768, baias: 8, tamanho_baia: '2.5"', custo_aquisicao: 9570 },
-  { ...rack, nome: 'Dell PowerEdge R730XD', geracao: '13G', cpu: '2x Intel Xeon E5-2680 v4 (28 núcleos / 56 threads)', ram_base_gb: 64, padrao_memoria: 'DDR4', tipo_modulo: 'RDIMM', slots_memoria: 24, ram_max_gb: 768, baias: 12, tamanho_baia: '3.5"', custo_aquisicao: 10570 },
-  { ...rack, nome: 'Dell PowerEdge R640', geracao: '14G', cpu: '2x Intel Xeon Gold 6138 (40 núcleos / 80 threads)', ram_base_gb: 64, padrao_memoria: 'DDR4', tipo_modulo: 'RDIMM', slots_memoria: 24, ram_max_gb: 1536, baias: 8, tamanho_baia: '2.5"', custo_aquisicao: 14010 },
-  { ...rack, formato: 'torre', fonte_redundante: false, nome: 'Dell PowerEdge T330', geracao: '13G', cpu: 'Intel Xeon E3-1220 v6 (4 núcleos)', ram_base_gb: 8, padrao_memoria: 'DDR4', tipo_modulo: 'UDIMM', slots_memoria: 4, ram_max_gb: 64, baias: 8, tamanho_baia: '3.5"', custo_aquisicao: 4410 },
+  { ...rack, nome: 'Dell PowerEdge R720', geracao: '12G', cpu: '2x Intel Xeon E5-2650L v2 (20 núcleos / 40 threads)', ram_base_gb: 64, padrao_memoria: 'DDR3', tipo_modulo: 'RDIMM', slots_memoria: 24, ram_max_gb: 768, baias: 8, tamanho_baia: '2.5"', custo_aquisicao: 5500 },
+  { ...rack, nome: 'Dell PowerEdge R720 128GB', geracao: '12G', cpu: '2x Intel Xeon E5-2650L v2 (20 núcleos / 40 threads)', ram_base_gb: 128, padrao_memoria: 'DDR3', tipo_modulo: 'RDIMM', slots_memoria: 24, ram_max_gb: 768, baias: 8, tamanho_baia: '2.5"', custo_aquisicao: 6500 },
+  { ...rack, nome: 'Dell PowerEdge R630', geracao: '13G', cpu: '2x Intel Xeon E5-2680 v4 (28 núcleos / 56 threads)', ram_base_gb: 64, padrao_memoria: 'DDR4', tipo_modulo: 'RDIMM', slots_memoria: 24, ram_max_gb: 768, baias: 8, tamanho_baia: '2.5"', custo_aquisicao: 10500 },
+  { ...rack, nome: 'Dell PowerEdge R630 128GB', geracao: '13G', cpu: '2x Intel Xeon E5-2680 v4 (28 núcleos / 56 threads)', ram_base_gb: 128, padrao_memoria: 'DDR4', tipo_modulo: 'RDIMM', slots_memoria: 24, ram_max_gb: 768, baias: 8, tamanho_baia: '2.5"', custo_aquisicao: 13000 },
+  { ...rack, nome: 'Dell PowerEdge R730', geracao: '13G', cpu: '2x Intel Xeon E5-2680 v4 (28 núcleos / 56 threads)', ram_base_gb: 64, padrao_memoria: 'DDR4', tipo_modulo: 'RDIMM', slots_memoria: 24, ram_max_gb: 768, baias: 8, tamanho_baia: '2.5"', custo_aquisicao: 11500 },
+  { ...rack, nome: 'Dell PowerEdge R730XD', geracao: '13G', cpu: '2x Intel Xeon E5-2680 v4 (28 núcleos / 56 threads)', ram_base_gb: 64, padrao_memoria: 'DDR4', tipo_modulo: 'RDIMM', slots_memoria: 24, ram_max_gb: 768, baias: 12, tamanho_baia: '3.5"', custo_aquisicao: 12000 },
+  { ...rack, nome: 'Dell PowerEdge R640', geracao: '14G', cpu: '2x Intel Xeon Gold 6138 (40 núcleos / 80 threads)', ram_base_gb: 64, padrao_memoria: 'DDR4', tipo_modulo: 'RDIMM', slots_memoria: 24, ram_max_gb: 1536, baias: 8, tamanho_baia: '2.5"', custo_aquisicao: 18250 },
+  { ...rack, formato: 'torre', fonte_redundante: false, nome: 'Dell PowerEdge T330', geracao: '13G', cpu: 'Intel Xeon E3-1220 v6 (4 núcleos)', ram_base_gb: 8, padrao_memoria: 'DDR4', tipo_modulo: 'UDIMM', slots_memoria: 4, ram_max_gb: 64, baias: 8, tamanho_baia: '3.5"', custo_aquisicao: 5000 },
 ];
 
 const disk = (nome: string, custo: number, iface: string[], baia: string[] = ['2.5"']): UpgradePreset => ({ categoria: 'armazenamento', nome, custo_aquisicao: custo, tipo_cobranca: 'mensal', aplica_modalidade: 'ambas', permite_quantidade: true, compat_baia: baia, compat_interface: iface });
