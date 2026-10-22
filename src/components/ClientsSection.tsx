@@ -15,10 +15,7 @@ const ClientsSection = () => {
   const { data: clients } = useQuery({
     queryKey: ['clients'],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
-        .from('clients_public')
-        .select('*')
-        .order('order_index', { ascending: true });
+      const { data, error } = await (supabase as any).rpc('get_public_clients');
       
       if (error) throw error;
       return data as Client[];
