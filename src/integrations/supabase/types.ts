@@ -1609,6 +1609,16 @@ export type Database = {
         Returns: Json
       }
       get_proposal_signature_link: { Args: { p_token: string }; Returns: Json }
+      get_public_clients: {
+        Args: never
+        Returns: {
+          id: string
+          logo_url: string
+          name: string
+          order_index: number
+          website_url: string
+        }[]
+      }
       get_report_signature_link: { Args: { p_token: string }; Returns: Json }
       get_service_order_by_hash: {
         Args: { p_hash: string }
