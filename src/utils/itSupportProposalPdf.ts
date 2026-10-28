@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import QRCode from 'qrcode';
 import html2canvas from 'html2canvas';
+import { paginateSupportCanvas } from './itSupportPagination';
 import { escapeHtml } from './reportNarrative';
 import { DELTA7_LOGO_DATA_URL, DELTA7_LOGO_DARK_DATA_URL } from '@/assets/delta7LogoBase64';
 import { DELL_EXPERT_LOGO_DATA_URL } from '@/assets/dellExpertLogoBase64';
@@ -727,80 +728,48 @@ function buildHtmlMinimal(r: ItSupportProposalPdfData): string {
 </div>`;
 }
 
-async function buildPdf(data: ItSupportProposalPdfData): Promise<jsPDF> {
+async function renderSupportPages(data: ItSupportProposalPdfData): Promise<HTMLCanvasElement[]> {
   const template: ProposalTemplate = data.template || 'modelo01';
   const validationUrl = data.validationUrl
     || `${window.location.origin}/validar-suporte/${data.integrityHash}`;
   let qrCodeDataUrl = data.qrCodeDataUrl;
   if (template === 'modelo01' && !qrCodeDataUrl) {
-    try {
-      qrCodeDataUrl = await QRCode.toDataURL(validationUrl, {
-        margin: 1, width: 220, errorCorrectionLevel: 'M',
-        color: { dark: '#0a1f44', light: '#ffffff' },
-      });
-    } catch (e) {
-      console.error('Falha ao gerar QR Code:', e);
-    }
+    qrCodeDataUrl = await QRCode.toDataURL(validationUrl, {
+      margin: 1, width: 220, errorCorrectionLevel: 'M',
+      color: { dark: '#0a1f44', light: '#ffffff' },
+    });
   }
-
-  const html = template === 'modelo02'
-    ? buildHtmlMinimal({ ...data, qrCodeDataUrl, validationUrl })
-    : buildHtml({ ...data, qrCodeDataUrl, validationUrl });
   const wrap = document.createElement('div');
   wrap.style.position = 'fixed';
   wrap.style.left = '-10000px';
   wrap.style.top = '0';
-  wrap.innerHTML = html;
+  wrap.innerHTML = template === 'modelo02'
+    ? buildHtmlMinimal({ ...data, qrCodeDataUrl, validationUrl })
+    : buildHtml({ ...data, qrCodeDataUrl, validationUrl });
   document.body.appendChild(wrap);
-
   try {
-    const node = wrap.firstElementChild as HTMLElement;
-    const pageWidthMM = 210;
-    const pageHeightMM = 297;
-    const pxPerMM = node.offsetWidth / pageWidthMM;
-    const pageHeightPx = pageHeightMM * pxPerMM;
-
-    const pushElement = (el: HTMLElement, baseMargin: number) => {
-      const top = el.offsetTop;
-      const bottom = top + el.offsetHeight;
-      const startPage = Math.floor(top / pageHeightPx);
-      const endPage = Math.floor((bottom - 1) / pageHeightPx);
-      if (endPage > startPage && el.offsetHeight < pageHeightPx - 40) {
-        const nextPageStart = (startPage + 1) * pageHeightPx;
-        const extraPx = nextPageStart - top + 8;
-        const current = parseFloat(el.style.marginTop || '0') || 0;
-        el.style.marginTop = `${current + extraPx + baseMargin}px`;
-      }
-    };
-    const tryPushAcross = (id: string, baseMargin = 24) => {
-      const el = node.querySelector(`#${id}`) as HTMLElement | null;
-      if (el) pushElement(el, baseMargin);
-    };
-    node.querySelectorAll<HTMLElement>('[data-keep="1"]').forEach((el) => pushElement(el, 8));
-    tryPushAcross('prop-financ-block', 8);
-    tryPushAcross('prop-suporte-block', 8);
-    tryPushAcross('prop-aceite-block', 12);
-
+    const node = wrap.firstElementChild;
+    if (!(node instanceof HTMLElement)) throw new Error('Conteúdo da proposta não encontrado.');
+    await document.fonts.ready;
+    await Promise.all(Array.from(node.querySelectorAll('img')).map(async image => {
+      try { await image.decode(); } catch { /* Unavailable optional logo. */ }
+    }));
     const canvas = await html2canvas(node, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-    const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
-    const pageW = pdf.internal.pageSize.getWidth();
-    const pageH = pdf.internal.pageSize.getHeight();
-    const imgW = pageW;
-    const imgH = (canvas.height * imgW) / canvas.width;
-    let heightLeft = imgH;
-    let position = 0;
-    pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, position, imgW, imgH);
-    heightLeft -= pageH;
-    while (heightLeft > 0) {
-      position = heightLeft - imgH;
-      pdf.addPage();
-      pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, position, imgW, imgH);
-      heightLeft -= pageH;
-    }
-    return pdf;
+    return paginateSupportCanvas(node, canvas);
   } finally {
-    document.body.removeChild(wrap);
+    wrap.remove();
   }
+}
+
+async function buildPdf(data: ItSupportProposalPdfData): Promise<jsPDF> {
+  const pages = await renderSupportPages(data);
+  const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+  pages.forEach((page, index) => {
+    if (index > 0) pdf.addPage();
+    pdf.addImage(page.toDataURL('image/png'), 'PNG', 0, 0,
+      pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
+  });
+  return pdf;
 }
 
 export async function downloadItSupportProposalPdf(data: ItSupportProposalPdfData) {
@@ -827,71 +796,6 @@ export async function downloadItSupportProposalPdf(data: ItSupportProposalPdfDat
 }
 
 export async function previewItSupportProposalPdf(data: ItSupportProposalPdfData): Promise<string[]> {
-  const template: ProposalTemplate = data.template || 'modelo01';
-  const validationUrl = data.validationUrl
-    || `${window.location.origin}/validar-suporte/${data.integrityHash}`;
-  let qrCodeDataUrl = data.qrCodeDataUrl;
-  if (template === 'modelo01' && !qrCodeDataUrl) {
-    try {
-      qrCodeDataUrl = await QRCode.toDataURL(validationUrl, {
-        margin: 1, width: 220, errorCorrectionLevel: 'M',
-        color: { dark: '#0a1f44', light: '#ffffff' },
-      });
-    } catch {}
-  }
-  const html = template === 'modelo02'
-    ? buildHtmlMinimal({ ...data, qrCodeDataUrl, validationUrl })
-    : buildHtml({ ...data, qrCodeDataUrl, validationUrl });
-  const wrap = document.createElement('div');
-  wrap.style.position = 'fixed';
-  wrap.style.left = '-10000px';
-  wrap.style.top = '0';
-  wrap.innerHTML = html;
-  document.body.appendChild(wrap);
-  try {
-    const node = wrap.firstElementChild as HTMLElement;
-    const pageWidthMM = 210;
-    const pageHeightMM = 297;
-    const pxPerMM = node.offsetWidth / pageWidthMM;
-    const pageHeightPx = pageHeightMM * pxPerMM;
-    const pushElement = (el: HTMLElement, baseMargin: number) => {
-      const top = el.offsetTop;
-      const bottom = top + el.offsetHeight;
-      const startPage = Math.floor(top / pageHeightPx);
-      const endPage = Math.floor((bottom - 1) / pageHeightPx);
-      if (endPage > startPage && el.offsetHeight < pageHeightPx - 40) {
-        const nextPageStart = (startPage + 1) * pageHeightPx;
-        const extraPx = nextPageStart - top + 8;
-        const current = parseFloat(el.style.marginTop || '0') || 0;
-        el.style.marginTop = `${current + extraPx + baseMargin}px`;
-      }
-    };
-    const tryPushAcross = (id: string, baseMargin = 24) => {
-      const el = node.querySelector(`#${id}`) as HTMLElement | null;
-      if (el) pushElement(el, baseMargin);
-    };
-    node.querySelectorAll<HTMLElement>('[data-keep="1"]').forEach((el) => pushElement(el, 8));
-    tryPushAcross('prop-financ-block', 8);
-    tryPushAcross('prop-suporte-block', 8);
-    tryPushAcross('prop-aceite-block', 12);
-
-    const canvas = await html2canvas(node, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-    const slicePxPerMM = canvas.width / pageWidthMM;
-    const slicePageH = Math.round(pageHeightMM * slicePxPerMM);
-    const pages: string[] = [];
-    for (let y = 0; y < canvas.height; y += slicePageH) {
-      const h = Math.min(slicePageH, canvas.height - y);
-      const slice = document.createElement('canvas');
-      slice.width = canvas.width;
-      slice.height = h;
-      const ctx = slice.getContext('2d')!;
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, slice.width, slice.height);
-      ctx.drawImage(canvas, 0, y, canvas.width, h, 0, 0, canvas.width, h);
-      pages.push(slice.toDataURL('image/jpeg', 0.85));
-    }
-    return pages;
-  } finally {
-    document.body.removeChild(wrap);
-  }
+  const pages = await renderSupportPages(data);
+  return pages.map(page => page.toDataURL('image/png'));
 }
