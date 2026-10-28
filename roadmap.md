@@ -29,3 +29,4 @@
 ## Quebras da proposta de suporte de TI
 - [ ] Corrigir cortes de conteúdo nos dois modelos e unificar prévia e download
 - [ ] Validar PDFs curtos e extensos e testar quebras entre linhas
+- [ ] Conferir o PDF SUP-2026-0007 enviado como referência

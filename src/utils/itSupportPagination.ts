@@ -18,8 +18,8 @@ export function paginateSupportCanvas(node: HTMLElement, canvas: HTMLCanvasEleme
   const capacity = pageHeight - inset * 2;
   const ranges: KeepRange[] = [];
   const add = (rect: DOMRect) => {
-    const top = Math.max(0, Math.floor((rect.top - bounds.top) * scale) - 1);
-    const bottom = Math.ceil((rect.bottom - bounds.top) * scale) + 1;
+    const top = Math.max(0, (rect.top - bounds.top) * scale);
+    const bottom = (rect.bottom - bounds.top) * scale;
     // Oversized sections are divided at their inner rows or text lines instead.
     if (bottom > top && bottom - top < capacity) ranges.push({ top, bottom });
   };
