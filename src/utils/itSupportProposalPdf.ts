@@ -4,6 +4,7 @@ import { DELTA7_LOGO_DARK_SMALL, DELTA7_LOGO_WHITE_SMALL } from '@/assets/delta7
 import { DELL_EXPERT_LOGO_SQUARE_DATA_URL } from '@/assets/dellExpertLogoSquareBase64';
 import { formatBRL, SUP_DEFAULT_SECTIONS, normalizeItSupportContent, type SupProposalSections, type ItSupportCustomContent } from '@/lib/itSupportContent';
 import type { FeaturedClientPdf } from './proposalClientsBlock';
+import { needsProposalPage, PROPOSAL_PAGE_TOP as TOP, PROPOSAL_PAGE_BOTTOM as BOTTOM } from './proposalPageLayout';
 
 export interface SupProposalItem { description: string; qty: number; unit_price: number; unit_label?: string }
 export interface ItSupportProposalPdfData {
@@ -21,7 +22,7 @@ const WHITE: [number, number, number] = [255,255,255];
 const INK: [number, number, number] = [26,37,64];
 const MUTED: [number, number, number] = [100,116,139];
 const LIGHT: [number, number, number] = [241,245,249];
-const ML=18, CW=174, BOTTOM=275, TOP=31;
+const ML=18, CW=174;
 const date=(value:string)=>new Date(value).toLocaleDateString('pt-BR');
 
 async function imageData(url:string): Promise<string | null> {
@@ -51,7 +52,7 @@ async function buildPdf(r:ItSupportProposalPdfData):Promise<jsPDF> {
     d.setDrawColor(...ORANGE);d.line(ML,21,ML+CW,21);
   };
   const newPage=()=>{d.addPage();header();y=TOP;};
-  const ensure=(height:number)=>{if(y+height>BOTTOM)newPage();};
+  const ensure=(height:number)=>{if(needsProposalPage(y,height))newPage();};
   const paragraph=(value:string,width=CW,x=ML,size=9,color=INK,bold=false)=>{
     for(const line of lines(value,width,size,bold)){ensure(5);text(line,x,y,size,color,bold);y+=4.5;}y+=3;
   };
@@ -84,13 +85,14 @@ async function buildPdf(r:ItSupportProposalPdfData):Promise<jsPDF> {
   if(S.showSla){title('SLA por prioridade');content.sla.forEach(s=>entry(`${s.priority} · ${s.response}`,s.description));}
   if(S.showIdealFor){title('Perfil ideal');content.idealFor.forEach(b=>entry(b.title,b.text));}
   if(S.showClients && r.featuredClients?.length){
+    ensure(Math.min(24+Math.ceil(r.featuredClients.length/4)*25,200));
     title('Clientes que confiam na Delta7');
     const clients=await Promise.all(r.featuredClients.map(async c=>({...c,image:c.logo_url?await imageData(c.logo_url):null})));
     for(let offset=0;offset<clients.length;offset+=4){ensure(28);const at=y;
       clients.slice(offset,offset+4).forEach((c,i)=>{const x=ML+i*44;
         if(c.image){try{const props=d.getImageProperties(c.image);const ratio=Math.min(38/props.width,12/props.height);const w=props.width*ratio,h=props.height*ratio;d.addImage(c.image,x+(40-w)/2,at,w,h);}catch{}}
         lines(c.name,40,8,true).slice(0,3).forEach((line,j)=>text(line,x+20,at+17+j*3.5,8,NAVY,true,'center'));
-      });y+=30;
+      });y+=25;
     }
   }
 
@@ -99,6 +101,8 @@ async function buildPdf(r:ItSupportProposalPdfData):Promise<jsPDF> {
   tableHeader();
   r.items.filter(i=>i.qty>0).forEach((item,index)=>{
     const wrapped=lines(item.description+(item.unit_label?` / ${item.unit_label}`:''),95,9);
+    const rowHeight=Math.max(10,wrapped.length*4.5+4);
+    if(rowHeight<=BOTTOM-TOP-9 && needsProposalPage(y,rowHeight)){newPage();tableHeader();}
     let offset=0;
     while(offset<wrapped.length){
       if(y+10>BOTTOM){newPage();tableHeader();}
@@ -119,7 +123,7 @@ async function buildPdf(r:ItSupportProposalPdfData):Promise<jsPDF> {
   newPage();title('Condições contratuais');paragraph(content.contractText);
   if(S.showSupportReqs){title('Condições e horários');content.requirements.forEach(value=>paragraph(`• ${value}`));}
   if(S.showQuote){ensure(Math.min(lines(content.quote.text).length*4.5+15,80));paragraph(content.quote.text,CW,ML,9,MUTED);paragraph(content.quote.author,CW,ML,8,NAVY,true);}
-  ensure(75);title('Aceite');paragraph(`Declaro estar de acordo com os termos, valores e condições apresentados nesta proposta de Suporte de TI, emitida em ${date(r.generatedAt)} com validade de ${r.validityDays} dias e vigência de ${r.contractMonths} meses.`);
+  ensure(120);title('Aceite');paragraph(`Declaro estar de acordo com os termos, valores e condições apresentados nesta proposta de Suporte de TI, emitida em ${date(r.generatedAt)} com validade de ${r.validityDays} dias e vigência de ${r.contractMonths} meses.`);
   ensure(45);y+=14;d.setDrawColor(...NAVY);d.line(ML,y,ML+70,y);d.line(ML+CW-70,y,ML+CW,y);
   lines(r.clientName,70,8,true).forEach((line,i)=>text(line,ML+35,y+6+i*4,8,NAVY,true,'center'));
   text('DELTA7 TECNOLOGIA',ML+CW-35,y+6,8,NAVY,true,'center');text(r.salesRepName,ML+CW-35,y+11,8,MUTED,false,'center');y+=29;
