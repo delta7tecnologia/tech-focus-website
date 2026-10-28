@@ -25,3 +25,7 @@
 - [ ] Adicionar seletor de RAM, quantidades, baias e preço automático/manual
 - [ ] Exibir a configuração consolidada no PDF
 - [ ] Validar catálogo, proposta e PDF em desktop e celular
+
+## Quebras da proposta de suporte de TI
+- [ ] Corrigir cortes de conteúdo nos dois modelos e unificar prévia e download
+- [ ] Validar PDFs curtos e extensos e testar quebras entre linhas
