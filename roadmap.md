@@ -25,3 +25,9 @@
 - [ ] Adicionar seletor de RAM, quantidades, baias e preço automático/manual
 - [ ] Exibir a configuração consolidada no PDF
 - [ ] Validar catálogo, proposta e PDF em desktop e celular
+
+## Quebras da proposta de suporte de TI
+- [x] Corrigir cortes de conteúdo nos dois modelos e unificar prévia e download
+- [x] Validar PDFs curtos e extensos e testar quebras entre linhas
+- [x] Conferir o PDF SUP-2026-0007 enviado como referência
+- [x] Aplicar o padrão de geração da proposta de locação de servidores ao suporte de TI

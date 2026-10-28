@@ -396,14 +396,15 @@ const ItSupportProposalForm: React.FC<Props> = ({ proposal, onClose }) => {
         <DialogContent className="max-w-5xl w-[95vw] h-[90vh] flex flex-col p-0">
           <DialogHeader className="px-6 py-3 border-b flex-row items-center justify-between gap-4 space-y-0">
             <DialogTitle className="text-blue-900">
-              Prévia · {previewTemplate === 'modelo02' ? 'Modelo 02 (Editorial)' : 'Modelo 01 (Premium)'} {previewPages ? `· ${previewPages.length} página(s)` : ''}
+              Prévia da proposta · Suporte de TI
             </DialogTitle>
-            <span className="text-xs text-gray-500 mr-8">Visualização aproximada — finalize para baixar o PDF</span>
           </DialogHeader>
           <div className="flex-1 overflow-auto bg-gray-200 p-4">
             <div className="mx-auto max-w-3xl space-y-4">
               {previewPages?.map((src, i) => (
-                <img key={i} src={src} alt={`Página ${i + 1}`} className="w-full block bg-white shadow-lg rounded" />
+                <object key={i} data={src} type="application/pdf" aria-label="Prévia da proposta de suporte de TI" className="w-full h-[72vh]">
+                  <a href={src} download="Proposta_Suporte.pdf">Baixar proposta em PDF</a>
+                </object>
               ))}
             </div>
           </div>
