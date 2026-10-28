@@ -1,4 +1,4 @@
 Proposal document copy is stored as a complete JSON snapshot per proposal, preserving historical output when defaults change.
 Server rental catalog is normalized, while each proposal stores full item, calculation, plan, clause, and document snapshots to preserve history.
 Server rental compatibility and automatic pricing rules live in `serverRental.ts` so catalog, proposal editor, totals, and PDF stay consistent.
-IT support proposal previews and downloads share DOM-aware canvas pagination so page cuts preserve rows, images and text lines in both templates.
+IT support proposals use native jsPDF A4 generation following server rental presentation; previews embed the same PDF, and long text and table rows paginate before drawing to avoid clipping.
